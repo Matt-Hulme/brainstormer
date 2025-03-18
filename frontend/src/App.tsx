@@ -1,32 +1,29 @@
-import { Button } from '@mui/base/Button'
 import { Input } from '@mui/base/Input'
+import { Button } from '@mui/base/Button'
 
 function App() {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Handle search
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md space-y-4">
-        <h1 className="text-2xl font-bold mb-4">MUI Base Test</h1>
-        <Input
-          slotProps={{
-            input: {
-              className:
-                'w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-            },
-          }}
-          placeholder="Test input..."
-        />
-        <Button
-          slotProps={{
-            root: {
-              className:
-                'w-full h-25 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 border border-blue-700 transition-colors',
-            },
-          }}
-        >
-          Test Button
-        </Button>
-      </div>
-    </div>
+    <main className="min-h-screen bg-background flex flex-col items-center justify-center">
+      <form onSubmit={handleSubmit} className="w-full max-w-xl px-4">
+        <div className="relative">
+          <Input
+            className="w-full rounded-full bg-[#1a1a1a] text-white pl-4 pr-24 py-3 border border-gray-700 focus:outline-none focus:border-yellow-500"
+            placeholder="Type your project theme (i.e. “storms”)"
+          />
+          <Button
+            type="submit"
+            className="absolute right-0 h-full top-1/2 -translate-y-1/2 px-4 py-1.5 bg-yellow-500 text-black rounded-full hover:bg-yellow-400 text-sm font-medium w-30"
+          >
+            Generate
+          </Button>
+        </div>
+      </form>
+    </main>
   )
 }
 
