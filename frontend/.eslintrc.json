@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "rules": {
+    "tailwindcss.validate": true
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
