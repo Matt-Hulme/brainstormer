@@ -13,7 +13,7 @@ export default {
     extend: {
       spacing: {
         ...Object.fromEntries(
-          Array.from({ length: 100 }, (_, i) => [i, `${i * 4}px`])
+          Array.from({ length: 200 }, (_, i) => [i / 2, `${i * 2}px`])
         ),
       },
       colors: {
