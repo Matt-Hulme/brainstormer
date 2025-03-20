@@ -1,5 +1,5 @@
 import { Root, Trigger } from '@radix-ui/react-dialog'
-import { Button, Text } from '@radix-ui/themes'
+import { Button } from '@radix-ui/themes'
 import { useNavigate } from 'react-router-dom'
 
 export const Search = () => {
@@ -18,7 +18,7 @@ export const Search = () => {
         <input
           aria-label="Enter project theme to start brainstorming"
           name="searchTerm"
-          className="w-full rounded-full bg-background px-7.5 py-3 border border-secondary-3 focus:outline-none focus:border-primary-1 text-primary-1"
+          className="w-full rounded-full bg-background px-7.5 py-3 border border-secondary-3 focus:outline-none focus:border-primary-1 text-primary-1 typography-body-large placeholder:typography-body-large"
           placeholder='Type your project theme (i.e. "storms")'
         />
         <Root>
@@ -28,9 +28,7 @@ export const Search = () => {
               aria-label="Generate ideas"
               className="absolute right-0 h-full top-1/2 -translate-y-1/2 px-4 py-1.5 bg-primary-1 text-black rounded-full hover:bg-primary-2 w-30"
             >
-              <Text size="2" weight="medium">
-                Generate
-              </Text>
+              <span className="typography-body-small">GENERATE</span>
             </Button>
           </Trigger>
         </Root>
