@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Search } from './pages/Search/Search'
-import { SearchResults } from './pages/Search/SearchResults/SearchResults'
+import { SearchResults } from './pages/SearchResults/SearchResults'
 
 function App() {
   return (

@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .typography-body-large {
+    @apply font-chivo text-lg;
+  }
+
+  .typography-body-small {
+    @apply font-chivo text-sm font-medium;
+  }
+}
+
