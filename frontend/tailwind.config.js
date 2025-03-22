@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -37,49 +36,43 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
-      fontSize: {
-        'header-1': [
-          '40px',
-          {
-            lineHeight: '50px',
-            fontWeight: '400',
-            fontFamily: '"Londrina Solid", sans-serif',
-          },
-        ],
-        'header-2': [
-          '30px',
-          {
-            lineHeight: '40px',
-            fontWeight: '400',
-            fontFamily: '"Londrina Solid", sans-serif',
-          },
-        ],
-        'body-large': [
-          '20px',
-          {
-            lineHeight: '30px',
-            fontWeight: '400',
-            fontFamily: 'Chivo, sans-serif',
-          },
-        ],
-        'body-medium': [
-          '15px',
-          {
-            lineHeight: '35px',
-            fontWeight: '600',
-            fontFamily: 'Chivo, sans-serif',
-          },
-        ],
-        'body-small': [
-          '15px',
-          {
-            lineHeight: '25px',
-            fontWeight: '500',
-            fontFamily: 'Chivo, sans-serif',
-          },
-        ],
-      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.text-header-1': {
+          fontSize: '40px',
+          lineHeight: '50px',
+          fontWeight: '400',
+          fontFamily: '"Londrina Solid", sans-serif',
+        },
+        '.text-header-2': {
+          fontSize: '30px',
+          lineHeight: '40px',
+          fontWeight: '400',
+          fontFamily: '"Londrina Solid", sans-serif',
+        },
+        '.text-body-large': {
+          fontSize: '20px',
+          lineHeight: '30px',
+          fontWeight: '400',
+          fontFamily: 'Chivo, sans-serif',
+        },
+        '.text-body-medium': {
+          fontSize: '15px',
+          lineHeight: '35px',
+          fontWeight: '600',
+          fontFamily: 'Chivo, sans-serif',
+        },
+        '.text-body-small': {
+          fontSize: '15px',
+          lineHeight: '25px',
+          fontWeight: '500',
+          fontFamily: 'Chivo, sans-serif',
+        },
+      })
+    },
+  ],
 }
+
