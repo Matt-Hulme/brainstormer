@@ -1,3 +1,9 @@
+import { SearchResultTerm } from './SearchResult/SearchResultTerm'
+
 export const SearchResults = () => {
-  return <div>SearchResults</div>
+  return (
+    <main className="flex flex-col h-screen items-center justify-center">
+      <SearchResultTerm />
+    </main>
+  )
 }
