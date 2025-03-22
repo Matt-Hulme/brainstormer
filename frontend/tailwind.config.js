@@ -21,19 +21,63 @@ export default {
         ),
       },
       colors: {
-        'primary-1': '#FFE81A',
-        'primary-2': '#FFF066',
-        'secondary-1': '#666666',
+        'primary-1': '#FFFF70',
+        'primary-2': '#FFF59A',
+        'secondary-1': '#9C9CA5',
         'secondary-2': '#4D4D4D',
         'secondary-3': '#333333',
-        'secondary-4': '#1A1A1A',
-        'secondary-5': '#0D0D0D',
-        background: '#121212',
+        'secondary-4': '#404043',
+        'secondary-5': '#1D1D21',
+        'secondary-6': '#313133',
+        'secondary-7': '#9898A3',
+        background: '#222223',
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      fontSize: {
+        'header-1': [
+          '40px',
+          {
+            lineHeight: '50px',
+            fontWeight: '400',
+            fontFamily: '"Londrina Solid", sans-serif',
+          },
+        ],
+        'header-2': [
+          '30px',
+          {
+            lineHeight: '40px',
+            fontWeight: '400',
+            fontFamily: '"Londrina Solid", sans-serif',
+          },
+        ],
+        'body-large': [
+          '20px',
+          {
+            lineHeight: '30px',
+            fontWeight: '400',
+            fontFamily: 'Chivo, sans-serif',
+          },
+        ],
+        'body-medium': [
+          '15px',
+          {
+            lineHeight: '35px',
+            fontWeight: '600',
+            fontFamily: 'Chivo, sans-serif',
+          },
+        ],
+        'body-small': [
+          '15px',
+          {
+            lineHeight: '25px',
+            fontWeight: '500',
+            fontFamily: 'Chivo, sans-serif',
+          },
+        ],
       },
     },
   },

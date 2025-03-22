@@ -1,5 +1,4 @@
-import { Root, Trigger } from '@radix-ui/react-dialog'
-import { Button } from '@radix-ui/themes'
+import { Button, TextField } from '@radix-ui/themes'
 import { useNavigate } from 'react-router-dom'
 
 export const Search = () => {
@@ -13,26 +12,28 @@ export const Search = () => {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-[800px] relative">
-        <input
-          aria-label="Enter project theme to start brainstorming"
+    <main className="flex flex-col h-screen items-center justify-center">
+      <form onSubmit={handleSubmit} className="max-w-[794px] relative w-full">
+        <TextField.Root
           name="searchTerm"
-          className="w-full rounded-full bg-background px-7.5 py-3 border border-secondary-3 focus:outline-none focus:border-primary-1 text-primary-1 typography-body-large placeholder:typography-body-large"
-          placeholder='Type your project theme (i.e. "storms")'
-        />
-        <Root>
-          <Trigger asChild>
+          placeholder='Type your project theme (i.e."storms")'
+          className="h-[62px] bg-secondary-6/80 backdrop-blur-[30px]
+          rounded-full text-primary-1 caret-white text-body-large flex-grow
+          focus:outline-none [&_input]:bg-transparent [&_input]:placeholder:text-secondary-7 [&_input]:outline-none [&_input]:flex-grow flex flex-row items-center [&_input]:pl-7.5 [&_input]:py-4"
+        >
+          <TextField.Slot className="h-full py-1 pr-1.5">
             <Button
+              disabled={true}
               type="submit"
               aria-label="Generate ideas"
-              className="absolute right-0 h-full top-1/2 -translate-y-1/2 px-4 py-1.5 bg-primary-1 text-black rounded-full hover:bg-primary-2 w-30"
+              className="bg-primary-1 h-full rounded-full hover:bg-opacity-60 px-6"
             >
-              <span className="typography-body-small">GENERATE</span>
+              <span className="text-body-medium text-background">GENERATE</span>
             </Button>
-          </Trigger>
-        </Root>
+          </TextField.Slot>
+        </TextField.Root>
       </form>
     </main>
   )
 }
+

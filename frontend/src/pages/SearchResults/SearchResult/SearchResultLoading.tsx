@@ -7,7 +7,7 @@ export const SearchResultLoading = () => {
 
   return (
     <div
-      className="h-8 bg-secondary-3 rounded-full animate-pulse"
+      className="animate-pulse bg-secondary-3 h-8 rounded-full"
       style={{ width: `${randomWidth}px` }}
     />
   )

@@ -5,7 +5,7 @@ import { SearchResults } from './pages/SearchResults/SearchResults'
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-background">
+      <div className="h-screen bg-background">
         <Routes>
           <Route path="/" element={<Search />} />
           <Route path="/search" element={<SearchResults />} />
