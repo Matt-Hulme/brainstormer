@@ -14,6 +14,13 @@ export default {
         londrina: ['"Londrina Solid"', 'sans-serif'],
         chivo: ['Chivo', 'sans-serif'],
       },
+      fontSize: {
+        'heading-1': ['40px', { lineHeight: '50px', fontWeight: '400' }],
+        'heading-2': ['30px', { lineHeight: '40px', fontWeight: '400' }],
+        'body-large': ['20px', { lineHeight: '30px', fontWeight: '400' }],
+        'body-medium': ['15px', { lineHeight: '35px', fontWeight: '600' }],
+        'body-small': ['15px', { lineHeight: '25px', fontWeight: '500' }],
+      },
       spacing: {
         ...Object.fromEntries(
           Array.from({ length: 200 }, (_, i) => [i / 2, `${i * 2}px`])
@@ -38,41 +45,6 @@ export default {
       },
     },
   },
-  plugins: [
-    function ({ addComponents }) {
-      addComponents({
-        '.text-header-1': {
-          fontSize: '40px',
-          lineHeight: '50px',
-          fontWeight: '400',
-          fontFamily: '"Londrina Solid", sans-serif',
-        },
-        '.text-header-2': {
-          fontSize: '30px',
-          lineHeight: '40px',
-          fontWeight: '400',
-          fontFamily: '"Londrina Solid", sans-serif',
-        },
-        '.text-body-large': {
-          fontSize: '20px',
-          lineHeight: '30px',
-          fontWeight: '400',
-          fontFamily: 'Chivo, sans-serif',
-        },
-        '.text-body-medium': {
-          fontSize: '15px',
-          lineHeight: '35px',
-          fontWeight: '600',
-          fontFamily: 'Chivo, sans-serif',
-        },
-        '.text-body-small': {
-          fontSize: '15px',
-          lineHeight: '25px',
-          fontWeight: '500',
-          fontFamily: 'Chivo, sans-serif',
-        },
-      })
-    },
-  ],
+  plugins: [],
 }
 

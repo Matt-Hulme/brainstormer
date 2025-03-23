@@ -26,7 +26,7 @@ export const Search = () => {
           name="searchTerm"
           placeholder='Type your project theme (i.e."storms")'
           className="h-[62px] bg-secondary-6/80 backdrop-blur-[30px]
-          rounded-full text-primary-1 caret-white text-body-large flex-grow
+          rounded-full text-primary-1 font-chivo text-body-large flex-grow
           focus:outline-none [&_input]:bg-transparent [&_input]:placeholder:text-secondary-7 [&_input]:outline-none [&_input]:flex-grow flex flex-row items-center [&_input]:pl-7.5 [&_input]:py-4"
           onChange={handleInputChange}
         >
