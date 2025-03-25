@@ -7,8 +7,8 @@ import { SearchResultsContent } from './SearchResultsContent'
 export const SearchResults = () => {
   const [searchParams] = useSearchParams()
   const searchTerm = searchParams.get('term') ?? ''
-  // const isLoading = false
-  const isLoading = true
+  const isLoading = false
+  // const isLoading = true
   const navigate = useNavigate()
 
   const handleBackClick = () => {
@@ -29,7 +29,7 @@ export const SearchResults = () => {
           </Button>
         </div>
         <SearchResultsTerm searchTerm={searchTerm} />
-        <SearchResultsContent isLoading={isLoading} searchTerm={searchTerm} />
+        <SearchResultsContent isLoading={isLoading} />
       </div>
     </main>
   )

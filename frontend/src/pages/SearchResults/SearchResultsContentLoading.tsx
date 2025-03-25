@@ -31,7 +31,7 @@ export const SearchResultsLoading = () => {
   }, [])
 
   return (
-    <main className="flex flex-col items-center h-screen bg-dark-1 pb-6 px-4 overflow-hidden">
+    <main className="flex flex-col items-center pb-6 px-4 overflow-hidden">
       <div ref={containerRef} className="w-full flex-1 overflow-hidden">
         <div className="flex flex-wrap gap-5 justify-center">
           {Array.from({ length: rowCount * itemsPerRow }, (_, i) => (
