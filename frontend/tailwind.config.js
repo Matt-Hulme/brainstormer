@@ -31,7 +31,7 @@ export default {
         'primary-2': '#FFF59A',
         'secondary-1': '#9C9CA5',
         'secondary-2': '#4D4D4D',
-        'secondary-3': '#333333',
+        'secondary-3': '#56565B',
         'secondary-4': '#404043',
         'secondary-5': '#1D1D21',
         'secondary-6': '#313133',
@@ -47,4 +47,3 @@ export default {
   },
   plugins: [],
 }
-
