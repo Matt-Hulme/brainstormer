@@ -7,8 +7,6 @@ import { SearchResultsContent } from './SearchResultsContent'
 export const SearchResults = () => {
   const [searchParams] = useSearchParams()
   const searchTerm = searchParams.get('term') ?? ''
-  const isLoading = false
-  // const isLoading = true
   const navigate = useNavigate()
 
   const handleBackClick = () => {
@@ -25,11 +23,11 @@ export const SearchResults = () => {
             className="flex items-center gap-2 text-secondary-7 hover:text-primary-1"
           >
             <ArrowLeftIcon width={20} height={20} />
-            <span>New Search</span>
+            <span>Back</span>
           </Button>
         </div>
         <SearchResultsTerm searchTerm={searchTerm} />
-        <SearchResultsContent isLoading={isLoading} />
+        <SearchResultsContent searchTerm={searchTerm} />
       </div>
     </main>
   )
