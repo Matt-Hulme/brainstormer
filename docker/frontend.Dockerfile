@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine as build
+FROM node:18-alpine as build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY frontend/ .
@@ -23,6 +23,9 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Create .htpasswd file
+COPY docker/.htpasswd /etc/nginx/.htpasswd
 
 # Expose port 80
 EXPOSE 80
