@@ -7,6 +7,11 @@ services:
       dockerfile: docker/frontend.Dockerfile
     container_name: brainstormer-frontend
     restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /etc/letsencrypt:/etc/nginx/ssl:ro
     networks:
       - app-network
 
@@ -17,24 +22,20 @@ services:
     container_name: brainstormer-backend
     restart: unless-stopped
     environment:
+      # OpenAI
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+      # Server
+      - PORT=${PORT}
+      - HOST=${HOST}
+
+      # Authentication
       - JWT_SECRET=${JWT_SECRET}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    networks:
-      - app-network
 
-  nginx:
-    image: nginx:alpine
-    container_name: brainstormer-nginx
-    restart: unless-stopped
-    ports:
-      - '80:80'
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - frontend
-      - backend
+      # Development
+      - DEBUG=${DEBUG}
     networks:
       - app-network
 
