@@ -1,6 +1,7 @@
 import { SearchResultsLoading } from './SearchResultsContentLoading'
 import { SearchResult } from './SearchResult/SearchResult'
 import { useState, useEffect } from 'react'
+import { generateIdeas } from '../../utils/api'
 
 interface SearchResultsContentProps {
   searchTerm: string
@@ -18,33 +19,14 @@ export const SearchResultsContent = ({
   useEffect(() => {
     const abortController = new AbortController()
 
-    const generateResults = async () => {
+    const fetchResults = async () => {
       if (!searchTerm) return
 
       setIsLoading(true)
       setError(null)
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: searchTerm,
-            temperature: 0.7,
-          }),
-          signal: abortController.signal,
-        })
+        const data = await generateIdeas(searchTerm, 0.7)
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(
-            errorData.detail ||
-              `Server error: ${response.status} ${response.statusText}`
-          )
-        }
-
-        const data = await response.json()
         // Expecting an array of generated texts from the backend
         const formattedResults = data.results.map(
           (text: string, index: number) => ({
@@ -68,7 +50,11 @@ export const SearchResultsContent = ({
       }
     }
 
-    generateResults()
+    fetchResults()
+
+    return () => {
+      abortController.abort()
+    }
   }, [searchTerm])
 
   const handleResultClick = async (id: number) => {
@@ -106,4 +92,3 @@ export const SearchResultsContent = ({
     </main>
   )
 }
-

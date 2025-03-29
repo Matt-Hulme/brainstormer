@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { login } from '../../utils/api'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -12,23 +13,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          username,
-          password,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Invalid credentials')
-      }
-
-      const data = await response.json()
-      localStorage.setItem('token', data.access_token)
+      await login(username, password)
       navigate('/') // Redirect to home page after successful login
     } catch (err) {
       console.error(err)
