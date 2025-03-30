@@ -3,8 +3,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: .
-      dockerfile: docker/frontend.Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: brainstormer-frontend
     restart: unless-stopped
     ports:
@@ -17,25 +17,12 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: docker/backend.Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: brainstormer-backend
     restart: unless-stopped
-    environment:
-      # OpenAI
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-
-      # Server
-      - PORT=${PORT}
-      - HOST=${HOST}
-
-      # Authentication
-      - JWT_SECRET=${JWT_SECRET}
-      - ADMIN_USERNAME=${ADMIN_USERNAME}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-
-      # Development
-      - DEBUG=${DEBUG}
+    env_file:
+      - .env
     networks:
       - app-network
 
