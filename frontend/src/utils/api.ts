@@ -23,10 +23,11 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     // If unauthorized, redirect to login
-    if (response.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-      throw new Error('Authentication required')
+    if (response.status === 401 || response.status === 403) {
+      // Authentication error, redirect to login
+      // window.location.href = '/login' // Removed redirect
+      console.error('Authentication error from API:', response.status)
+      throw new Error('Authentication Required') // Throw an error to be caught by the caller
     }
 
     const errorData = await response.json().catch(() => ({}))
@@ -93,7 +94,7 @@ export function isLoggedIn(): boolean {
  */
 export function logout(): void {
   localStorage.removeItem('token')
-  window.location.href = '/login'
+  // window.location.href = '/login' // Removed redirect
 }
 
 export default {

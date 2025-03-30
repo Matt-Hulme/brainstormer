@@ -100,10 +100,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 API_URL = "https://api.openai.com/v1/chat/completions"
 
-@app.post("/api/generate")
+@app.post("/generate")
 async def generate_words(
-    request: GenerateRequest,
-    current_user: TokenData = Depends(get_current_user)
+    request: GenerateRequest
 ):
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
