@@ -100,7 +100,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 API_URL = "https://api.openai.com/v1/chat/completions"
 
-@app.post("/generate")
+@app.post("/api/generate")
 async def generate_words(
     request: GenerateRequest
 ):
