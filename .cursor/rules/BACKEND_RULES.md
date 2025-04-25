@@ -1,6 +1,6 @@
 # Backend Rules
 
-These rules apply specifically to the Python/FastAPI backend!
+These rules apply specifically to the Python/FastAPI backend
 
 ## Project Structure
 
