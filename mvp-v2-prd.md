@@ -191,4 +191,3 @@ We will log these clicks for analysis.
 - [ ] Users can create, rename, and delete Collections.
 - [ ] Inside Collections, users can delete individual Saved Words.
 - [ ] Project Page shows all Collections grouped.
-
