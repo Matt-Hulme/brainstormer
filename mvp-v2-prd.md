@@ -27,8 +27,8 @@ It helps users generate and organize keyword ideas.
   - Built-in accessibility and theming
   - Modern, responsive design system
 - **State Management**:
-  - React Context (for auth state and app-wide settings)
   - Local component state with useState/useEffect
+  - Co-located hooks with their relevant components/features
 - **API Client**: Axios for HTTP requests
   - Simple data fetching
   - Error handling
@@ -196,13 +196,16 @@ We will log these clicks for analysis.
 
 ### Phase 1: Frontend Setup and Configuration
 
-1. **Project Initialization**
+1. **Project Initialization** ✅
 
    - Set up a new React project with Vite
    - Configure TypeScript
    - Set up ESLint and Prettier
+   - Create basic project structure (components/, pages/, utils/)
+   - Clean up boilerplate code
+   - Configure code style (no semicolons)
 
-2. **UI Framework Setup**
+2. **UI Framework Setup** 🔄 (Current)
 
    - Install and configure Tailwind CSS
    - Set up shadcn/ui components
@@ -210,7 +213,10 @@ We will log these clicks for analysis.
    - Create a design system with reusable components
 
 3. **Project Structure**
-   - Set up folder structure (components, pages, hooks, context, utils)
+   - Set up folder structure:
+     - components/ (reusable UI components)
+     - pages/ (main page components with co-located hooks)
+     - utils/ (helper functions and utilities)
    - Configure routing with React Router
    - Set up API client with Axios
 
