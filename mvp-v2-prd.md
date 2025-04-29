@@ -191,3 +191,105 @@ We will log these clicks for analysis.
 - [ ] Users can create, rename, and delete Collections.
 - [ ] Inside Collections, users can delete individual Saved Words.
 - [ ] Project Page shows all Collections grouped.
+
+## Development Roadmap
+
+### Phase 1: Frontend Setup and Configuration
+
+1. **Project Initialization**
+
+   - Set up a new React project with Vite
+   - Configure TypeScript
+   - Set up ESLint and Prettier
+
+2. **UI Framework Setup**
+
+   - Install and configure Tailwind CSS
+   - Set up shadcn/ui components
+   - Configure theme (colors, fonts, spacing)
+   - Create a design system with reusable components
+
+3. **Project Structure**
+   - Set up folder structure (components, pages, hooks, context, utils)
+   - Configure routing with React Router
+   - Set up API client with Axios
+
+### Phase 2: Frontend Development - Page by Page
+
+1. **Logged Out Home Page**
+
+   - Create layout components
+   - Implement hero section with tagline
+   - Add "Give it a Try" CTA button
+
+2. **Authentication Pages**
+
+   - Create Login page
+   - Create Sign Up page
+   - Implement form validation
+   - Set up authentication context
+
+3. **Logged In Home Page (Empty State)**
+
+   - Create empty state UI
+   - Implement "Create New Project" button
+
+4. **Logged In Home Page (Filled State)**
+
+   - Create project list component
+   - Implement project card component
+   - Add project navigation
+
+5. **Search Results Page**
+
+   - Create search bar component
+   - Implement loading state
+   - Create keyword suggestion list
+   - Add multi-select functionality
+   - Create right sidebar for collections
+   - Implement save to collection functionality
+
+6. **Project Page (Collections Overview)**
+   - Create collection list view
+   - Implement saved words display
+   - Add collection management UI
+
+### Phase 3: Backend Development
+
+1. **Backend Setup**
+
+   - Set up FastAPI project structure
+   - Configure Supabase connection
+   - Set up authentication middleware
+
+2. **Database Schema**
+
+   - Design and implement database tables
+   - Set up Row Level Security policies
+
+3. **API Endpoints**
+
+   - Implement authentication endpoints
+   - Create project management endpoints
+   - Implement collection management endpoints
+   - Create saved words management endpoints
+   - Implement search and keyword suggestion endpoints
+
+4. **Integration**
+   - Connect frontend to backend API
+   - Implement error handling
+   - Add loading states
+
+### Phase 4: Testing and Deployment
+
+1. **Testing**
+
+   - Test user flows
+   - Fix bugs and issues
+   - Implement error handling
+
+2. **Deployment**
+   - Manual deployment to production environment
+   - Basic monitoring setup
+   - Documentation for future maintenance
+
