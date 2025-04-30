@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #f4f5f6;
+  }
+
+  body {
+    @apply bg-background text-secondary-4 font-sans text-p2;
+  }
+}
+
+@layer utilities {
+  .h1 {
+    @apply text-h1;
+  }
+
+  .h2 {
+    @apply text-h2;
+  }
+
+  .h3 {
+    @apply text-h3;
+  }
+
+  .h4 {
+    @apply text-h4;
+  }
+
+  .h5 {
+    @apply text-h5;
+  }
+
+  .p1 {
+    @apply text-p1;
+  }
+
+  .p2 {
+    @apply text-p2;
+  }
+
+  .p3 {
+    @apply text-p3;
+  }
+
+  .p3-caps {
+    @apply text-p3-caps;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
