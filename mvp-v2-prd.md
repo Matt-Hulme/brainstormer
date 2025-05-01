@@ -217,20 +217,27 @@ We will log these clicks for analysis.
        - Secondary colors (grayscale)
        - Background color
    - Set up shadcn/ui components 🔄
-     - Initialize shadcn/ui
-     - Configure base theme
+     - Initialize shadcn/ui ✅
+     - Configure base theme ✅
+       - Style: New York
+       - Base color: Neutral
+       - CSS variables configured ✅
      - Install essential components:
        - Button (CTAs)
        - Input (search)
        - Card (collections)
        - Dialog (confirmations)
+       - Toast (notifications)
+       - Loading/Shimmer (loading states)
+       - Checkbox (multi-select)
    - ~~Create a design system with reusable components~~ (Deferred - will create components as needed)
 
-3. **Project Structure**
+3. **Project Structure**a
    - Set up folder structure:
-     - components/ (reusable UI components)
+     - components/ (reusable UI components) ✅
      - pages/ (main page components with co-located hooks)
-     - utils/ (helper functions and utilities)
+     - utils/ (helper functions and utilities) ✅
+   - Configure path aliases (@/\*) ✅
    - Configure routing with React Router
    - Set up API client with Axios
 
