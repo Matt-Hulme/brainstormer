@@ -205,7 +205,7 @@ We will log these clicks for analysis.
    - Clean up boilerplate code ✅
    - Configure code style (no semicolons) ✅
 
-2. **UI Framework Setup** 🔄 (Current)
+2. **UI Framework Setup** ✅
 
    - Install and configure Tailwind CSS ✅
      - Base configuration ✅
@@ -216,23 +216,17 @@ We will log these clicks for analysis.
        - Primary colors (yellows)
        - Secondary colors (grayscale)
        - Background color
-   - Set up shadcn/ui components 🔄
+   - Set up shadcn/ui components ✅
      - Initialize shadcn/ui ✅
      - Configure base theme ✅
        - Style: New York
        - Base color: Neutral
        - CSS variables configured ✅
-     - Install essential components:
-       - Button (CTAs)
-       - Input (search)
-       - Card (collections)
-       - Dialog (confirmations)
-       - Toast (notifications)
-       - Loading/Shimmer (loading states)
-       - Checkbox (multi-select)
-   - ~~Create a design system with reusable components~~ (Deferred - will create components as needed)
+     - Install components as needed during development ✅
+       - Components will be added when required for specific features
+       - Common needs will include: buttons, inputs, cards, dialogs, toasts, loading states, and checkboxes
 
-3. **Project Structure**a
+3. **Project Structure**
    - Set up folder structure:
      - components/ (reusable UI components) ✅
      - pages/ (main page components with co-located hooks)
@@ -243,31 +237,37 @@ We will log these clicks for analysis.
 
 ### Phase 2: Frontend Development - Page by Page
 
-1. **Logged Out Home Page**
+1. **General Component Strategy**
+
+   - Create page-specific components as needed
+   - Install required shadcn/ui components for each page/feature
+   - Keep components focused on current needs without over-engineering
+
+2. **Logged Out Home Page**
 
    - Create layout components
    - Implement hero section with tagline
    - Add "Give it a Try" CTA button
 
-2. **Authentication Pages**
+3. **Authentication Pages**
 
    - Create Login page
    - Create Sign Up page
    - Implement form validation
    - Set up authentication context
 
-3. **Logged In Home Page (Empty State)**
+4. **Logged In Home Page (Empty State)**
 
    - Create empty state UI
    - Implement "Create New Project" button
 
-4. **Logged In Home Page (Filled State)**
+5. **Logged In Home Page (Filled State)**
 
    - Create project list component
    - Implement project card component
    - Add project navigation
 
-5. **Search Results Page**
+6. **Search Results Page**
 
    - Create search bar component
    - Implement loading state
@@ -276,7 +276,7 @@ We will log these clicks for analysis.
    - Create right sidebar for collections
    - Implement save to collection functionality
 
-6. **Project Page (Collections Overview)**
+7. **Project Page (Collections Overview)**
    - Create collection list view
    - Implement saved words display
    - Add collection management UI
