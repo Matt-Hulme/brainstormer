@@ -33,56 +33,64 @@ It helps users generate and organize keyword ideas.
   - Simple data fetching
   - Error handling
   - Request/response interceptors for auth
+- **Authentication**: Supabase
+  - Anonymous authentication for tracking individual users
+  - No explicit signup/login required from users
+  - Option to upgrade to full accounts in the future
 
 ### Backend
 
 - **Framework**: Python (FastAPI)
 - **Database & Auth**: Supabase
   - PostgreSQL database
-  - Built-in authentication
-  - Row Level Security (RLS)
+  - Anonymous authentication
+  - Row Level Security (RLS) for data access
   - Analytics for painted door features
 - **API**: REST endpoints
 - **Containerization**: Docker
 
+### Routing Structure
+
+```
+/                     # Home page (starting point for all users)
+/projects             # Projects list (automatically authenticates anonymously)
+/projects/new         # Create new project
+/projects/:projectId  # Project page (collections overview)
+/projects/:projectId/search  # Search results within project
+/projects/:projectId/search?searchId=123  # Specific search session
+```
+
 ### Security Considerations
 
-- Authentication required for all operations
+- Anonymous authentication for tracking individual users
 - Row Level Security (RLS) policies for data access
 - Basic rate limiting
 - Environment variable management
 
 ## User Roles
 
-- **Anonymous User**: Can browse Logged Out Home, Login/Sign Up.
-- **Authenticated User**: Full access to Projects, Collections, Search, and Saved Words.
+- **Anonymous User**: Full access to Projects, Collections, Search, and Saved Words with a unique anonymous ID.
 
 ## Pages / Flows
 
-### 1. Logged Out Home
+### 1. Home Page
 
 - Intro to Brainstormer
 - Tagline and short description
-- CTA: **"Give it a Try"** → routes to **Log In / Sign Up**
+- CTA: **"Give it a Try"** → routes to **Projects** (with automatic anonymous auth)
 
-### 2. Log In / Sign Up
-
-- Minimal login/signup form
-- Email/password auth (or OAuth if available)
-- Links to switch between Log In and Sign Up
-
-### 3. Logged In Home (Empty State)
+### 2. Projects Page (Empty State)
 
 - Message: **"Looks like you don't have any projects yet!"**
 - CTA Button: **"Create New Project"**
 
-### 4. Logged In Home (Filled State)
+### 3. Projects Page (Filled State)
 
 - Displays a list of existing Projects.
 - Projects show Title.
-- Clicking a Project opens Search Results view inside that Project.
+- Clicking a Project opens Project Page (Collections Overview).
 
-### 5. Search Results (inside a Project)
+### 4. Search Results (inside a Project)
 
 - **Top Search Bar**: Type a keyword to brainstorm ideas.
 - **Searching State**: Loading animation.
@@ -103,7 +111,7 @@ It helps users generate and organize keyword ideas.
     - Delete Saved Words.
     - (Post-MVP) Edit or manually add Saved Words.
 
-### 6. Project Page (Collections Overview)
+### 5. Project Page (Collections Overview)
 
 - Full-page view of all Collections grouped inside a Project.
 - Shows:
@@ -117,7 +125,8 @@ It helps users generate and organize keyword ideas.
 
 ### Authentication
 
-- Sign up, Log in, Log out
+- Anonymous authentication (automatic)
+- Future upgrade path to full accounts (post-MVP)
 
 ### Project Management
 
@@ -140,6 +149,7 @@ It helps users generate and organize keyword ideas.
 - Enter a search term
 - Fetch LLM-generated suggestions
 - Select and Save suggested Keywords
+- Search sessions tracked with searchId parameter
 
 ### UI States
 
@@ -161,6 +171,7 @@ We will log these clicks for analysis.
 
 - "Manually Add a Saved Word" button
 - "Share Project" or "Export" button
+- "Create an account to save your work" button
 
 > **Note**: Keep Painted Door actions visually subtle but discoverable.
 
@@ -174,18 +185,20 @@ We will log these clicks for analysis.
 
 ## Out of Scope (Post-MVP ideas)
 
+- Full user accounts (email/password signup)
 - Manually editing or adding Saved Words (after search)
 - Sharing/exporting Projects
 - Project descriptions, tags, or metadata
 
 ## Acceptance Criteria (Cursor-ready checklist)
 
-- [ ] Users can Sign Up, Log In, Log Out.
-- [ ] Logged Out Home and Log In/Sign Up pages are functional.
-- [ ] Authenticated users see an empty state if no Projects exist.
+- [ ] Anonymous authentication works automatically.
+- [ ] Home page and Projects page are functional.
+- [ ] Anonymous users see an empty state if no Projects exist.
 - [ ] Users can create and view Projects.
 - [ ] Inside Projects, users can Search for new Keywords.
 - [ ] Searching triggers loading state and populates suggestions.
+- [ ] Search sessions can be tracked with searchId parameter.
 - [ ] Users can select one or multiple Keywords and Save to a Collection.
 - [ ] Right sidebar shows Collections.
 - [ ] Users can create, rename, and delete Collections.
@@ -229,11 +242,16 @@ We will log these clicks for analysis.
 3. **Project Structure**
    - Set up folder structure:
      - components/ (reusable UI components) ✅
-     - pages/ (main page components with co-located hooks)
+     - pages/ (main page components with co-located hooks) ✅
      - utils/ (helper functions and utilities) ✅
    - Configure path aliases (@/\*) ✅
-   - Configure routing with React Router
-   - Set up API client with Axios
+   - Configure routing with React Router ✅
+     - Implement routing structure as defined above ✅
+   - Set up Supabase ✅
+     - Configure anonymous authentication ✅
+     - Set up PostgreSQL database and tables
+     - Configure Row Level Security (RLS) policies
+   - Set up API client with Axios ✅
 
 ### Phase 2: Frontend Development - Page by Page
 
@@ -243,31 +261,25 @@ We will log these clicks for analysis.
    - Install required shadcn/ui components for each page/feature
    - Keep components focused on current needs without over-engineering
 
-2. **Logged Out Home Page**
+2. **Home Page**
 
    - Create layout components
    - Implement hero section with tagline
    - Add "Give it a Try" CTA button
+   - Implement automatic anonymous authentication
 
-3. **Authentication Pages**
-
-   - Create Login page
-   - Create Sign Up page
-   - Implement form validation
-   - Set up authentication context
-
-4. **Logged In Home Page (Empty State)**
+3. **Projects Page (Empty State)**
 
    - Create empty state UI
    - Implement "Create New Project" button
 
-5. **Logged In Home Page (Filled State)**
+4. **Projects Page (Filled State)**
 
    - Create project list component
    - Implement project card component
    - Add project navigation
 
-6. **Search Results Page**
+5. **Search Results Page**
 
    - Create search bar component
    - Implement loading state
@@ -275,8 +287,9 @@ We will log these clicks for analysis.
    - Add multi-select functionality
    - Create right sidebar for collections
    - Implement save to collection functionality
+   - Set up searchId parameter handling
 
-7. **Project Page (Collections Overview)**
+6. **Project Page (Collections Overview)**
    - Create collection list view
    - Implement saved words display
    - Add collection management UI
@@ -287,16 +300,15 @@ We will log these clicks for analysis.
 
    - Set up FastAPI project structure
    - Configure Supabase connection
-   - Set up authentication middleware
+   - Set up authentication middleware for anonymous users
 
 2. **Database Schema**
 
-   - Design and implement database tables
+   - Design and implement PostgreSQL tables
    - Set up Row Level Security policies
 
 3. **API Endpoints**
 
-   - Implement authentication endpoints
    - Create project management endpoints
    - Implement collection management endpoints
    - Create saved words management endpoints
