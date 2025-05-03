@@ -4,7 +4,7 @@ import { Home, ProjectsList, NewProject, ProjectDetail, ProjectSearch } from '@/
 export const App = () => {
   return (
     <Router>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<ProjectsList />} />

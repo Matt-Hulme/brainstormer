@@ -77,7 +77,8 @@ export default {
           {
             lineHeight: '4.0625rem',
             letterSpacing: '-0.03em',
-            fontFamily: 'Young Serif',
+            fontFamily: 'Young Serif, serif',
+            fontWeight: '700',
           },
         ],
         h3: [
@@ -85,7 +86,8 @@ export default {
           {
             lineHeight: '2.5rem',
             letterSpacing: '-0.01em',
-            fontFamily: 'Young Serif',
+            fontFamily: 'Young Serif, serif',
+            fontWeight: '400',
           },
         ],
         h4: [
@@ -93,15 +95,15 @@ export default {
           {
             lineHeight: '1.875rem',
             letterSpacing: '-0.01em',
-            fontFamily: 'Chivo',
+            fontFamily: 'Chivo, sans-serif',
           },
         ],
         h5: [
           '0.875rem',
           {
-            lineHeight: '1.35em',
+            lineHeight: '2.1875rem',
             letterSpacing: '-0.01em',
-            fontFamily: 'Young Serif',
+            fontFamily: 'Young Serif, serif',
           },
         ],
         p1: [
@@ -109,7 +111,7 @@ export default {
           {
             lineHeight: '1.75rem',
             letterSpacing: '-0.02em',
-            fontFamily: 'Chivo',
+            fontFamily: 'Chivo, sans-serif',
           },
         ],
         p2: [
@@ -117,7 +119,7 @@ export default {
           {
             lineHeight: '1.25rem',
             letterSpacing: '-0.02em',
-            fontFamily: 'Chivo',
+            fontFamily: 'Chivo, sans-serif',
           },
         ],
         p3: [
@@ -125,7 +127,7 @@ export default {
           {
             lineHeight: '1.125rem',
             letterSpacing: '-0.02em',
-            fontFamily: 'Chivo',
+            fontFamily: 'Chivo, sans-serif',
           },
         ],
         'p3-caps': [
@@ -133,7 +135,7 @@ export default {
           {
             lineHeight: '0.9375rem',
             letterSpacing: '0.06em',
-            fontFamily: 'Chivo',
+            fontFamily: 'Chivo, sans-serif',
             textTransform: 'uppercase',
           },
         ],
