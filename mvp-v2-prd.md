@@ -242,6 +242,8 @@ We will log these clicks for analysis.
 3. **Project Structure**
    - Set up folder structure:
      - components/ (reusable UI components) ✅
+       - design-system/ (flexible UI primitives like Button)a
+       - Application-specific components at root level (SearchBar, etc.)
      - pages/ (main page components with co-located hooks) ✅
      - utils/ (helper functions and utilities) ✅
    - Configure path aliases (@/\*) ✅
@@ -265,8 +267,8 @@ We will log these clicks for analysis.
 
    - Create layout components
    - Implement hero section with tagline
-   - Add "Give it a Try" CTA button
-   - Implement automatic anonymous authentication
+   - Add "Give it a Try" CTA button logic with navigation to Projects page
+   - Add "Log in" button logic with navigation to Projects page
 
 3. **Projects Page (Empty State)**
 
@@ -301,6 +303,7 @@ We will log these clicks for analysis.
    - Set up FastAPI project structure
    - Configure Supabase connection
    - Set up authentication middleware for anonymous users
+   - Implement automatic anonymous authentication
 
 2. **Database Schema**
 
