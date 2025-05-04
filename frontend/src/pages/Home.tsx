@@ -1,23 +1,32 @@
-import { Button } from '@/components/Button'
+import { Button } from '@/components'
+import { useNavigate } from 'react-router-dom'
 
 export const Home = () => {
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="flex flex-row items-center justify-between p-[30px] w-full">
+      <div className="flex flex-row items-center justify-between p-[30px] w-full">
         <span className="color-secondary-3 text-h4">AI tools for the creative minded</span>
-        <Button variant="outline" className="border-secondary-1 text-secondary-4">
+        <Button
+          variant="outline"
+          className="border-secondary-1 text-secondary-4"
+          onClick={() => navigate('/projects')}
+        >
           Log in
         </Button>
-      </header>
+      </div>
       <main className="flex-grow py-[70px]">
         <div className="pl-[120px] pr-[214px] space-y-[50px]">
-          <h1 className="color-secondary-4 text-h1 max-w-[804px] font-serif">
-            We use AI to{' '}
-            <span className="underline decoration-primary-3 decoration-8 underline-offset-[14px]">
-              help you be more creative
-            </span>
-            , not to replace your creativity.
-          </h1>
+          <header>
+            <h1 className="color-secondary-4 text-h1 max-w-[804px]">
+              We use AI to{' '}
+              <span className="underline decoration-primary-3 decoration-8 underline-offset-[14px]">
+                help you be more creative
+              </span>
+              , not to replace your creativity.
+            </h1>
+          </header>
           <div className="flex flex-row gap-[45px] pl-[118px]">
             <p className="text-h4 color-secondary-4 max-w-[582px]">
               Instead of making art or writing for you, Creaitve helps you break out of your
@@ -37,6 +46,7 @@ export const Home = () => {
           <Button
             variant="text"
             textClass="text-[25px] leading-[40px] font-serif color-secondary-4"
+            onClick={() => navigate('/projects')}
           >
             Give it a try
           </Button>
