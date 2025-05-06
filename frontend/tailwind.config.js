@@ -73,60 +73,60 @@ export default {
       },
       fontSize: {
         h1: [
-          '3.75rem',
+          '60px',
           {
-            lineHeight: '4.0625rem',
+            lineHeight: '65px',
             letterSpacing: '-0.03em',
             fontWeight: '400',
           },
         ],
         h3: [
-          '1.5625rem',
+          '25px',
           {
-            lineHeight: '2.5rem',
+            lineHeight: '40px',
             letterSpacing: '-0.01em',
             fontWeight: '400',
           },
         ],
         h4: [
-          '1.25rem',
+          '20px',
           {
-            lineHeight: '1.875rem',
+            lineHeight: '30px',
             letterSpacing: '-0.01em',
           },
         ],
         h5: [
-          '0.875rem',
+          '14px',
           {
-            lineHeight: '2.1875rem',
+            lineHeight: '35px',
             letterSpacing: '-0.01em',
           },
         ],
         p1: [
-          '1.0625rem',
+          '17px',
           {
-            lineHeight: '1.75rem',
+            lineHeight: '28px',
             letterSpacing: '-0.02em',
           },
         ],
         p2: [
-          '0.9375rem',
+          '15px',
           {
-            lineHeight: '1.25rem',
+            lineHeight: '20px',
             letterSpacing: '-0.02em',
           },
         ],
         p3: [
-          '0.8125rem',
+          '13px',
           {
-            lineHeight: '1.125rem',
+            lineHeight: '18px',
             letterSpacing: '-0.02em',
           },
         ],
         'p3-caps': [
-          '0.8125rem',
+          '13px',
           {
-            lineHeight: '0.9375rem',
+            lineHeight: '15px',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
           },

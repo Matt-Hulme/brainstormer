@@ -22,7 +22,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variant !== 'text' && variant !== 'icon' && 'h-[30px] px-3 text-sm',
           // Variant-specific styles
           variant === 'primary' && 'bg-primary-1 text-secondary-5 hover:bg-primary-2',
-          variant === 'outline' && 'border hover:bg-accent/10 bg-transparent',
+          variant === 'outline' && 'border border-secondary-1 hover:bg-accent/10 bg-transparent',
           variant === 'text' && 'shadow-none p-0 h-auto hover:bg-transparent',
           variant === 'icon' &&
             'shadow-none h-auto flex items-center justify-center hover:bg-gray-100',
