@@ -4,7 +4,7 @@ import { ProjectsListContent } from './ProjectsListContent'
 import { ProjectsListEmpty } from './ProjectsListEmpty'
 
 export const ProjectsListLayout = () => {
-  const projectsMock = []
+  const projectsMock = [1, 2]
   const hasProjects = projectsMock.length > 0
 
   return (
