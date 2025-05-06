@@ -1,6 +1,6 @@
 import emptyShapesImage from '../../../assets/home-empty-shapes.png'
 
-export const ProjectsListEmpty = () => {
+export const ProjectsListContentEmpty = () => {
   return (
     <div className="flex flex-col justify-center pt-[90px] pb-[56px] gap-y-[50px]">
       <h1 className="color-secondary-4 text-h1">Looks like you don't have any projects (yet).</h1>
