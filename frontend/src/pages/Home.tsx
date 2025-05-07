@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 export const Home = () => {
   const navigate = useNavigate()
+  // For now, we'll use a placeholder userId until authentication is set up
+  const userId = 'userId'
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -11,7 +13,7 @@ export const Home = () => {
         <Button
           variant="outline"
           className="border-secondary-1 text-secondary-4"
-          onClick={() => navigate('/projects')}
+          onClick={() => navigate(`/${userId}/projects`)}
         >
           Log in
         </Button>
@@ -46,7 +48,7 @@ export const Home = () => {
           <Button
             variant="text"
             textClass="text-[25px] leading-[40px] font-serif color-secondary-4"
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate(`/${userId}/projects`)}
           >
             Give it a try
           </Button>

@@ -7,9 +7,9 @@ export const App = () => {
       <div className="bg-background">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/projects" element={<ProjectsList />} />
-          <Route path="/projects/:projectId" element={<ProjectDetail />} />
-          <Route path="/projects/:projectId/search" element={<ProjectSearch />} />
+          <Route path="/:userId/projects" element={<ProjectsList />} />
+          <Route path="/:userId/projects/:projectName" element={<ProjectDetail />} />
+          <Route path="/:userId/projects/:projectName/search" element={<ProjectSearch />} />
         </Routes>
       </div>
     </Router>

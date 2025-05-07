@@ -52,12 +52,11 @@ It helps users generate and organize keyword ideas.
 ### Routing Structure
 
 ```
-/                     # Home page (starting point for all users)
-/projects             # Projects list (automatically authenticates anonymously)
-/projects/new         # Create new project
-/projects/:projectId  # Project page (collections overview)
-/projects/:projectId/search  # Search results within project
-/projects/:projectId/search?searchId=123  # Specific search session
+/                                 # Home page (starting point for all users)
+/:userId/projects                 # Projects list (automatically authenticates anonymously)
+/:userId/projects/new             # Create new project
+/:userId/projects/:projectName    # Project page (collections overview)
+/:userId/projects/:projectName/search?q=searchterm  # Search results within project with search term as query parameter
 ```
 
 ### Security Considerations
@@ -93,6 +92,7 @@ It helps users generate and organize keyword ideas.
 ### 4. Search Results (inside a Project)
 
 - **Top Search Bar**: Type a keyword to brainstorm ideas.
+  - Uses query parameter (`?q=searchterm`) for search terms
 - **Searching State**: Loading animation.
 - **Loaded State**:
 

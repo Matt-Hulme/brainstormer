@@ -89,6 +89,14 @@ import { formatDate } from '@/utils/formatDate'
 import './styles.css'
 ```
 
+### Import Rules
+
+- Never use wildcard imports (`import * as X`)
+  - Preferred: `import { useState, useEffect } from 'react'`
+  - Avoid: `import * as React from 'react'`
+- Be explicit about what you're importing
+- This improves code clarity, bundle size optimization, and IDE auto-imports
+
 ### Export Rules
 
 - Use named exports for all components
@@ -104,6 +112,13 @@ import './styles.css'
 - Use types for utility types
 - Export types from types directory
 - Use strict mode
+
+### Type Imports
+
+- Import React types directly instead of using the React namespace
+  - Preferred: `import { ChangeEvent } from 'react'`
+  - Avoid: `React.ChangeEvent`
+- This applies to all React types: ChangeEvent, MouseEvent, KeyboardEvent, ReactNode, etc.
 
 ### Type Naming
 
@@ -136,6 +151,14 @@ import './styles.css'
 - Keep styles modular and scoped
 - Use CSS variables for theming
 - Avoid inline styles
+
+### Class Name Handling
+
+- Use the `classnames` package for conditional class names
+  - Import: `import classNames from 'classnames'`
+  - Usage: `className={classNames('base-class', isActive && 'active-class')}`
+- Avoid creating custom utilities for class name management
+- Keep class names readable and descriptive
 
 ### Responsive Design
 
