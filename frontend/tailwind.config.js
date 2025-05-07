@@ -95,6 +95,14 @@ export default {
             letterSpacing: '-0.01em',
           },
         ],
+        'active-term': [
+          '23px',
+          {
+            lineHeight: '30px',
+            letterSpacing: '-0.01em',
+            fontWeight: '500',
+          },
+        ],
         h5: [
           '14px',
           {
@@ -161,7 +169,7 @@ export default {
         '.text-h3, .text-h5': {
           fontFamily: 'Young Serif, serif',
         },
-        '.text-h4, .text-p1, .text-p2, .text-p3, .text-p3-caps': {
+        '.text-h4, .text-active-term, .text-p1, .text-p2, .text-p3, .text-p3-caps': {
           fontFamily: 'Chivo, sans-serif',
         },
       }
