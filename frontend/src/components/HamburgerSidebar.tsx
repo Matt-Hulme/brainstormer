@@ -24,7 +24,11 @@ export const HamburgerSidebar = ({ children }: HamburgerSidebarProps) => {
         {children}
       </div>
       <div className="flex justify-center">
-        <img src={profilePicture} alt="Profile" className="rounded-full border-2 border-gray-200" />
+        <img
+          src={profilePicture}
+          alt="Profile"
+          className="rounded-full border-1 border-secondary-4"
+        />
       </div>
     </aside>
   )
