@@ -212,10 +212,10 @@ We will log these clicks for analysis.
 
 ## Acceptance Criteria (Cursor-ready checklist)
 
-- [ ] Anonymous authentication works automatically.
-- [ ] Home page and Projects page are functional.
-- [ ] Anonymous users see an empty state if no Projects exist.
-- [ ] Users can create and view Projects.
+- [x] Anonymous authentication works automatically.
+- [x] Home page and Projects page are functional.
+- [x] Anonymous users see an empty state if no Projects exist.
+- [x] Users can create and view Projects.
 - [ ] Inside Projects, users can Search for new Keywords (initially with single-phrase search).
   - Note: Multi-phrase search will be implemented in Phase 2.6 post-initial feedback.
 - [ ] Searching triggers loading state and populates suggestions.

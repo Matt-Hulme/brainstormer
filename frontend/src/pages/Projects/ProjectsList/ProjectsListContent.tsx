@@ -1,5 +1,6 @@
+import { projectCardsMock } from './mocks/projectCardsMock'
 import { ProjectCard } from './ProjectCard'
-import { projectCardsMock } from './mocks/ProjectCardsMock'
+
 export const ProjectsListContent = () => {
   return (
     <div className="flex flex-col gap-[72px] justify-center pt-[70px]">

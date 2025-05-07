@@ -10,14 +10,29 @@ export const ProjectSearchContent = () => {
   const searchResults = Array.from({ length: 5 }, () => [...searchResultsMock]).flat()
   const [activeTermIds, setActiveTermIds] = useState<Set<string>>(new Set())
 
-  const handleTermClick = useCallback((termId: string) => {
+  const handleSelectWord = useCallback((termId: string) => {
     setActiveTermIds(prevActiveTermIds => {
       const newActiveTermIds = new Set(prevActiveTermIds)
-      if (newActiveTermIds.has(termId)) {
-        newActiveTermIds.delete(termId)
-      } else {
-        newActiveTermIds.add(termId)
-      }
+      newActiveTermIds.add(termId)
+      return newActiveTermIds
+    })
+  }, [])
+
+  const handleUnselectWord = useCallback((termId: string) => {
+    setActiveTermIds(prevActiveTermIds => {
+      const newActiveTermIds = new Set(prevActiveTermIds)
+      newActiveTermIds.delete(termId)
+      return newActiveTermIds
+    })
+  }, [])
+
+  const activeWords = Array.from(activeTermIds).map(id => id.split('-')[0])
+
+  const handleRemoveWord = useCallback((word: string) => {
+    setActiveTermIds(prevActiveTermIds => {
+      const newActiveTermIds = new Set(
+        Array.from(prevActiveTermIds).filter(id => id.split('-')[0] !== word)
+      )
       return newActiveTermIds
     })
   }, [])
@@ -31,14 +46,16 @@ export const ProjectSearchContent = () => {
             <SearchTerm
               key={termId}
               isActive={activeTermIds.has(termId)}
-              onClick={() => handleTermClick(termId)}
+              onClick={() =>
+                activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
+              }
             >
               {term}
             </SearchTerm>
           )
         })}
       </div>
-      <ProjectSearchCollectionsSidebar />
+      <ProjectSearchCollectionsSidebar activeWords={activeWords} onRemoveWord={handleRemoveWord} />
     </div>
   )
 }
