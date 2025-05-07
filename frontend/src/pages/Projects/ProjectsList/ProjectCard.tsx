@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
+import { useNavigate } from 'react-router-dom'
+import { ResultsCard } from '@/components/design-system/ResultsCard'
 
 interface ProjectCardProps {
   title: string
@@ -9,8 +11,12 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard = ({ title, lastEdited, collections, savedWords }: ProjectCardProps) => {
+  const navigate = useNavigate()
+  const userId = 'userId' // fixed for now
+  const projectName = 'winter-is-calling' // fixed for now
+
   return (
-    <div className="bg-white p-[30px] flex flex-row items-center justify-between border-b border-solid border-secondary-2/20">
+    <ResultsCard onClick={() => navigate(`/${userId}/projects/${projectName}`)}>
       <div className="space-y-[4px]">
         <h3 className="text-h3 text-secondary-4 line-clamp-1">{title ? title : 'New Project'}</h3>
         <div className="flex flex-row items-center gap-[10px]">
@@ -38,6 +44,6 @@ export const ProjectCard = ({ title, lastEdited, collections, savedWords }: Proj
       <Button variant="icon" className="rounded-full">
         <ArrowRight className="w-7 h-7 text-gray-500" />
       </Button>
-    </div>
+    </ResultsCard>
   )
 }

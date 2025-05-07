@@ -54,7 +54,6 @@ It helps users generate and organize keyword ideas.
 ```
 /                                 # Home page (starting point for all users)
 /:userId/projects                 # Projects list (automatically authenticates anonymously)
-/:userId/projects/new             # Create new project
 /:userId/projects/:projectName    # Project page (collections overview)
 /:userId/projects/:projectName/search?q=searchterm  # Search results within project with search term as query parameter
 ```
@@ -81,59 +80,52 @@ It helps users generate and organize keyword ideas.
 ### 2. Projects Page (Empty State)
 
 - Message: **"Looks like you don't have any projects yet!"**
-- CTA Button: **"Create New Project"**
+- Visual empty state with shapes illustration
+- CTA: **"Use the search bar above to start a new project"**
 
 ### 3. Projects Page (Filled State)
 
-- Displays a list of existing Projects.
-- Projects show Title.
-- Clicking a Project opens Project Page (Collections Overview).
+- Welcome message: "Welcome back. Time to get mischievous."
+- Displays a list of existing Projects with:
+  - Project Title
+  - Last edited timestamp
+  - Collections count and names
+  - Saved words count and preview
+- Each project card is clickable and navigates to Project Details
+- Search bar at the top for creating new projects
 
-### 4. Search Results (inside a Project)
+### 4. Project Details Page
 
-- **Search Interface**:
-  - Multi-phrase search bar supporting up to 3 phrases
-  - Each phrase limited to 3 words maximum
-  - Visual separation between different phrases
-  - Ability to add/remove phrases
-- **Searching State**: Loading animation.
-- **Loaded State**:
-  - List of suggested Keywords based on the search phrases.
-  - Results prioritize matches across multiple phrases.
-  - Ability to select one or multiple Keywords.
-  - Save selected Keywords into a Collection (existing or new).
-- **URL Structure**:
-  - Uses query parameters for search terms: `?q1=phrase1&q2=phrase2&q3=phrase3`
-  - Each phrase is URL encoded
-- **Right Sidebar**:
-  - Lists existing Collections within the current Project.
-  - Button to **Add New Collection**.
-  - Ability to edit (rename) or delete Collections.
-- **Saved Words**:
-  - Within Collections, users can:
-    - Delete Saved Words.
-    - (Post-MVP) Edit or manually add Saved Words.
-
-### 5. Project Page (Collections Overview)
-
-- Full-page view of all Collections grouped inside a Project.
-- Shows:
-  - Collection Title
-  - Saved Words within each Collection
-- Basic management:
-  - Delete Collection
-  - Delete Saved Words inside Collection
+- Header with:
+  - Project title
+  - Last edited timestamp
+  - User profile picture
+- Two-column layout:
+  - Left column: Collection names
+  - Right column: Saved words for each collection
+- Collections are separated by dividers
+- Each collection shows:
+  - Collection name with arrow button
+  - List of saved words or "No words (yet)" message
+- Hamburger sidebar for navigation
 
 ### 5. Search Results Page
 
-- Create search bar component (initially supporting single-phrase search)
-  - Note: Multi-phrase functionality is planned but deferred to Phase 2.6
-- Implement loading state
-- Create keyword suggestion list
-- Add multi-select functionality
-- Create right sidebar for collections
-- Implement save to collection functionality
-- Set up searchId parameter handling
+- **Search Interface**:
+  - Search bar at the top
+  - View toggle buttons in sidebar:
+    - List view
+    - Connections view
+    - Focus view
+- **Searching State**: Loading animation
+- **Loaded State**:
+  - Horizontal list of search terms
+  - Terms can be selected/deselected
+  - Selected terms appear in collections sidebar
+  - Collections sidebar for managing saved words
+- **URL Structure**:
+  - Uses query parameter for search term: `?q=searchterm`
+  - View type parameter: `?view=list|connections|focus`
 
 ## Core Functionality
 
@@ -144,19 +136,26 @@ It helps users generate and organize keyword ideas.
 
 ### Project Management
 
-- Create, View, Delete Projects
-- Projects have only a **Title** (no descriptions/tags)
+- Create, View Projects
+- Projects have:
+  - Title
+  - Last edited timestamp
+  - Collections
+  - Saved words
 
 ### Collection Management
 
-- Create, View, Rename, Delete Collections
-- Collections belong to a single Project
+- View Collections within Projects
+- Collections show:
+  - Name
+  - List of saved words
+  - Empty state when no words
 
 ### Saved Word Management
 
-- Save single or multiple Keywords from search results
-- Delete Saved Words inside Collections
-- (Post-MVP) Edit or manually add Saved Words
+- View saved words within collections
+- Words are organized by collection
+- Empty state handling when no words exist
 
 ### Search and Keyword Suggestions
 
@@ -216,6 +215,11 @@ We will log these clicks for analysis.
 - [x] Home page and Projects page are functional.
 - [x] Anonymous users see an empty state if no Projects exist.
 - [x] Users can create and view Projects.
+- [x] Project Details page shows collections and saved words
+- [x] Search interface with loading states
+- [x] Search terms can be selected/deselected
+- [x] Collections sidebar for managing saved words
+- [x] View toggles for different search result displays
 - [ ] Inside Projects, users can Search for new Keywords (initially with single-phrase search).
   - Note: Multi-phrase search will be implemented in Phase 2.6 post-initial feedback.
 - [ ] Searching triggers loading state and populates suggestions.
@@ -263,8 +267,8 @@ We will log these clicks for analysis.
 3. **Project Structure**
    - Set up folder structure:
      - components/ (reusable UI components) ✅
-       - design-system/ (flexible UI primitives like Button)a
-       - Application-specific components at root level (SearchBar, etc.)
+       - design-system/ (flexible UI primitives like Button) ✅
+       - Application-specific components at root level (SearchBar, etc.) ✅
      - pages/ (main page components with co-located hooks) ✅
      - utils/ (helper functions and utilities) ✅
    - Configure path aliases (@/\*) ✅
@@ -276,7 +280,7 @@ We will log these clicks for analysis.
      - Configure Row Level Security (RLS) policies
    - Set up API client with Axios ✅
 
-### Phase 2: Frontend Development - Page by Page
+### Phase 2: Frontend Development - Page by Page ✅
 
 1. **General Component Strategy** ✅
 
@@ -302,21 +306,21 @@ We will log these clicks for analysis.
    - Implement project card component ✅
    - Add project navigation ✅
 
-5. **Search Results Page**
+5. **Search Results Page** ✅
 
-   - Create search bar component (initially supporting single-phrase search)
+   - Create search bar component (initially supporting single-phrase search) ✅
      - Note: Multi-phrase functionality is planned but deferred to Phase 2.6
-   - Implement loading state
-   - Create keyword suggestion list
-   - Add multi-select functionality
-   - Create right sidebar for collections
-   - Implement save to collection functionality
-   - Set up searchId parameter handling
+   - Implement loading state ✅
+   - Create keyword suggestion list ✅
+   - Add multi-select functionality ✅
+   - Create right sidebar for collections ✅
+   - Implement save to collection functionality ✅
+   - Set up searchId parameter handling ✅
 
-6. **Project Page (Collections Overview)**
-   - Create collection list view
-   - Implement saved words display
-   - Add collection management UI
+6. **Project Page (Collections Overview)** ✅
+   - Create collection list view ✅
+   - Implement saved words display ✅
+   - Add collection management UI ✅
 
 ### Phase 2.5: Multi-Phrase Search Implementation (Deferred)
 
@@ -347,7 +351,7 @@ We will log these clicks for analysis.
 
 > **Note**: This phase is intentionally deferred until after initial user feedback on the core functionality.
 
-### Phase 2.6: Data Integration
+### Phase 2.6: Data Integration (In Progress)
 
 1. **Replace Mock Data with Actual API Data**
    - Implement API client functions to fetch projects

@@ -11,7 +11,7 @@ export const ProjectsList = () => {
     <div className="flex flex-row items-start gap-[10px]">
       <HamburgerSidebar />
       <div className="flex flex-col w-full">
-        <SearchBar />
+        <SearchBar searchValue={''} />
         <main>
           {hasProjects && <ProjectsListContent />}
           {!hasProjects && <ProjectsListContentEmpty />}
