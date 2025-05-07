@@ -10,11 +10,10 @@ interface SearchBarProps {
 }
 
 export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarProps) => {
+  const [inputValue, setInputValue] = useState(searchValue)
   const navigate = useNavigate()
-  // const { userId, projectName } = useParams()
   const userId = 'userId'
   const projectName = 'projectName'
-  const [inputValue, setInputValue] = useState(searchValue)
 
   useEffect(() => {
     setInputValue(searchValue)
@@ -25,17 +24,17 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     onChange?.(e.target.value)
   }
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   const handleSearch = () => {
     if (inputValue.trim()) {
       navigate(
         `/${userId}/projects/${projectName}/search?q=${encodeURIComponent(inputValue.trim())}`
       )
-    }
-  }
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch()
     }
   }
 

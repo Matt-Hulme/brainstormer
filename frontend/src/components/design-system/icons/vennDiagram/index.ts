@@ -1,0 +1,1 @@
+export { VennDiagramIcon } from './VennDiagramIcon'

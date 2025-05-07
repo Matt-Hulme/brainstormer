@@ -91,21 +91,24 @@ It helps users generate and organize keyword ideas.
 
 ### 4. Search Results (inside a Project)
 
-- **Top Search Bar**: Type a keyword to brainstorm ideas.
-  - Uses query parameter (`?q=searchterm`) for search terms
+- **Search Interface**:
+  - Multi-phrase search bar supporting up to 3 phrases
+  - Each phrase limited to 3 words maximum
+  - Visual separation between different phrases
+  - Ability to add/remove phrases
 - **Searching State**: Loading animation.
 - **Loaded State**:
-
-  - List of suggested Keywords.
+  - List of suggested Keywords based on the search phrases.
+  - Results prioritize matches across multiple phrases.
   - Ability to select one or multiple Keywords.
   - Save selected Keywords into a Collection (existing or new).
-
+- **URL Structure**:
+  - Uses query parameters for search terms: `?q1=phrase1&q2=phrase2&q3=phrase3`
+  - Each phrase is URL encoded
 - **Right Sidebar**:
-
   - Lists existing Collections within the current Project.
   - Button to **Add New Collection**.
   - Ability to edit (rename) or delete Collections.
-
 - **Saved Words**:
   - Within Collections, users can:
     - Delete Saved Words.
@@ -120,6 +123,17 @@ It helps users generate and organize keyword ideas.
 - Basic management:
   - Delete Collection
   - Delete Saved Words inside Collection
+
+### 5. Search Results Page
+
+- Create search bar component (initially supporting single-phrase search)
+  - Note: Multi-phrase functionality is planned but deferred to Phase 2.6
+- Implement loading state
+- Create keyword suggestion list
+- Add multi-select functionality
+- Create right sidebar for collections
+- Implement save to collection functionality
+- Set up searchId parameter handling
 
 ## Core Functionality
 
@@ -146,8 +160,14 @@ It helps users generate and organize keyword ideas.
 
 ### Search and Keyword Suggestions
 
-- Enter a search term
-- Fetch LLM-generated suggestions
+- Multi-phrase search functionality:
+  - A search query is made up of 1-3 distinct phrases
+  - Each phrase can contain 1-3 words maximum
+  - Example: "Guybrush Threepwood Pirate" + "Funny" + "Games"
+  - Backend searches for results matching ANY of the phrases ("OR" logic)
+  - Results that match multiple phrases may be prioritized
+- Enter search phrases in a structured interface
+- Fetch LLM-generated suggestions based on provided phrases
 - Select and Save suggested Keywords
 - Search sessions tracked with searchId parameter
 
@@ -196,7 +216,8 @@ We will log these clicks for analysis.
 - [ ] Home page and Projects page are functional.
 - [ ] Anonymous users see an empty state if no Projects exist.
 - [ ] Users can create and view Projects.
-- [ ] Inside Projects, users can Search for new Keywords.
+- [ ] Inside Projects, users can Search for new Keywords (initially with single-phrase search).
+  - Note: Multi-phrase search will be implemented in Phase 2.6 post-initial feedback.
 - [ ] Searching triggers loading state and populates suggestions.
 - [ ] Search sessions can be tracked with searchId parameter.
 - [ ] Users can select one or multiple Keywords and Save to a Collection.
@@ -283,7 +304,8 @@ We will log these clicks for analysis.
 
 5. **Search Results Page**
 
-   - Create search bar component
+   - Create search bar component (initially supporting single-phrase search)
+     - Note: Multi-phrase functionality is planned but deferred to Phase 2.6
    - Implement loading state
    - Create keyword suggestion list
    - Add multi-select functionality
@@ -296,7 +318,36 @@ We will log these clicks for analysis.
    - Implement saved words display
    - Add collection management UI
 
-### Phase 2.5: Data Integration
+### Phase 2.5: Multi-Phrase Search Implementation (Deferred)
+
+1. **SearchBar Component Update**
+
+   - Refactor SearchBar to support multiple phrases (1-3)
+   - Implement word limit per phrase (max 3 words)
+   - Add UI for phrase separation with visual indicators
+   - Create "+" button functionality to add new phrases
+   - Implement removal of phrases
+
+2. **Search Parameter Handling**
+
+   - Update URL structure to support multiple query parameters (q1, q2, q3)
+   - Implement parsing of multi-phrase queries
+   - Update search logic to handle multiple phrases
+
+3. **Backend Integration**
+
+   - Connect updated search UI to backend endpoints
+   - Implement "OR" logic handling between phrases
+   - Add result prioritization for items matching multiple phrases
+
+4. **Testing and Refinement**
+   - Test various search combinations
+   - Optimize performance for multi-phrase queries
+   - Fine-tune result ranking algorithm
+
+> **Note**: This phase is intentionally deferred until after initial user feedback on the core functionality.
+
+### Phase 2.6: Data Integration
 
 1. **Replace Mock Data with Actual API Data**
    - Implement API client functions to fetch projects
@@ -327,6 +378,10 @@ We will log these clicks for analysis.
    - Implement collection management endpoints
    - Create saved words management endpoints
    - Implement search and keyword suggestion endpoints
+     - Support for multi-phrase queries (1-3 phrases)
+     - "OR" logic between phrases
+     - Optional prioritization for results matching multiple phrases
+     - Response structure optimized for frontend display
 
 4. **Integration**
    - Connect frontend to backend API
