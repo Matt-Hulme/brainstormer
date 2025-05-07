@@ -1,0 +1,42 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# PRD Management Guide
+
+The Product Requirements Document (PRD) is the source of truth for feature implementation. Key files and guidelines:
+
+## Core Files
+- [PRD.md](mdc:PRD.md) - Main product requirements document
+- [development-roadmap.md](mdc:development-roadmap.md) - Implementation phases and milestones
+
+## Implementation Guidelines
+1. Always evaluate the PRD at the start of new interactions
+2. Follow the development roadmap and phases as outlined
+3. Update the PRD when making significant decisions
+4. Document any deviations from the original plan
+5. Keep acceptance criteria checklist up to date
+
+## PRD Structure Requirements
+The PRD must include:
+- Clear statement of goals
+- Core object model
+- Technical stack details
+- User flows and interactions
+- Architecture decisions
+- Security considerations
+- Performance requirements
+
+## Maintenance Rules
+1. Review PRD weekly
+2. Document all significant changes
+3. Keep stakeholders informed of updates
+4. Maintain version history
+5. Update based on implementation progress
+
+## Code Alignment
+- Maintain consistency with PRD specifications
+- Document technical decisions
+- Keep code aligned with PRD requirements
+- Use PRD acceptance criteria for testing

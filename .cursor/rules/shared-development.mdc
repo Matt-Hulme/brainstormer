@@ -1,0 +1,54 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Shared Development Guide
+
+## Project Structure
+Key directories:
+- [frontend](mdc:frontend) - React frontend application
+- [backend](mdc:backend) - FastAPI backend application
+- [.cursor](mdc:.cursor) - Project configuration and rules
+
+## File Naming
+1. Use descriptive, meaningful names
+2. Avoid abbreviations unless widely known
+3. Keep file names concise but clear
+4. Use appropriate case for your language
+5. Follow language-specific conventions
+
+## Environment Configuration
+1. Use `.env` for local development
+2. Use `.env.example` as a template
+3. Never commit `.env` files
+4. Document all required environment variables
+5. Use environment variables for secrets
+
+## Git Practices
+1. Write clear, descriptive commit messages
+2. Keep commits focused and atomic
+3. Use present tense in commit messages
+4. Reference issues when applicable
+5. Use feature branches for new features
+
+## Security Guidelines
+1. Never commit sensitive data
+2. Use environment variables for secrets
+3. Follow security best practices
+4. Keep dependencies updated
+5. Use HTTPS in production
+
+## Error Handling
+1. Handle errors gracefully
+2. Log errors appropriately
+3. Provide meaningful error messages
+4. Implement proper error recovery
+5. Use consistent error handling patterns
+
+## Performance
+1. Optimize database queries
+2. Implement proper caching
+3. Monitor performance
+4. Profile code when needed
+5. Follow performance best practices

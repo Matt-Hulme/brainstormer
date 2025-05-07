@@ -1,0 +1,49 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Frontend Development Guide
+
+## Project Structure
+Key directories and their purposes:
+- [frontend/src/components](mdc:frontend/src/components) - Reusable UI components
+- [frontend/src/pages](mdc:frontend/src/pages) - Page components (routes)
+- [frontend/src/hooks](mdc:frontend/src/hooks) - Custom React hooks
+- [frontend/src/utils](mdc:frontend/src/utils) - Utility functions
+- [frontend/src/types](mdc:frontend/src/types) - TypeScript types/interfaces
+- [frontend/src/services](mdc:frontend/src/services) - API integrations
+
+## Component Guidelines
+1. One component per file
+2. Use PascalCase for component files
+3. Keep components focused and single-responsibility
+4. Use composition over inheritance
+5. No index.ts files - use direct imports
+
+## Code Organization
+1. React hooks at the top of components
+2. State hooks alphabetized by variable name
+3. Custom functions after hooks in alphabetical order
+4. Use proper TypeScript types and interfaces
+5. Follow import order:
+   - React and external libraries
+   - Types
+   - Components
+   - Hooks
+   - Utils
+   - Styles
+
+## Styling Rules
+1. Use Tailwind CSS for styling
+2. Follow mobile-first approach
+3. Use CSS variables for theming
+4. Avoid inline styles
+5. Use classnames package for conditional classes
+
+## API Integration
+1. All API calls in services directory
+2. Use typed API responses
+3. Handle errors consistently
+4. Use environment variables for endpoints
+5. Implement proper error handling
