@@ -27,11 +27,9 @@ export const ProjectSearch = () => {
             onClick={() => {}}
           >
             <AlignLeft
-              size={27}
               className={`${activeView === 'list' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
             />
           </Button>
-
           <Button
             variant="icon"
             className={`w-[35px] h-[35px] rounded-md ${
@@ -40,11 +38,9 @@ export const ProjectSearch = () => {
             onClick={() => {}}
           >
             <VennDiagramIcon
-              size={27}
               className={`${activeView === 'connections' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
             />
           </Button>
-
           <Button
             variant="icon"
             className={`w-[35px] h-[35px] rounded-md ${
@@ -53,7 +49,6 @@ export const ProjectSearch = () => {
             onClick={() => {}}
           >
             <Target
-              size={25}
               className={`${activeView === 'focus' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
             />
           </Button>

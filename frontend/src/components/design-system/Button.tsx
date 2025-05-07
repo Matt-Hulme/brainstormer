@@ -22,7 +22,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'rounded-md border border-secondary-1 hover:bg-accent/10 bg-transparent',
           variant === 'text' && 'shadow-none p-0 h-auto hover:bg-transparent',
           variant === 'icon' &&
-            'rounded-md shadow-none h-auto flex items-center justify-center group',
+            'rounded-md shadow-none flex items-center justify-center group p-1 w-[35px] h-[35px]',
           variant === 'link' && 'text-primary underline-offset-4 hover:underline',
           className
         )}
