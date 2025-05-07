@@ -66,6 +66,75 @@ export const ComponentName = () => {
 };
 ```
 
+### Code Comments
+
+- Use comments sparingly and only for explaining complex logic or non-obvious decisions
+- Do not add comments for obvious code patterns (e.g., "// State declarations", "// Hooks", etc.)
+- Comment complex algorithms, business logic, or workarounds
+- Examples of good comments:
+
+  ```typescript
+  // Using reduce instead of map+filter for performance with large datasets
+  const activeUsers = users.reduce((acc, user) => {
+    if (user.isActive) acc.push(transformUserData(user))
+    return acc
+  }, [])
+
+  // Workaround for iOS Safari bug #123456
+  if (isIOS && someCondition) {
+    // Implementation details...
+  }
+  ```
+
+### Function Organization
+
+- React hooks should be declared at the top of the component in alphabetical order by hook name
+  - All hooks (useState, useEffect, useRef, etc.) should be alphabetized, unless their values depend on another hook
+  - State hooks (useState) should be alphabetized by state variable name, unless their order is dependent on each other
+- Place all custom functions after hooks in alphabetical order
+- Example:
+
+```typescript
+export const Component = () => {
+  // State hooks alphabetized by state variable name
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  // Other hooks alphabetized by hook name
+  const formRef = useRef(null);
+  const navigate = useNavigate();
+  const theme = useTheme();
+  // Custom variables
+  const data = 'abc'
+
+  // useEffect hooks come after other hooks (still in alphabetical order if multiple)
+  useEffect(() => {
+    // Data fetching logic
+  }, []);
+
+  useEffect(() => {
+    // Form validation logic
+  }, [errors]);
+
+  // Custom functions in alphabetical order
+  const handleClick = () => {
+    // Logic
+  };
+
+  const handleSubmit = () => {
+    // Logic
+  };
+
+  const processData = () => {
+    // Logic
+  };
+
+  return (
+    // JSX
+  );
+};
+```
+
 ### Import Order
 
 ```typescript
