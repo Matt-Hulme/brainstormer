@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
 # Frontend Development Guide
@@ -9,10 +9,8 @@ alwaysApply: false
 Key directories and their purposes:
 - [frontend/src/components](mdc:frontend/src/components) - Reusable UI components
 - [frontend/src/pages](mdc:frontend/src/pages) - Page components (routes)
-- [frontend/src/hooks](mdc:frontend/src/hooks) - Custom React hooks
 - [frontend/src/utils](mdc:frontend/src/utils) - Utility functions
-- [frontend/src/types](mdc:frontend/src/types) - TypeScript types/interfaces
-- [frontend/src/services](mdc:frontend/src/services) - API integrations
+- [frontend/src/config](mdc:frontend/src/config) - Configuration and API setup
 
 ## Component Guidelines
 1. One component per file
@@ -34,6 +32,20 @@ Key directories and their purposes:
    - Utils
    - Styles
 
+## Type Organization
+1. Keep types close to where they're used
+2. Only move types to shared types directory if used in multiple places
+3. Use descriptive type names
+4. Export types from the same file they're defined in
+5. Use interfaces for public APIs and types for internal use
+
+## Hook Organization
+1. Keep hooks close to the components that use them
+2. Co-locate hooks with their related components
+3. Only extract hooks to shared location if used by multiple components
+4. Name hooks with 'use' prefix
+5. Keep hooks focused and single-responsibility
+
 ## Styling Rules
 1. Use Tailwind CSS for styling
 2. Follow mobile-first approach
@@ -42,7 +54,7 @@ Key directories and their purposes:
 5. Use classnames package for conditional classes
 
 ## API Integration
-1. All API calls in services directory
+1. All API configuration in config directory
 2. Use typed API responses
 3. Handle errors consistently
 4. Use environment variables for endpoints

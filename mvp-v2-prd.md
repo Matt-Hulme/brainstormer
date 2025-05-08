@@ -271,6 +271,13 @@ We will log these clicks for analysis.
        - Application-specific components at root level (SearchBar, etc.) ✅
      - pages/ (main page components with co-located hooks) ✅
      - utils/ (helper functions and utilities) ✅
+     - config/ (configuration files) ✅
+       - api/ (API-related configuration)
+         - client.ts (Axios instance and interceptors)
+         - supabase.ts (Supabase client and auth utilities)
+         - types.ts (API-specific types like ApiError, ApiResponse)
+     - types/ (shared domain types) ✅
+       - index.ts (Project, Collection, SavedWord, Keyword interfaces)
    - Configure path aliases (@/\*) ✅
    - Configure routing with React Router ✅
      - Implement routing structure as defined above ✅
@@ -322,47 +329,7 @@ We will log these clicks for analysis.
    - Implement saved words display ✅
    - Add collection management UI ✅
 
-### Phase 2.5: Multi-Phrase Search Implementation (Deferred)
-
-1. **SearchBar Component Update**
-
-   - Refactor SearchBar to support multiple phrases (1-3)
-   - Implement word limit per phrase (max 3 words)
-   - Add UI for phrase separation with visual indicators
-   - Create "+" button functionality to add new phrases
-   - Implement removal of phrases
-
-2. **Search Parameter Handling**
-
-   - Update URL structure to support multiple query parameters (q1, q2, q3)
-   - Implement parsing of multi-phrase queries
-   - Update search logic to handle multiple phrases
-
-3. **Backend Integration**
-
-   - Connect updated search UI to backend endpoints
-   - Implement "OR" logic handling between phrases
-   - Add result prioritization for items matching multiple phrases
-
-4. **Testing and Refinement**
-   - Test various search combinations
-   - Optimize performance for multi-phrase queries
-   - Fine-tune result ranking algorithm
-
-> **Note**: This phase is intentionally deferred until after initial user feedback on the core functionality.
-
-### Phase 2.6: Data Integration (In Progress)
-
-1. **Replace Mock Data with Actual API Data**
-   - Implement API client functions to fetch projects
-   - Create data fetching hooks for projects list
-   - Handle loading and error states
-   - Implement proper state management for API data
-   - Add pagination if needed for large datasets
-   - Ensure proper error handling and fallbacks
-   - Update components to use real data instead of mocks
-
-### Phase 3: Backend Development
+### Phase 3: Backend Development (Current Focus)
 
 1. **Backend Setup**
 
@@ -373,8 +340,12 @@ We will log these clicks for analysis.
 
 2. **Database Schema**
 
-   - Design and implement PostgreSQL tables
-   - Set up Row Level Security policies
+   - Design and implement PostgreSQL tables:
+     - Projects table (id, user_id, title, timestamps)
+     - Collections table (id, project_id, name, timestamps)
+     - Saved Words table (id, collection_id, word, timestamp)
+   - Set up Row Level Security policies for data access
+   - Configure proper indexes and constraints
 
 3. **API Endpoints**
 
@@ -382,9 +353,7 @@ We will log these clicks for analysis.
    - Implement collection management endpoints
    - Create saved words management endpoints
    - Implement search and keyword suggestion endpoints
-     - Support for multi-phrase queries (1-3 phrases)
-     - "OR" logic between phrases
-     - Optional prioritization for results matching multiple phrases
+     - Initially support single-phrase search
      - Response structure optimized for frontend display
 
 4. **Integration**
@@ -392,7 +361,27 @@ We will log these clicks for analysis.
    - Implement error handling
    - Add loading states
 
-### Phase 4: Testing and Deployment
+### Phase 4: Data-Integration + Multi-Search
+
+1. **Data Integration Improvements**
+
+   - Implement API client functions to fetch projects
+   - Create data fetching hooks for projects list
+   - Handle loading and error states
+   - Implement proper state management for API data
+   - Add pagination if needed
+   - Ensure proper error handling and fallbacks
+
+2. **Multi-Phrase Search Implementation**
+
+   - Refactor SearchBar to support multiple phrases (1-3)
+   - Implement word limit per phrase (max 3 words)
+   - Add UI for phrase separation
+   - Update backend to handle multi-phrase queries
+   - Implement "OR" logic between phrases
+   - Add result prioritization
+
+### Phase 5: Testing and Deployment
 
 1. **Testing**
 
