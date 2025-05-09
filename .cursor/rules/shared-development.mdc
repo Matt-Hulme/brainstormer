@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
 # Shared Development Guide
@@ -10,6 +10,15 @@ Key directories:
 - [frontend](mdc:frontend) - React frontend application
 - [backend](mdc:backend) - FastAPI backend application
 - [.cursor](mdc:.cursor) - Project configuration and rules
+
+## Import Rules
+1. No wildcard imports (export * or import *)
+2. Import directly from source files
+3. Use explicit, named imports
+4. Keep imports organized and grouped
+5. Follow language-specific import conventions
+6. Avoid re-exporting from index files
+7. Use absolute imports when possible
 
 ## File Naming
 1. Use descriptive, meaningful names

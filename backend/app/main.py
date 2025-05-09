@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
 from .core.auth import verify_anonymous_user
+from .core.rate_limit import rate_limit_middleware, RATE_LIMITS
 from .routes import projects, collections, saved_words, search
 
 settings = get_settings()
@@ -21,19 +22,24 @@ app.add_middleware(
 )
 
 @app.middleware("http")
-async def auth_middleware(request: Request, call_next):
+async def auth_and_rate_limit_middleware(request: Request, call_next):
     """
-    Middleware to handle anonymous authentication for all requests.
+    Middleware to handle anonymous authentication and rate limiting for all requests.
     """
     # Get or create anonymous user
     user_id = await verify_anonymous_user(request)
-    
-    # Add user_id to request state for use in route handlers
     request.state.user_id = user_id
     
-    # Process the request
-    response = await call_next(request)
-    return response
+    # Apply rate limiting based on endpoint type
+    path = request.url.path
+    if "/search" in path:
+        limiter = RATE_LIMITS["search"]
+    elif "/bulk" in path:
+        limiter = RATE_LIMITS["bulk"]
+    else:
+        limiter = RATE_LIMITS["default"]
+    
+    return await rate_limit_middleware(request, call_next, limiter)
 
 # Include routers
 app.include_router(projects.router, prefix=settings.API_V1_STR)

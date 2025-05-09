@@ -21,6 +21,14 @@ class Collection(CollectionBase):
     class Config:
         from_attributes = True
 
+class BulkUpdateCollections(BaseModel):
+    collection_ids: List[str]
+    name: str
+
+class BulkMoveCollections(BaseModel):
+    collection_ids: List[str]
+    target_project_id: str
+
 @router.post("/", response_model=Collection)
 async def create_collection(
     collection: CollectionCreate,
@@ -147,4 +155,102 @@ async def delete_collection(collection_id: str, request: Request):
     if not result.data:
         raise HTTPException(status_code=400, detail="Failed to delete collection")
     
-    return {"message": "Collection deleted successfully"} 
+    return {"message": "Collection deleted successfully"}
+
+@router.put("/bulk/update", response_model=List[Collection])
+async def bulk_update_collections(
+    bulk_update: BulkUpdateCollections,
+    request: Request
+):
+    """Update multiple collections' names."""
+    supabase = get_supabase_client()
+    
+    # Verify collections ownership through projects
+    collections = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .in_("id", bulk_update.collection_ids)\
+        .eq("projects.user_id", request.state.user_id)\
+        .execute()
+    
+    if not collections.data:
+        raise HTTPException(status_code=404, detail="No collections found")
+    
+    # Update all collections
+    result = supabase.table("collections")\
+        .update({"name": bulk_update.name})\
+        .in_("id", bulk_update.collection_ids)\
+        .execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=400, detail="Failed to update collections")
+    
+    return result.data
+
+@router.put("/bulk/move", response_model=List[Collection])
+async def bulk_move_collections(
+    bulk_move: BulkMoveCollections,
+    request: Request
+):
+    """Move multiple collections to a different project."""
+    supabase = get_supabase_client()
+    
+    # Verify target project ownership
+    target_project = supabase.table("projects")\
+        .select("id")\
+        .eq("id", bulk_move.target_project_id)\
+        .eq("user_id", request.state.user_id)\
+        .single()\
+        .execute()
+    
+    if not target_project.data:
+        raise HTTPException(status_code=404, detail="Target project not found")
+    
+    # Verify collections ownership through projects
+    collections = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .in_("id", bulk_move.collection_ids)\
+        .eq("projects.user_id", request.state.user_id)\
+        .execute()
+    
+    if not collections.data:
+        raise HTTPException(status_code=404, detail="No collections found")
+    
+    # Move collections to target project
+    result = supabase.table("collections")\
+        .update({"project_id": bulk_move.target_project_id})\
+        .in_("id", bulk_move.collection_ids)\
+        .execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=400, detail="Failed to move collections")
+    
+    return result.data
+
+@router.delete("/bulk")
+async def bulk_delete_collections(
+    collection_ids: List[str],
+    request: Request
+):
+    """Delete multiple collections."""
+    supabase = get_supabase_client()
+    
+    # Verify collections ownership through projects
+    collections = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .in_("id", collection_ids)\
+        .eq("projects.user_id", request.state.user_id)\
+        .execute()
+    
+    if not collections.data:
+        raise HTTPException(status_code=404, detail="No collections found")
+    
+    # Delete collections
+    result = supabase.table("collections")\
+        .delete()\
+        .in_("id", collection_ids)\
+        .execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=400, detail="Failed to delete collections")
+    
+    return {"message": "Collections deleted successfully"} 
