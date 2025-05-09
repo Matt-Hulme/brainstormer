@@ -7,10 +7,10 @@ alwaysApply: false
 
 ## Project Structure
 Key directories and their purposes:
-- [frontend/src/components](mdc:frontend/src/components) - Reusable UI components
-- [frontend/src/pages](mdc:frontend/src/pages) - Page components (routes)
-- [frontend/src/utils](mdc:frontend/src/utils) - Utility functions
-- [frontend/src/config](mdc:frontend/src/config) - Configuration and API setup
+- @frontend/src/components - Reusable UI components
+- @frontend/src/pages - Page components (routes)
+- @frontend/src/utils - Utility functions
+- @frontend/src/config - Configuration and API setup
 
 ## Component Guidelines
 1. One component per file
@@ -40,11 +40,11 @@ Key directories and their purposes:
 5. Use interfaces for public APIs and types for internal use
 
 ## Hook Organization
-1. Keep hooks close to the components that use them
-2. Co-locate hooks with their related components
-3. Only extract hooks to shared location if used by multiple components
-4. Name hooks with 'use' prefix
-5. Keep hooks focused and single-responsibility
+1. Keep hooks colocated with their related components/pages
+2. Name query hooks with verb prefix and Query suffix (e.g., useGetProjectsQuery)
+3. Name mutation hooks with verb prefix and Mutation suffix (e.g., useCreateProjectMutation)
+4. Keep hooks focused and single-responsibility
+5. Place hooks in the same directory as their related component/page
 
 ## Styling Rules
 1. Use Tailwind CSS for styling
