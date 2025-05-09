@@ -24,6 +24,10 @@ class BulkSaveWords(BaseModel):
     words: List[str]
     collection_id: str
 
+class BulkMoveWords(BaseModel):
+    word_ids: List[str]
+    target_collection_id: str
+
 @router.post("/", response_model=SavedWord)
 async def create_saved_word(
     saved_word: SavedWordCreate,
@@ -159,4 +163,73 @@ async def delete_saved_word(word_id: str, request: Request):
     if not result.data:
         raise HTTPException(status_code=400, detail="Failed to delete word")
     
-    return {"message": "Word deleted successfully"} 
+    return {"message": "Word deleted successfully"}
+
+@router.put("/bulk/move", response_model=List[SavedWord])
+async def bulk_move_words(
+    bulk_move: BulkMoveWords,
+    request: Request
+):
+    """Move multiple words to a different collection."""
+    supabase = get_supabase_client()
+    
+    # Verify target collection ownership through project
+    target_collection = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .eq("id", bulk_move.target_collection_id)\
+        .eq("projects.user_id", request.state.user_id)\
+        .single()\
+        .execute()
+    
+    if not target_collection.data:
+        raise HTTPException(status_code=404, detail="Target collection not found")
+    
+    # Verify words ownership through collections and projects
+    words = supabase.table("saved_words")\
+        .select("*, collections!inner(*, projects!inner(*))")\
+        .in_("id", bulk_move.word_ids)\
+        .eq("collections.projects.user_id", request.state.user_id)\
+        .execute()
+    
+    if not words.data:
+        raise HTTPException(status_code=404, detail="No words found")
+    
+    # Move words to target collection
+    result = supabase.table("saved_words")\
+        .update({"collection_id": bulk_move.target_collection_id})\
+        .in_("id", bulk_move.word_ids)\
+        .execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=400, detail="Failed to move words")
+    
+    return result.data
+
+@router.delete("/bulk")
+async def bulk_delete_words(
+    word_ids: List[str],
+    request: Request
+):
+    """Delete multiple saved words."""
+    supabase = get_supabase_client()
+    
+    # Verify words ownership through collections and projects
+    words = supabase.table("saved_words")\
+        .select("*, collections!inner(*, projects!inner(*))")\
+        .in_("id", word_ids)\
+        .eq("collections.projects.user_id", request.state.user_id)\
+        .execute()
+    
+    if not words.data:
+        raise HTTPException(status_code=404, detail="No words found")
+    
+    # Delete words
+    result = supabase.table("saved_words")\
+        .delete()\
+        .in_("id", word_ids)\
+        .execute()
+    
+    if not result.data:
+        raise HTTPException(status_code=400, detail="Failed to delete words")
+    
+    return {"message": "Words deleted successfully"} 

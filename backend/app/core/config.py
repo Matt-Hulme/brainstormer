@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     
     # API settings
     API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Brainstormer"
+    PROJECT_NAME: str = "Brainstormer API"
     PORT: int = 8000
     HOST: str = "0.0.0.0"
     
@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     
     # Debug settings
     DEBUG: bool = True
+    
+    # Redis settings for rate limiting
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
     
     class Config:
         env_file = str(ROOT_DIR / ".env")

@@ -349,7 +349,7 @@ We will log these clicks for analysis.
    - Set up Row Level Security policies for data access ✅
    - Configure proper indexes and constraints ✅
 
-3. **API Endpoints** (In Progress)
+3. **API Endpoints** ✅
 
    - Create project management endpoints ✅
    - Implement collection management endpoints ✅
@@ -357,16 +357,26 @@ We will log these clicks for analysis.
    - Implement search and keyword suggestion endpoints ✅
      - Initially support single-phrase search ✅
      - Response structure optimized for frontend display ✅
+   - Add rate limiting ✅
+     - Redis-based rate limiting implementation ✅
+     - Different limits for various endpoint types:
+       - Default: 100 requests/minute ✅
+       - Search: 20 requests/minute ✅
+       - Bulk operations: 10 requests/minute ✅
+     - Per-user and per-IP tracking ✅
+     - Proper error responses with retry-after headers ✅
 
-4. **Integration** (Next Focus)
-   - Connect frontend to backend API
-   - Implement error handling
-   - Add loading states
-   - Test API endpoints
-   - Add rate limiting
-   - Implement proper error responses
+4. **Integration** ✅
+   - API services for projects, collections, and saved words ✅
+   - Bulk operations added for collections (update, move, delete) ✅
+   - Bulk operations added for saved words (save, move, delete) ✅
+   - Proper type definitions added in frontend ✅
+   - Frontend API services updated to use new types ✅
+   - All endpoints maintain security through RLS policies ✅
+   - Frontend error handling for rate limits ✅
+   - User-friendly rate limit notifications ✅
 
-### Phase 4: Data-Integration + Multi-Search
+### Phase 4: Data-Integration + Multi-Search (Next Focus)
 
 1. **Data Integration Improvements**
 

@@ -1,25 +1,26 @@
-import axios from 'axios'
-import { supabase } from './supabase'
+import axios, { AxiosInstance } from 'axios'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-// Create axios instance with default config
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+// Create API instance
+const api: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Add auth token to requests
-api.interceptors.request.use(async config => {
-  const { data } = await supabase.auth.getSession()
-  const token = data.session?.access_token
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+// Handle request interceptors
+api.interceptors.request.use(
+  config => {
+    // Add any request handling here
+    return config
+  },
+  error => {
+    return Promise.reject(error)
   }
-
-  return config
-})
+)
 
 // Handle response errors
 api.interceptors.response.use(
@@ -27,11 +28,21 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      console.error('Unauthorized access')
-    }
-    if (error.response?.status === 429) {
+      toast.error('Unauthorized access. Please try again.')
+    } else if (error.response?.status === 429) {
       // Handle rate limiting
-      console.error('Rate limit exceeded')
+      const retryAfter = error.response.headers['retry-after'] || 60
+      toast.error(`Rate limit exceeded. Please try again in ${retryAfter} seconds.`)
+
+      // Add rate limit info to error for component handling
+      error.isRateLimit = true
+      error.retryAfter = retryAfter
+    } else if (error.response?.status >= 500) {
+      // Handle server errors
+      toast.error('Server error. Please try again later.')
+    } else {
+      // Handle other errors
+      toast.error(error.response?.data?.detail || 'An error occurred. Please try again.')
     }
     return Promise.reject(error)
   }

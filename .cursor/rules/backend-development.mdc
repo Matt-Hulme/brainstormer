@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
 # Backend Development Guide
@@ -14,12 +14,24 @@ Key directories and their purposes:
 - [backend/app/services](mdc:backend/app/services) - Business logic
 - [backend/app/utils](mdc:backend/app/utils) - Utility functions
 
+## Import Rules
+1. No wildcard imports (from module import *)
+2. Import directly from source files
+3. Use explicit imports for better code traceability
+4. Keep imports organized and grouped:
+   - Standard library imports
+   - Third-party imports
+   - Local application imports
+5. Use absolute imports over relative imports
+
 ## Code Style
 1. Follow PEP 8 guidelines
 2. Use type hints
 3. Keep functions focused and small
 4. Use docstrings for public functions
 5. Maximum line length: 88 characters (Black formatter)
+6. Avoid barrel imports (index.ts/py files that re-export multiple modules)
+7. Import directly from source files for better code traceability
 
 ## FastAPI Guidelines
 1. Group related endpoints

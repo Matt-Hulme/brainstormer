@@ -28,5 +28,21 @@ export interface SaveWordRequest {
 
 export interface SearchRequest {
   query: string
+  projectId: string
   searchId?: string
+}
+
+export interface BulkUpdateCollectionsRequest {
+  collectionIds: string[]
+  name: string
+}
+
+export interface BulkMoveCollectionsRequest {
+  collectionIds: string[]
+  targetProjectId: string
+}
+
+export interface BulkMoveWordsRequest {
+  wordIds: string[]
+  targetCollectionId: string
 }
