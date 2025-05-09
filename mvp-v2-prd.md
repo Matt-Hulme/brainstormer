@@ -220,19 +220,19 @@ We will log these clicks for analysis.
 - [x] Search terms can be selected/deselected
 - [x] Collections sidebar for managing saved words
 - [x] View toggles for different search result displays
-- [ ] Inside Projects, users can Search for new Keywords (initially with single-phrase search).
+- [x] Inside Projects, users can Search for new Keywords (initially with single-phrase search).
   - Note: Multi-phrase search will be implemented in Phase 2.6 post-initial feedback.
-- [ ] Searching triggers loading state and populates suggestions.
-- [ ] Search sessions can be tracked with searchId parameter.
-- [ ] Users can select one or multiple Keywords and Save to a Collection.
-- [ ] Right sidebar shows Collections.
-- [ ] Users can create, rename, and delete Collections.
-- [ ] Inside Collections, users can delete individual Saved Words.
-- [ ] Project Page shows all Collections grouped.
+- [x] Searching triggers loading state and populates suggestions.
+- [x] Search sessions can be tracked with searchId parameter.
+- [x] Users can select one or multiple Keywords and Save to a Collection.
+- [x] Right sidebar shows Collections.
+- [x] Users can create, rename, and delete Collections.
+- [x] Inside Collections, users can delete individual Saved Words.
+- [x] Project Page shows all Collections grouped.
 
 ## Development Roadmap
 
-### Phase 1: Frontend Setup and Configuration
+### Phase 1: Frontend Setup and Configuration ✅
 
 1. **Project Initialization** ✅
 
@@ -331,35 +331,40 @@ We will log these clicks for analysis.
 
 ### Phase 3: Backend Development (Current Focus)
 
-1. **Backend Setup**
+1. **Backend Setup** ✅
 
-   - Set up FastAPI project structure
-   - Configure Supabase connection
-   - Set up authentication middleware for anonymous users
-   - Implement automatic anonymous authentication
+   - Set up FastAPI project structure ✅
+   - Configure Supabase connection ✅
+   - Set up authentication middleware for anonymous users ✅
+   - Implement automatic anonymous authentication ✅
+   - Environment configuration consolidated in root .env ✅
 
-2. **Database Schema**
+2. **Database Schema** ✅
 
-   - Design and implement PostgreSQL tables:
-     - Projects table (id, user_id, title, timestamps)
-     - Collections table (id, project_id, name, timestamps)
-     - Saved Words table (id, collection_id, word, timestamp)
-   - Set up Row Level Security policies for data access
-   - Configure proper indexes and constraints
+   - Design and implement PostgreSQL tables ✅
+     - Projects table (id, user_id, title, timestamps) ✅
+     - Collections table (id, project_id, name, timestamps) ✅
+     - Saved Words table (id, collection_id, word, timestamp) ✅
+     - Search Sessions table (id, project_id, user_id, query, timestamp) ✅
+   - Set up Row Level Security policies for data access ✅
+   - Configure proper indexes and constraints ✅
 
-3. **API Endpoints**
+3. **API Endpoints** (In Progress)
 
-   - Create project management endpoints
-   - Implement collection management endpoints
-   - Create saved words management endpoints
-   - Implement search and keyword suggestion endpoints
-     - Initially support single-phrase search
-     - Response structure optimized for frontend display
+   - Create project management endpoints ✅
+   - Implement collection management endpoints ✅
+   - Create saved words management endpoints ✅
+   - Implement search and keyword suggestion endpoints ✅
+     - Initially support single-phrase search ✅
+     - Response structure optimized for frontend display ✅
 
-4. **Integration**
+4. **Integration** (Next Focus)
    - Connect frontend to backend API
    - Implement error handling
    - Add loading states
+   - Test API endpoints
+   - Add rate limiting
+   - Implement proper error responses
 
 ### Phase 4: Data-Integration + Multi-Search
 
@@ -393,4 +398,70 @@ We will log these clicks for analysis.
    - Manual deployment to production environment
    - Basic monitoring setup
    - Documentation for future maintenance
+
+### Database Schema Versioning
+
+- The database schema (for Projects, Collections, and Saved Words) is versioned in the repo at `backend/sql/schema.sql`.
+- To recreate the tables, run the SQL in that file in your Supabase SQL editor.
+
+#### Example schema.sql
+
+```sql
+-- Projects Table
+CREATE TABLE IF NOT EXISTS projects (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    title text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Collections Table
+CREATE TABLE IF NOT EXISTS collections (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id uuid NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    name text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Saved Words Table
+CREATE TABLE IF NOT EXISTS saved_words (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    collection_id uuid NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+    word text NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
+);
+```
+
+### Row Level Security (RLS) Policies
+
+For user data privacy, enable RLS on all tables and add the following policies:
+
+#### projects Table
+
+| Action | Policy Name                  | Policy Expression    |
+| ------ | ---------------------------- | -------------------- |
+| SELECT | User can read own projects   | user_id = auth.uid() |
+| INSERT | User can insert own projects | user_id = auth.uid() |
+| UPDATE | User can update own projects | user_id = auth.uid() |
+| DELETE | User can delete own projects | user_id = auth.uid() |
+
+#### collections Table
+
+| Action | Policy Name                     | Policy Expression                                                                                            |
+| ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| SELECT | User can read own collections   | EXISTS (SELECT 1 FROM projects WHERE projects.id = collections.project_id AND projects.user_id = auth.uid()) |
+| INSERT | User can insert own collections | EXISTS (SELECT 1 FROM projects WHERE projects.id = new.project_id AND projects.user_id = auth.uid())         |
+| UPDATE | User can update own collections | EXISTS (SELECT 1 FROM projects WHERE projects.id = collections.project_id AND projects.user_id = auth.uid()) |
+| DELETE | User can delete own collections | EXISTS (SELECT 1 FROM projects WHERE projects.id = collections.project_id AND projects.user_id = auth.uid()) |
+
+#### saved_words Table
+
+| Action | Policy Name                     | Policy Expression                                                                                                                                                           |
+| ------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SELECT | User can read own saved words   | EXISTS (SELECT 1 FROM collections JOIN projects ON projects.id = collections.project_id WHERE collections.id = saved_words.collection_id AND projects.user_id = auth.uid()) |
+| INSERT | User can insert own saved words | EXISTS (SELECT 1 FROM collections JOIN projects ON projects.id = collections.project_id WHERE collections.id = new.collection_id AND projects.user_id = auth.uid())         |
+| UPDATE | User can update own saved words | EXISTS (SELECT 1 FROM collections JOIN projects ON projects.id = collections.project_id WHERE collections.id = saved_words.collection_id AND projects.user_id = auth.uid()) |
+| DELETE | User can delete own saved words | EXISTS (SELECT 1 FROM collections JOIN projects ON projects.id = collections.project_id WHERE collections.id = saved_words.collection_id AND projects.user_id = auth.uid()) |
 
