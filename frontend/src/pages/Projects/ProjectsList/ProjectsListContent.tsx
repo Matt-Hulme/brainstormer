@@ -1,11 +1,15 @@
-import { projectCardsMock } from './mocks/projectCardsMock'
+import { Project } from '@/types'
 import { ProjectCard } from './ProjectCard'
 
-export const ProjectsListContent = () => {
+interface ProjectsListContentProps {
+  projects: Project[]
+}
+
+export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
   return (
     <div className="flex flex-col gap-[72px] justify-center pt-[70px]">
       <h1 className="color-secondary-4 max-w-[724px] text-h1">
-        Welcome back. Time to get mischiveous.
+        Welcome back. Time to get mischievous.
       </h1>
       <div className="space-y-[20px]">
         <div className="flex flex-row items-center justify-between pr-[30px]">
@@ -16,13 +20,13 @@ export const ProjectsListContent = () => {
         </div>
         <div className="flex flex-col gap-[20px]">
           <div>
-            {projectCardsMock.map(projectCard => (
+            {projects.map(project => (
               <ProjectCard
-                key={projectCard.title}
-                title={projectCard.title}
-                lastEdited={projectCard.lastEdited}
-                collections={projectCard.collections}
-                savedWords={projectCard.savedWords}
+                key={project.id}
+                title={project.title}
+                lastEdited={new Date(project.lastEdited).toLocaleDateString()}
+                collections={project.collections.map(c => c.name)}
+                savedWords={project.savedWords.map(w => w.word)}
               />
             ))}
           </div>
