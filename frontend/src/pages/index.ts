@@ -1,4 +1,5 @@
 export { Home } from './Home'
-export { ProjectsList } from './Projects/ProjectsList/ProjectsList'
+export { Login } from './Login'
 export { ProjectDetails } from './Projects/ProjectDetails/ProjectDetails'
+export { ProjectsList } from './Projects/ProjectsList/ProjectsList'
 export { ProjectSearch } from './Projects/ProjectSearch/ProjectSearch'

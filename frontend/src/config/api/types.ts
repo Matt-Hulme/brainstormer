@@ -27,9 +27,18 @@ export interface SaveWordRequest {
 }
 
 export interface SearchRequest {
-  query: string
   projectId: string
-  searchId?: string
+  query: string
+}
+
+export interface KeywordSuggestion {
+  word: string
+  score: number
+}
+
+export interface SearchResponse {
+  suggestions: KeywordSuggestion[]
+  searchId: string
 }
 
 export interface BulkUpdateCollectionsRequest {

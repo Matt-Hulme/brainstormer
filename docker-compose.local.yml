@@ -18,6 +18,8 @@ services:
     container_name: brainstormer-backend-local
     env_file:
       - .env
+    volumes:
+      - ./.env:/code/.env:ro
     # Port exposure is handled by nginx, no need to map to host directly for local test via nginx
     # ports:
     #   - "${PORT}:${PORT}"

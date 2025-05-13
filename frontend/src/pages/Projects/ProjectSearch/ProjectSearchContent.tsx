@@ -1,13 +1,14 @@
-import { searchResultsMock } from './mocks/searchResultsMock'
 import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
 import { useState, useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
-// import { useSearchParams } from 'react-router-dom'
+import { KeywordSuggestion } from '@/config/api/types'
 
-export const ProjectSearchContent = () => {
-  // const [searchParams] = useSearchParams()
-  // const searchQuery = searchParams.get('q')
-  const searchResults = Array.from({ length: 5 }, () => [...searchResultsMock]).flat()
+interface ProjectSearchContentProps {
+  projectId: string
+  results: KeywordSuggestion[]
+}
+
+export const ProjectSearchContent = ({ projectId, results }: ProjectSearchContentProps) => {
   const [activeTermIds, setActiveTermIds] = useState<Set<string>>(new Set())
 
   const handleSelectWord = useCallback((termId: string) => {
@@ -40,8 +41,8 @@ export const ProjectSearchContent = () => {
   return (
     <div className="flex flex-row pt-[25px]">
       <div className="pb-[35px] flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
-        {searchResults.map((term, index) => {
-          const termId = `${term}-${index}`
+        {results.map((result, index) => {
+          const termId = `${result.word}-${index}`
           return (
             <SearchTerm
               key={termId}
@@ -50,12 +51,16 @@ export const ProjectSearchContent = () => {
                 activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
               }
             >
-              {term}
+              {result.word}
             </SearchTerm>
           )
         })}
       </div>
-      <ProjectSearchCollectionsSidebar activeWords={activeWords} onRemoveWord={handleRemoveWord} />
+      <ProjectSearchCollectionsSidebar
+        projectId={projectId}
+        activeWords={activeWords}
+        onRemoveWord={handleRemoveWord}
+      />
     </div>
   )
 }

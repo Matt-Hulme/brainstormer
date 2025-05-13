@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 export const Home = () => {
   const navigate = useNavigate()
-  // For now, we'll use a placeholder userId until authentication is set up
-  const userId = 'userId'
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -13,7 +11,7 @@ export const Home = () => {
         <Button
           variant="outline"
           className="border-secondary-1 text-secondary-4"
-          onClick={() => navigate(`/${userId}/projects`)}
+          onClick={() => navigate('/login')}
         >
           Log in
         </Button>
@@ -29,7 +27,7 @@ export const Home = () => {
               , not to replace your creativity.
             </h1>
           </header>
-          <div className="flex flex-row gap-[45px] pl-[118px]">
+          <div>
             <p className="text-h4 color-secondary-4 max-w-[582px]">
               Instead of making art or writing for you, Creaitve helps you break out of your
               creative block so you can create even better—because creativity breeds culture. When
@@ -48,7 +46,7 @@ export const Home = () => {
           <Button
             variant="text"
             textClass="text-[25px] leading-[40px] font-serif color-secondary-4"
-            onClick={() => navigate(`/${userId}/projects`)}
+            onClick={() => navigate('/login')}
           >
             Give it a try
           </Button>

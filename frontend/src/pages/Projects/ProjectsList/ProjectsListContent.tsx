@@ -1,11 +1,23 @@
-import { Project } from '@/types'
+import { useGetProjectsQuery } from './useGetProjectsQuery'
 import { ProjectCard } from './ProjectCard'
 
-interface ProjectsListContentProps {
-  projects: Project[]
-}
+export const ProjectsListContent = () => {
+  const { projects, loading, error } = useGetProjectsQuery()
 
-export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full text-secondary-2">Loading...</div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full text-red-500">
+        Failed to load projects
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-[72px] justify-center pt-[70px]">
       <h1 className="color-secondary-4 max-w-[724px] text-h1">
@@ -24,9 +36,9 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
               <ProjectCard
                 key={project.id}
                 title={project.title}
-                lastEdited={new Date(project.lastEdited).toLocaleDateString()}
-                collections={project.collections.map(c => c.name)}
-                savedWords={project.savedWords.map(w => w.word)}
+                lastEdited={new Date(project.updated_at).toLocaleDateString()}
+                collections={project.collections?.map(c => c.name) || []}
+                savedWords={project.savedWords?.map(w => w.word) || []}
               />
             ))}
           </div>

@@ -1,16 +1,18 @@
-# Direct dependencies with specific versions
-fastapi>=0.68.0,<0.69.0
-uvicorn>=0.15.0,<0.16.0
-python-dotenv>=0.19.0,<0.20.0
-openai>=1.0.0
-httpx
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
-python-multipart>=0.0.5
-python-jose[cryptography]>=3.3.0
-passlib[bcrypt]>=1.7.4
-supabase>=0.7.1,<0.8.0
-redis>=4.5.0,<5.0.0
+# Core dependencies
+fastapi==0.65.2  # Known to work with Pydantic 1.9.1
+uvicorn==0.15.0
+python-dotenv==0.19.0
+pydantic==1.9.1  # Required by gotrue
+pydantic-settings<2.0.0,>=1.2.0
+python-multipart==0.0.5
+
+# Extra dependencies
+openai==0.28.0  # Last version before major API changes
+httpx==0.23.0  # Required by supabase
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+supabase==0.7.1
+redis==4.5.0
 
 # Note: To generate a requirements.lock file with all sub-dependencies pinned:
 # pip freeze > requirements.lock 

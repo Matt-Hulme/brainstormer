@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 // Create API instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -14,7 +14,11 @@ const api: AxiosInstance = axios.create({
 // Handle request interceptors
 api.interceptors.request.use(
   config => {
-    // Add any request handling here
+    // Add auth token to requests if available
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   error => {
@@ -28,7 +32,12 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      toast.error('Unauthorized access. Please try again.')
+      toast.error('Session expired. Please log in again.')
+      // Clear stored auth data
+      localStorage.removeItem('token')
+      localStorage.removeItem('anonymousId')
+      // Redirect to login
+      window.location.href = '/login'
     } else if (error.response?.status === 429) {
       // Handle rate limiting
       const retryAfter = error.response.headers['retry-after'] || 60

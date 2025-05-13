@@ -1,47 +1,121 @@
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Request, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from .supabase import supabase
 from .config import get_settings
 import uuid
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
+from pydantic import BaseModel
+from typing import Optional
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 security = HTTPBearer()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-async def get_anonymous_user_id(request: Request) -> str:
+# Verify JWT_SECRET is set
+if not settings.JWT_SECRET:
+    raise ValueError("JWT_SECRET environment variable is not set")
+
+# Log environment variables (without sensitive values)
+logger.info(f"ADMIN_USERNAME from settings: {'*' * len(settings.ADMIN_USERNAME)}")
+logger.info(f"ADMIN_PASSWORD from settings: {'*' * len(settings.ADMIN_PASSWORD)}")
+logger.info(f"JWT_SECRET from settings: {'*' * len(settings.JWT_SECRET)}")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    anonymous_id: str
+
+class User(BaseModel):
+    username: str
+    anonymous_id: str
+    disabled: Optional[bool] = None
+
+# Get admin credentials from environment
+ADMIN_USERNAME = settings.ADMIN_USERNAME
+ADMIN_PASSWORD = settings.ADMIN_PASSWORD
+
+def get_user(username: str):
+    """Get user by username"""
+    logger.info(f"Attempting to get user with username: {username}")
+    if username == ADMIN_USERNAME:
+        logger.info("Username matches ADMIN_USERNAME")
+        return {
+            "username": ADMIN_USERNAME,
+            "anonymous_id": f"{settings.ANONYMOUS_USER_PREFIX}admin",
+            "disabled": False
+        }
+    logger.info("Username does not match ADMIN_USERNAME")
+    return None
+
+def authenticate_user(username: str, password: str):
+    """Authenticate a user"""
+    logger.info(f"Attempting to authenticate user: {username}")
+    
+    user = get_user(username)
+    if not user:
+        logger.info(f"User not found: {username}")
+        return False
+    
+    # Log password comparison (without revealing actual values)
+    logger.info(f"Comparing passwords - Input length: {len(password)}, Expected length: {len(ADMIN_PASSWORD)}")
+    if password != ADMIN_PASSWORD:
+        logger.info(f"Password verification failed for user: {username}")
+        return False
+    
+    logger.info(f"Authentication successful for user: {username}")
+    return user
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, algorithm="HS256")
+    return encoded_jwt
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        username: str = payload.get("sub")
+        anonymous_id: str = payload.get("anonymous_id")
+        if username is None or anonymous_id is None:
+            raise credentials_exception
+        user = get_user(username)
+        if user is None:
+            raise credentials_exception
+        return user
+    except JWTError:
+        raise credentials_exception
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+async def verify_user_auth(request: Request) -> str:
     """
-    Gets or creates an anonymous user ID from the request.
-    If no user ID is provided, creates a new anonymous user.
+    Middleware to verify user authentication and return anonymous ID.
     """
     try:
-        # Try to get the user ID from the Authorization header
         auth = await security(request)
-        user_id = auth.credentials
-        
-        # Verify the user exists in Supabase
-        response = supabase.auth.get_user(user_id)
-        if response.user:
-            return user_id
-            
-    except HTTPException:
-        # If no valid auth header, create new anonymous user
-        pass
-    
-    # Create new anonymous user
-    anonymous_id = f"{settings.ANONYMOUS_USER_PREFIX}{str(uuid.uuid4())}"
-    
-    # Create user in Supabase
-    try:
-        response = supabase.auth.admin.create_user({
-            "email": f"{anonymous_id}@anonymous.brainstormer",
-            "password": str(uuid.uuid4()),
-            "user_metadata": {"is_anonymous": True}
-        })
-        return response.user.id
+        payload = jwt.decode(auth.credentials, settings.JWT_SECRET, algorithms=["HS256"])
+        anonymous_id = payload.get("anonymous_id")
+        if not anonymous_id:
+            raise HTTPException(status_code=401, detail="Invalid authentication")
+        return anonymous_id
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to create anonymous user")
-
-async def verify_anonymous_user(request: Request) -> str:
-    """
-    Middleware to verify and get the anonymous user ID.
-    """
-    return await get_anonymous_user_id(request) 
+        logger.error(f"Authentication error: {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid authentication") 
