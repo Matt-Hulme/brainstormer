@@ -1,19 +1,19 @@
-// import { useParams } from 'react-router-dom'
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { SearchBar } from '@/components/SearchBar'
 import { ProjectSearchContentLoading } from './ProjectSearchContentLoading'
 import { ProjectSearchContent } from './ProjectSearchContent'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useParams } from 'react-router-dom'
 import { AlignLeft, Target } from 'lucide-react'
 import { Button, VennDiagramIcon } from '@/components'
+import { useSearchQuery } from './useSearchQuery'
 
 export const ProjectSearch = () => {
-  // const { projectId } = useParams()
-  // const isLoading = true
-  const isLoading = false
+  const { projectId } = useParams<{ projectId: string }>()
   const [searchParams] = useSearchParams()
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
+
+  const { results, loading, error } = useSearchQuery(projectId!, searchValue)
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -57,8 +57,13 @@ export const ProjectSearch = () => {
       <div className="flex flex-col w-full h-screen">
         <SearchBar searchValue={searchValue} className="text-h3 text-secondary-4" />
         <main className="flex-1 h-full">
-          {isLoading && <ProjectSearchContentLoading />}
-          {!isLoading && <ProjectSearchContent />}
+          {loading && <ProjectSearchContentLoading />}
+          {!loading && !error && <ProjectSearchContent projectId={projectId!} results={results} />}
+          {error && (
+            <div className="flex items-center justify-center h-full text-red-500">
+              Failed to load search results
+            </div>
+          )}
         </main>
       </div>
     </div>

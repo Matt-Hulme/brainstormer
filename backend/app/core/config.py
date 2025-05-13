@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     
     # API settings
-    API_V1_STR: str = "/api/mvp_v2"
+    API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Brainstormer API"
     PORT: int = 8000
     HOST: str = "0.0.0.0"
