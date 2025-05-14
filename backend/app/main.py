@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from datetime import timedelta
+from starlette.responses import PlainTextResponse
 from .core.config import get_settings
 from .core.auth import (
     Token,
@@ -24,11 +25,25 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["http://localhost:5173"],  # Frontend origin
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Authorization", "Content-Type"],
+    expose_headers=["Content-Length", "Content-Type"],  # Only expose necessary headers
+    max_age=600,  # Cache preflight requests for 10 minutes
 )
+
+# Add explicit OPTIONS route handler for preflight requests
+@app.options("/{full_path:path}")
+async def options_route(request: Request, full_path: str):
+    """Handle OPTIONS preflight requests"""
+    # Apply rate limiting to OPTIONS requests to prevent abuse
+    limiter = RATE_LIMITS["default"]
+    return await rate_limit_middleware(
+        request, 
+        lambda req: PlainTextResponse(""), 
+        limiter
+    )
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -55,8 +70,8 @@ async def auth_and_rate_limit_middleware(request: Request, call_next):
     """
     Middleware to handle authentication and rate limiting for all requests.
     """
-    # Skip auth for login endpoint
-    if request.url.path == "/token":
+    # Skip auth for login endpoint and OPTIONS requests
+    if request.url.path == "/token" or request.method == "OPTIONS":
         return await call_next(request)
         
     # Verify auth and get anonymous ID

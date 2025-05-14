@@ -62,8 +62,6 @@ def authenticate_user(username: str, password: str):
         logger.info(f"User not found: {username}")
         return False
     
-    # Log password comparison (without revealing actual values)
-    logger.info(f"Comparing passwords - Input length: {len(password)}, Expected length: {len(ADMIN_PASSWORD)}")
     if password != ADMIN_PASSWORD:
         logger.info(f"Password verification failed for user: {username}")
         return False

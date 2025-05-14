@@ -20,20 +20,22 @@ services:
       - .env
     volumes:
       - ./.env:/code/.env:ro
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     # Port exposure is handled by nginx, no need to map to host directly for local test via nginx
     # ports:
     #   - "${PORT}:${PORT}"
     networks:
       - brainstormer-net
-    # Add depends_on if needed, e.g., if backend relies on a database
-    # depends_on:
-    #   - db
+    depends_on:
+      - redis
 
   nginx:
     image: nginx:stable-alpine
     container_name: brainstormer-nginx-local
     ports:
-      - '8080:80' # Map host port 8080 to container port 80 (Nginx reverse proxy)
+      - '8000:8000' # Map host port 8080 to container port 80 (Nginx reverse proxy)
     volumes:
       - ./docker/nginx/local.conf:/etc/nginx/conf.d/default.conf:ro
       - ./docker/.htpasswd:/etc/nginx/.htpasswd:ro # Mount the password file
@@ -43,6 +45,17 @@ services:
     networks:
       - brainstormer-net
 
+  redis:
+    image: redis:alpine
+    container_name: brainstormer-redis-local
+    volumes:
+      - redis-data-local:/data
+    networks:
+      - brainstormer-net
+
 networks:
   brainstormer-net:
     driver: bridge
+
+volumes:
+  redis-data-local:

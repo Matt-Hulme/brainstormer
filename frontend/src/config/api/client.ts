@@ -2,9 +2,23 @@ import axios, { AxiosInstance } from 'axios'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+// Ensure the API URL has the correct format
+const getApiBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+  // Make sure the URL ends with /api/v1
+  if (url.endsWith('/api/v1')) {
+    return url
+  } else if (url.endsWith('/')) {
+    return `${url}api/v1`
+  } else {
+    return `${url}/api/v1`
+  }
+}
+
 // Create API instance
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -19,6 +33,12 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    // Log the full URL for debugging
+    const baseUrl = config.baseURL || ''
+    const url = config.url || ''
+    console.log('Making API request to:', baseUrl + url)
+
     return config
   },
   error => {
@@ -30,6 +50,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
+    console.error('API error:', error.message, error.config?.url)
+
     if (error.response?.status === 401) {
       // Handle unauthorized access
       toast.error('Session expired. Please log in again.')

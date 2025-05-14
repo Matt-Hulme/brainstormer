@@ -29,9 +29,26 @@ services:
       - .env
     volumes:
       - ./.env:/code/.env:ro
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: brainstormer-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  redis-data:
