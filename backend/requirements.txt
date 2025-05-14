@@ -1,18 +1,24 @@
 # Core dependencies
-fastapi==0.65.2  # Known to work with Pydantic 1.9.1
+fastapi==0.95.2  # Using a version compatible with pydantic 1.x
 uvicorn==0.15.0
-python-dotenv==0.19.0
-pydantic==1.9.1  # Required by gotrue
-pydantic-settings<2.0.0,>=1.2.0
+python-dotenv==0.21.0
+pydantic==1.10.8  # Specific version known to work with fastapi 0.95.x
 python-multipart==0.0.5
 
-# Extra dependencies
-openai==0.28.0  # Last version before major API changes
-httpx==0.23.0  # Required by supabase
+# Authentication and security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-supabase==0.7.1
+
+# Database and API
+httpx==0.26.0  # Updated to be compatible with supabase 2.15.1
 redis==4.5.0
+supabase==2.15.1  # Using the latest version
+
+# OpenAI
+openai>=1.0.0  # Updated to support AsyncOpenAI
+
+# Note: Commented out dependencies that cause conflicts
+# pydantic-settings - Not needed, using pydantic directly
 
 # Note: To generate a requirements.lock file with all sub-dependencies pinned:
 # pip freeze > requirements.lock 

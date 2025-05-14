@@ -2,10 +2,14 @@ import profilePicture from '@/assets/profile-picture.png'
 import { Project } from '@/types'
 
 interface ProjectDetailsHeaderProps {
-  project: Project
+  project: Project | null
 }
 
 export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => {
+  if (!project) {
+    return null
+  }
+
   return (
     <header className="flex flex-row py-[30px] border-b-[.5px] border-secondary-2/20">
       <div className="grow space-y-[4px]">
