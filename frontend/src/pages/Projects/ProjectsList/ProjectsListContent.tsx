@@ -1,4 +1,4 @@
-import { useGetProjectsQuery } from './useGetProjectsQuery'
+import { useGetProjectsQuery } from './hooks/useGetProjectsQuery'
 import { ProjectCard } from './ProjectCard'
 
 export const ProjectsListContent = () => {

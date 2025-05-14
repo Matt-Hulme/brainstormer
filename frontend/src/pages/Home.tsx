@@ -1,8 +1,21 @@
 import { Button } from '@/components'
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export const Home = () => {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // If user is already authenticated, redirect to projects
+    const token = localStorage.getItem('token')
+    if (token) {
+      navigate('/projects')
+    }
+  }, [navigate])
+
+  const handleLogin = () => {
+    navigate('/login')
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -11,7 +24,7 @@ export const Home = () => {
         <Button
           variant="outline"
           className="border-secondary-1 text-secondary-4"
-          onClick={() => navigate('/login')}
+          onClick={handleLogin}
         >
           Log in
         </Button>
@@ -46,7 +59,7 @@ export const Home = () => {
           <Button
             variant="text"
             textClass="text-[25px] leading-[40px] font-serif color-secondary-4"
-            onClick={() => navigate('/login')}
+            onClick={handleLogin}
           >
             Give it a try
           </Button>

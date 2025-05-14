@@ -4,8 +4,8 @@ import { Fragment } from 'react'
 import { Button } from '@/components/design-system/Button'
 import { ArrowRight } from 'lucide-react'
 import { useParams } from 'react-router-dom'
-import { useGetCollectionsQuery } from '../ProjectsList/useGetCollectionsQuery'
-import { useGetProjectQuery } from '../ProjectsList/useGetProjectQuery'
+import { useGetCollectionsQuery } from '../ProjectsList/hooks/useGetCollectionsQuery'
+import { useGetProjectQuery } from '../ProjectsList/hooks/useGetProjectQuery'
 
 export const ProjectDetails = () => {
   const { projectId } = useParams<{ projectId: string }>()

@@ -2,7 +2,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { HamburgerSidebar } from '../../../components/HamburgerSidebar'
 import { ProjectsListContent } from './ProjectsListContent'
 import { ProjectsListContentEmpty } from './ProjectsListContentEmpty'
-import { useGetProjectsQuery } from './useGetProjectsQuery'
+import { useGetProjectsQuery } from './hooks/useGetProjectsQuery'
 
 export const ProjectsList = () => {
   const { projects, loading, error } = useGetProjectsQuery()

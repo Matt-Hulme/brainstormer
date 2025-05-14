@@ -52,4 +52,5 @@ def get_settings() -> Settings:
     # Print for debugging
     print(f"ADMIN_USERNAME: {settings.ADMIN_USERNAME}")
     print(f"ADMIN_PASSWORD length: {len(settings.ADMIN_PASSWORD)}")
+    print(f"JWT_SECRET length: {len(settings.JWT_SECRET)}")
     return settings 

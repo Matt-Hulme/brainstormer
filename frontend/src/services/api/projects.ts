@@ -13,6 +13,7 @@ export const projectsApi = {
 
   // List all projects
   list: async () => {
+    // The backend handles user filtering based on the JWT token
     const response = await api.get<Project[]>(BASE_PATH)
     return response.data
   },

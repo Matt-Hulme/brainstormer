@@ -45,8 +45,8 @@ export const Login = () => {
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('anonymousId', data.anonymous_id)
 
-      // Navigate to projects page with the anonymous ID
-      navigate(`/${data.anonymous_id}/projects`)
+      // Navigate to projects page
+      navigate('/projects')
     } catch (err) {
       console.error('Login error:', err)
       setError('Invalid username or password')

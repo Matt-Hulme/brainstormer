@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
 
 export const App = () => {
@@ -8,9 +8,10 @@ export const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/:userId/projects" element={<ProjectsList />} />
-          <Route path="/:userId/projects/:projectName" element={<ProjectDetails />} />
-          <Route path="/:userId/projects/:projectName/search" element={<ProjectSearch />} />
+          <Route path="/projects" element={<ProjectsList />} />
+          <Route path="/projects/:projectName" element={<ProjectDetails />} />
+          <Route path="/projects/:projectName/search" element={<ProjectSearch />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>
