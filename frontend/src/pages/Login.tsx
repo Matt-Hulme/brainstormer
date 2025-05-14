@@ -15,11 +15,16 @@ export const Login = () => {
     setLoading(true)
 
     try {
-      const apiUrlFromEnv = import.meta.env.VITE_API_URL
-      console.log('VITE_API_URL from env:', apiUrlFromEnv)
-      const baseUrl = apiUrlFromEnv.replace('/api/v1', '')
-      console.log('Constructed baseUrl:', baseUrl)
-      const response = await fetch(`${baseUrl}/token`, {
+      // The token endpoint is at the root level, not under /api/v1
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      // Remove /api/v1 if it's included in the URL
+      const tokenUrl = baseUrl.includes('/api/v1')
+        ? baseUrl.replace('/api/v1', '/token')
+        : `${baseUrl}/token`
+
+      console.log('Making token request to:', tokenUrl)
+
+      const response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -42,7 +47,8 @@ export const Login = () => {
 
       // Navigate to projects page with the anonymous ID
       navigate(`/${data.anonymous_id}/projects`)
-    } catch {
+    } catch (err) {
+      console.error('Login error:', err)
       setError('Invalid username or password')
     } finally {
       setLoading(false)
