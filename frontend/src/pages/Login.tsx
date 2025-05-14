@@ -15,7 +15,10 @@ export const Login = () => {
     setLoading(true)
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL.replace('/api/v1', '')
+      const apiUrlFromEnv = import.meta.env.VITE_API_URL
+      console.log('VITE_API_URL from env:', apiUrlFromEnv)
+      const baseUrl = apiUrlFromEnv.replace('/api/v1', '')
+      console.log('Constructed baseUrl:', baseUrl)
       const response = await fetch(`${baseUrl}/token`, {
         method: 'POST',
         headers: {

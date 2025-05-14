@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from datetime import timedelta
 from .core.config import get_settings
 from .core.auth import (
@@ -40,13 +41,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "anonymous_id": user.anonymous_id},
+        data={"sub": user["username"], "anonymous_id": user["anonymous_id"]},
         expires_delta=access_token_expires
     )
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "anonymous_id": user.anonymous_id
+        "anonymous_id": user["anonymous_id"]
     }
 
 @app.middleware("http")
