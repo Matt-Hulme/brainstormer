@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel
 from ..core.database import get_supabase_client
 from ..core.openai_client import get_openai_client
+import re
 
 router = APIRouter(prefix="/search", tags=["search"])
 
@@ -12,7 +13,6 @@ class SearchRequest(BaseModel):
 
 class KeywordSuggestion(BaseModel):
     word: str
-    score: float
 
 class SearchResponse(BaseModel):
     suggestions: List[KeywordSuggestion]
@@ -45,17 +45,17 @@ async def search_keywords(
             messages=[
                 {
                     "role": "system",
-                    "content": """You are a Scattershot Brainstormer. Your job is to take a single word input from the user and generate a diverse list of 100 relevant words associated with it.Instructions:
-                    - Do not assume the user's intent—generate words that span multiple fields and applications, such as writing, science, medicine, gaming, design, history, etc.
-                    - The words should not be organized in any particular order. They should feel random yet relevant to the input word.
-                    - Ensure that **both single words and multi-word phrases** appear **evenly throughout the list** to maintain a natural scatter.
-                    - Avoid clustering single words at the beginning and longer phrases at the end.
-                    - Output each word as a bullet point in a single-column format.
-                    The goal is to spark creativity and cover a wide range of potential connections. The user will provide the input word in the next message."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Generate exactly 100 keyword suggestions for: {search.query}"
+                    "content": f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to "{search.query}".
+                    Instructions:
+                    - Generate at least 100 words or phrases related to "{search.query}"
+                    - Include both single words and multi-word phrases, evenly mixed
+                    - The words should not be organized in any particular order
+                    - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
+                    - Each item should be on its own line with NO prefix characters (no bullet points, no dashes)
+                    - Do not number your list
+                    - Separate items using ONLY line breaks
+
+                    The goal is to provide a wide range of potential connections to "{search.query}" across different domains and contexts."""
                 }
             ],
             temperature=0.7,
@@ -63,8 +63,9 @@ async def search_keywords(
         
         # Process suggestions
         suggestions_text = response.choices[0].message.content.strip()
+        # Split by newlines and clean each item
         suggestions = [
-            KeywordSuggestion(word=word.strip(), score=1.0) 
+            KeywordSuggestion(word=word.strip().lstrip('-•*').strip()) 
             for word in suggestions_text.split('\n')
             if word.strip()
         ]

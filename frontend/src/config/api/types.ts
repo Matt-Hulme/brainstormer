@@ -33,7 +33,6 @@ export interface SearchRequest {
 
 export interface KeywordSuggestion {
   word: string
-  score: number
 }
 
 export interface SearchResponse {
