@@ -2,7 +2,7 @@ import api from '@/config/api/client'
 import type { Project } from '@/types'
 import type { CreateProjectRequest } from '@/config/api/types'
 
-const BASE_PATH = '/projects'
+const BASE_PATH = '/projects/'
 
 export const projectsApi = {
   // Create a new project

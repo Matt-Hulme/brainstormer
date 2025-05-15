@@ -2,7 +2,7 @@ import api from '@/config/api/client'
 import type { SavedWord } from '@/types'
 import type { SaveWordRequest, BulkMoveWordsRequest } from '@/config/api/types'
 
-const BASE_PATH = '/saved-words'
+const BASE_PATH = '/saved-words/'
 
 export const savedWordsApi = {
   // Save a single word

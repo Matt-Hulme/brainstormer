@@ -39,6 +39,7 @@ class User(BaseModel):
 # Get admin credentials from environment
 ADMIN_USERNAME = settings.ADMIN_USERNAME
 ADMIN_PASSWORD = settings.ADMIN_PASSWORD
+ADMIN_USER_ID = str(uuid.uuid4())  # Generate a unique UUID for admin at startup
 
 def get_user(username: str):
     """Get user by username"""
@@ -47,7 +48,7 @@ def get_user(username: str):
         logger.info("Username matches ADMIN_USERNAME")
         return {
             "username": ADMIN_USERNAME,
-            "anonymous_id": f"{settings.ANONYMOUS_USER_PREFIX}admin",
+            "anonymous_id": ADMIN_USER_ID,  # Use UUID for admin
             "disabled": False
         }
     logger.info("Username does not match ADMIN_USERNAME")

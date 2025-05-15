@@ -1,6 +1,6 @@
 # Core dependencies
-fastapi==0.95.2  # Using a version compatible with pydantic 1.x
-uvicorn==0.15.0
+fastapi>=0.100.0
+uvicorn>=0.22.0
 python-dotenv==0.21.0
 pydantic==1.10.8  # Specific version known to work with fastapi 0.95.x
 python-multipart==0.0.5

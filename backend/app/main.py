@@ -12,7 +12,7 @@ from .core.auth import (
     verify_user_auth,
     get_current_active_user
 )
-from .core.rate_limit import rate_limit_middleware, RATE_LIMITS
+# from .core.rate_limit import rate_limit_middleware, RATE_LIMITS # Commented out
 from .routes import projects, collections, saved_words, search
 
 settings = get_settings()
@@ -38,12 +38,14 @@ app.add_middleware(
 async def options_route(request: Request, full_path: str):
     """Handle OPTIONS preflight requests"""
     # Apply rate limiting to OPTIONS requests to prevent abuse
-    limiter = RATE_LIMITS["default"]
-    return await rate_limit_middleware(
-        request, 
-        lambda req: PlainTextResponse(""), 
-        limiter
-    )
+    # limiter = RATE_LIMITS["default"] # Commented out
+    # return await rate_limit_middleware( # Commented out
+    #     request, 
+    #     lambda req: PlainTextResponse(""), 
+    #     limiter
+    # )
+    # Simpler response for OPTIONS when rate limiting is disabled
+    return PlainTextResponse("")
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -86,14 +88,15 @@ async def auth_and_rate_limit_middleware(request: Request, call_next):
     
     # Apply rate limiting based on endpoint type
     path = request.url.path
-    if "/search" in path:
-        limiter = RATE_LIMITS["search"]
-    elif "/bulk" in path:
-        limiter = RATE_LIMITS["bulk"]
-    else:
-        limiter = RATE_LIMITS["default"]
+    # if "/search" in path: # Commented out
+    #     limiter = RATE_LIMITS["search"] # Commented out
+    # elif "/bulk" in path: # Commented out
+    #     limiter = RATE_LIMITS["bulk"] # Commented out
+    # else: # Commented out
+    #     limiter = RATE_LIMITS["default"] # Commented out
     
-    return await rate_limit_middleware(request, call_next, limiter)
+    # return await rate_limit_middleware(request, call_next, limiter) # Commented out
+    return await call_next(request) # Directly call next without rate limiting
 
 # Include routers
 app.include_router(projects.router, prefix=settings.API_V1_STR)
@@ -104,3 +107,6 @@ app.include_router(search.router, prefix=settings.API_V1_STR)
 @app.get("/")
 async def root():
     return {"message": "Welcome to Brainstormer API"} 
+
+for route in app.routes:
+    print(route.path, route.methods)

@@ -1,7 +1,7 @@
 import api from '@/config/api/client'
 import type { SearchRequest } from '@/config/api/types'
 
-const BASE_PATH = '/search'
+const BASE_PATH = '/search/'
 
 export interface KeywordSuggestion {
   word: string

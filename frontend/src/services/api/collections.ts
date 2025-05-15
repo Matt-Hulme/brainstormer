@@ -6,7 +6,7 @@ import type {
   BulkMoveCollectionsRequest,
 } from '@/config/api/types'
 
-const BASE_PATH = '/collections'
+const BASE_PATH = '/collections/'
 
 export const collectionsApi = {
   // Create a new collection

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
+import { ProtectedRoute } from './components/ProtectedRoute'
 
 export const App = () => {
   return (
@@ -8,9 +9,30 @@ export const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/projects" element={<ProjectsList />} />
-          <Route path="/projects/:projectName" element={<ProjectDetails />} />
-          <Route path="/projects/:projectName/search" element={<ProjectSearch />} />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <ProjectsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectName"
+            element={
+              <ProtectedRoute>
+                <ProjectDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectName/search"
+            element={
+              <ProtectedRoute>
+                <ProjectSearch />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
