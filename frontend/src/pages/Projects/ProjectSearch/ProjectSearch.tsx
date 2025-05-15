@@ -6,7 +6,7 @@ import { ProjectSearchContentEmpty } from './ProjectSearchContentEmpty'
 import { useSearchParams, useParams } from 'react-router-dom'
 import { AlignLeft, Target } from 'lucide-react'
 import { Button, VennDiagramIcon } from '@/components'
-import { useSearchQuery } from '@/hooks'
+import { useSearchQuery, useGetProjectQuery } from '@/hooks'
 import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
 
 export const ProjectSearch = () => {
@@ -15,7 +15,11 @@ export const ProjectSearch = () => {
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
 
-  const { data, isLoading, error } = useSearchQuery(projectName!, searchValue)
+  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName!, searchValue)
+  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName!)
+
+  // Determine overall loading state
+  const isLoading = searchLoading || projectLoading
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -57,8 +61,14 @@ export const ProjectSearch = () => {
         <SearchBar searchValue={searchValue} className="text-h3 text-secondary-4" />
         <main className="flex-1 h-full">
           {isLoading && <ProjectSearchContentLoading />}
-          {error && <ProjectSearchContentEmpty />}
-          {!isLoading && !error && <ProjectSearchContent projectName={projectName!} results={data?.suggestions ?? []} />}
+          {searchError && <ProjectSearchContentEmpty />}
+          {!isLoading && !searchError && (
+            <ProjectSearchContent
+              projectName={projectName!}
+              results={data?.suggestions ?? []}
+              project={project}
+            />
+          )}
         </main>
       </div>
     </div>

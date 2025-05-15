@@ -5,10 +5,9 @@ import { Button } from '@/components/design-system/Button'
 import {
   useGetCollectionsQuery,
   useCreateCollectionMutation,
-  useAddWordToCollectionMutation,
-  useGetProjectQuery
+  useAddWordToCollectionMutation
 } from '@/hooks'
-import { Collection } from '@/types'
+import { Collection, Project } from '@/types'
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
@@ -17,21 +16,20 @@ interface ProjectSearchCollectionsSidebarProps {
   activeWords: string[]
   onRemoveWord?: (word: string) => void
   onWordAdded?: (word: string) => void
+  project?: Project
 }
 
 export const ProjectSearchCollectionsSidebar = ({
   projectName,
   activeWords,
   onRemoveWord,
-  onWordAdded
+  onWordAdded,
+  project
 }: ProjectSearchCollectionsSidebarProps) => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('q') || ''
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [lastProcessedWords, setLastProcessedWords] = useState<string[]>([])
-
-  // Get project ID from project name
-  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName)
 
   // Fetch collections for the project
   const {
@@ -102,14 +100,6 @@ export const ProjectSearchCollectionsSidebar = ({
     )
   }
 
-  if (projectLoading) {
-    return (
-      <aside className="px-[30px] py-[10px] space-y-[15px] min-w-[244px] h-full">
-        <p className="text-p3 text-secondary-1">Loading project...</p>
-      </aside>
-    )
-  }
-
   return (
     <aside className="px-[30px] py-[10px] space-y-[15px] min-w-[244px] h-full">
       <div className="flex justify-between items-center">
@@ -118,7 +108,7 @@ export const ProjectSearchCollectionsSidebar = ({
       <div className="w-full h-[1px] bg-secondary-1/20" />
 
       {/* Collections List */}
-      {!collectionsLoading && collections.length > 0 && (
+      {!collectionsLoading && collections && collections.length > 0 && (
         <div className="space-y-[10px]">
           <p className="text-p3 text-secondary-2">SELECT COLLECTION</p>
           {collections.map((collection: Collection) => (
