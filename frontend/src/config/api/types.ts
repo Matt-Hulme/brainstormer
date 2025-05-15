@@ -12,7 +12,7 @@ export interface ApiResponse<T> {
 
 // API request/response types
 export interface CreateProjectRequest {
-  title: string
+  name: string
 }
 
 export interface CreateCollectionRequest {

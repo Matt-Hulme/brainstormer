@@ -4,7 +4,6 @@ import classNames from 'classnames'
 export interface ResultsCardProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean
   children?: React.ReactNode
-  actions?: React.ReactNode // for nested buttons/links
 }
 
 /**
@@ -19,27 +18,27 @@ export interface ResultsCardProps extends React.ButtonHTMLAttributes<HTMLButtonE
 export const ResultsCard = ({
   selected = false,
   children,
-  actions,
   onClick,
   className,
   ...props
 }: ResultsCardProps) => {
   return (
-    <div className={classNames('relative w-full', className)}>
+    <>
+      <div className={classNames("flex flex-row items-center relative w-full", className)}>
+      </div>
       <button
         type="button"
         onClick={onClick}
         className={classNames(
-          'transition-colors w-full text-left p-[30px] border-b border-solid border-secondary-2/20 flex flex-row items-center justify-between bg-white',
+          "bg-white border-b border-secondary-2/20 border-solid flex flex-row items-center justify-between p-[30px] text-left transition-colors w-full",
           onClick ? 'cursor-pointer hover:bg-opacity-60' : 'cursor-default',
-          selected && 'bg-accent/10 border-primary-1'
+          selected && 'bg-accent/10 border-primary-1',
+          className
         )}
-        disabled={!onClick}
         {...props}
       >
         {children}
       </button>
-      {actions && <div className="absolute top-0 right-0 p-2">{actions}</div>}
-    </div>
+    </>
   )
 }

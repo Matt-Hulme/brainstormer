@@ -4,21 +4,26 @@ import { useNavigate } from 'react-router-dom'
 import { ResultsCard } from '@/components/design-system/ResultsCard'
 
 interface ProjectCardProps {
-  title: string
+  name: string
   lastEdited: string
   collections: string[]
   savedWords: string[]
 }
 
-export const ProjectCard = ({ title, lastEdited, collections, savedWords }: ProjectCardProps) => {
+export const ProjectCard = ({ name, lastEdited, collections, savedWords }: ProjectCardProps) => {
   const navigate = useNavigate()
-  const userId = 'userId' // fixed for now
   const projectName = 'winter-is-calling' // fixed for now
 
+  const onCardClick = () => {
+    const projectUrl = `/projects/${projectName}`
+    console.log(projectUrl)
+    navigate(projectUrl)
+  }
+
   return (
-    <ResultsCard onClick={() => navigate(`/${userId}/projects/${projectName}`)}>
+    <ResultsCard onClick={onCardClick}>
       <div className="space-y-[4px]">
-        <h3 className="text-h3 text-secondary-4 line-clamp-1">{title ? title : 'New Project'}</h3>
+        <h3 className="text-h3 text-secondary-4 line-clamp-1">{name ? name : 'New Project'}</h3>
         <div className="flex flex-row items-center gap-[10px]">
           {lastEdited && (
             <>

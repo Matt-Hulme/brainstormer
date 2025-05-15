@@ -1,7 +1,8 @@
 import { Button } from './design-system/Button'
 import { Input } from './design-system/Input'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'
+import { useCreateProjectMutation } from '@/pages/Projects/ProjectsList/hooks/useCreateProjectMutation'
 
 interface SearchBarProps {
   searchValue: string
@@ -12,8 +13,8 @@ interface SearchBarProps {
 export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarProps) => {
   const [inputValue, setInputValue] = useState(searchValue)
   const navigate = useNavigate()
-  const userId = 'userId'
-  const projectName = 'projectName'
+  const { projectName } = useParams<{ projectName?: string }>()
+  const createProjectMutation = useCreateProjectMutation()
 
   useEffect(() => {
     setInputValue(searchValue)
@@ -30,10 +31,20 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     }
   }
 
-  const handleSearch = () => {
-    if (inputValue.trim()) {
-      navigate(
-        `/${userId}/projects/${projectName}/search?q=${encodeURIComponent(inputValue.trim())}`
+  const handleSearch = async () => {
+    if (!inputValue.trim()) return
+
+    if (projectName) {
+      navigate(`/projects/${projectName}/search?q=${encodeURIComponent(inputValue.trim())}`)
+    } else {
+      // Create a new project, then navigate
+      createProjectMutation.mutate(
+        { name: inputValue.trim() },
+        {
+          onSuccess: (project) => {
+            navigate(`/projects/${project.name}/search?q=${encodeURIComponent(inputValue.trim())}`)
+          },
+        }
       )
     }
   }

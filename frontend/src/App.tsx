@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { ProtectedRoute } from './components'
 
 export const App = () => {
   return (

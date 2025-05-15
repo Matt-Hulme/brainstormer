@@ -7,7 +7,7 @@ from ..core.database import get_supabase_client
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 class ProjectBase(BaseModel):
-    title: str
+    name: str
 
 class ProjectCreate(ProjectBase):
     pass
@@ -30,7 +30,7 @@ async def create_project(
     supabase = get_supabase_client()
     
     data = {
-        "title": project.title,
+        "name": project.name,
         "user_id": request.state.user_id
     }
     
@@ -77,11 +77,11 @@ async def update_project(
     project: ProjectBase,
     request: Request
 ):
-    """Update a project's title."""
+    """Update a project's name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
-        .update({"title": project.title})\
+        .update({"name": project.name})\
         .eq("id", project_id)\
         .eq("user_id", request.state.user_id)\
         .execute()

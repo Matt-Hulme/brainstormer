@@ -8,12 +8,12 @@ import { Button, VennDiagramIcon } from '@/components'
 import { useSearchQuery } from './useSearchQuery'
 
 export const ProjectSearch = () => {
-  const { projectId } = useParams<{ projectId: string }>()
+  const { projectName } = useParams<{ projectName: string }>()
   const [searchParams] = useSearchParams()
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
 
-  const { results, loading, error } = useSearchQuery(projectId!, searchValue)
+  const { results, loading, error } = useSearchQuery(projectName!, searchValue)
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -58,7 +58,7 @@ export const ProjectSearch = () => {
         <SearchBar searchValue={searchValue} className="text-h3 text-secondary-4" />
         <main className="flex-1 h-full">
           {loading && <ProjectSearchContentLoading />}
-          {!loading && !error && <ProjectSearchContent projectId={projectId!} results={results} />}
+          {!loading && !error && <ProjectSearchContent projectName={projectName!} results={results} />}
           {error && (
             <div className="flex items-center justify-center h-full text-red-500">
               Failed to load search results

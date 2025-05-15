@@ -4,11 +4,11 @@ import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 
 interface ProjectSearchContentProps {
-  projectId: string
+  projectName: string
   results: KeywordSuggestion[]
 }
 
-export const ProjectSearchContent = ({ projectId, results }: ProjectSearchContentProps) => {
+export const ProjectSearchContent = ({ projectName, results }: ProjectSearchContentProps) => {
   const [activeTermIds, setActiveTermIds] = useState<Set<string>>(new Set())
 
   const handleSelectWord = useCallback((termId: string) => {
@@ -57,7 +57,7 @@ export const ProjectSearchContent = ({ projectId, results }: ProjectSearchConten
         })}
       </div>
       <ProjectSearchCollectionsSidebar
-        projectId={projectId}
+        projectName={projectName}
         activeWords={activeWords}
         onRemoveWord={handleRemoveWord}
       />
