@@ -12,7 +12,7 @@ import type { AxiosError } from 'axios'
  *   createProjectMutation.mutate({ name: 'My Project' }, { onSuccess: () => { ... } });
  */
 export const useCreateProjectMutation = () => {
-  return useMutation<Project, AxiosError, CreateProjectRequest>({
-    mutationFn: projectsApi.create,
-  })
+    return useMutation<Project, AxiosError, CreateProjectRequest>({
+        mutationFn: projectsApi.create,
+    })
 } 

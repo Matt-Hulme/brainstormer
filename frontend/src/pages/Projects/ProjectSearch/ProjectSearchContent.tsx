@@ -38,29 +38,40 @@ export const ProjectSearchContent = ({ projectName, results }: ProjectSearchCont
     })
   }, [])
 
+  const handleWordAdded = useCallback((word: string) => {
+    // If a word is successfully added to a collection, we can optionally remove it from active words
+    // Uncomment this if you want to clear words after they're added to a collection automatically
+    // handleRemoveWord(word)
+  }, [])
+
   return (
     <div className="flex flex-row pt-[25px]">
-      <div className="pb-[35px] flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
-        {results.map((result, index) => {
-          const termId = `${result.word}-${index}`
-          return (
-            <SearchTerm
-              key={termId}
-              isActive={activeTermIds.has(termId)}
-              onClick={() =>
-                activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
-              }
-            >
-              {result.word}
-            </SearchTerm>
-          )
-        })}
+      <div className="flex-1 pb-[35px]">
+        <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
+          {results.map((result, index) => {
+            const termId = `${result.word}-${index}`
+            return (
+              <SearchTerm
+                key={termId}
+                isActive={activeTermIds.has(termId)}
+                onClick={() =>
+                  activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
+                }
+              >
+                {result.word}
+              </SearchTerm>
+            )
+          })}
+        </div>
       </div>
-      <ProjectSearchCollectionsSidebar
-        projectName={projectName}
-        activeWords={activeWords}
-        onRemoveWord={handleRemoveWord}
-      />
+      <div className="ml-5">
+        <ProjectSearchCollectionsSidebar
+          projectName={projectName}
+          activeWords={activeWords}
+          onRemoveWord={handleRemoveWord}
+          onWordAdded={handleWordAdded}
+        />
+      </div>
     </div>
   )
 }

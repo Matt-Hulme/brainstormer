@@ -2,9 +2,9 @@
 export interface Project {
   id: string
   name: string
-  user_id: string
-  created_at: string
-  updated_at: string
+  userId: string
+  createdAt: string
+  updatedAt: string
   collections: Collection[]
   savedWords: SavedWord[]
 }
@@ -12,17 +12,17 @@ export interface Project {
 export interface Collection {
   id: string
   name: string
-  project_id: string
-  created_at: string
-  updated_at: string
+  projectId: string
+  createdAt: string
+  updatedAt: string
   savedWords: SavedWord[]
 }
 
 export interface SavedWord {
   id: string
   word: string
-  collection_id: string
-  created_at: string
+  collectionId: string
+  createdAt: string
 }
 
 export interface Keyword {

@@ -2,7 +2,7 @@ import { Button } from './design-system/Button'
 import { Input } from './design-system/Input'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'
-import { useCreateProjectMutation } from '@/pages/Projects/ProjectsList/hooks/useCreateProjectMutation'
+import { useCreateProjectMutation } from '@/hooks'
 
 interface SearchBarProps {
   searchValue: string

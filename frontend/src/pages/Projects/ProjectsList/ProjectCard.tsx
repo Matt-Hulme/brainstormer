@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
 import { useNavigate } from 'react-router-dom'
 import { ResultsCard } from '@/components/design-system/ResultsCard'
-import { useDeleteProjectMutation } from './hooks/useDeleteProjectMutation'
+import { useDeleteProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {
   name: string

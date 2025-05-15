@@ -1,1 +1,0 @@
-export { useSearchQuery } from './useSearchQuery'

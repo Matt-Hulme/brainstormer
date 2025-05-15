@@ -6,7 +6,8 @@ import { ProjectSearchContentEmpty } from './ProjectSearchContentEmpty'
 import { useSearchParams, useParams } from 'react-router-dom'
 import { AlignLeft, Target } from 'lucide-react'
 import { Button, VennDiagramIcon } from '@/components'
-import { useSearchQuery } from './hooks'
+import { useSearchQuery } from '@/hooks'
+import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
 
 export const ProjectSearch = () => {
   const { projectName } = useParams<{ projectName: string }>()

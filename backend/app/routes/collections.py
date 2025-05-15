@@ -29,6 +29,9 @@ class BulkMoveCollections(BaseModel):
     collection_ids: List[str]
     target_project_id: str
 
+class AddWordRequest(BaseModel):
+    word: str
+
 @router.post("/", response_model=Collection)
 async def create_collection(
     collection: CollectionCreate,
@@ -253,4 +256,48 @@ async def bulk_delete_collections(
     if not result.data:
         raise HTTPException(status_code=400, detail="Failed to delete collections")
     
-    return {"message": "Collections deleted successfully"} 
+    return {"message": "Collections deleted successfully"}
+
+@router.post("/{collection_id}/word", response_model=Collection)
+async def add_word_to_collection(
+    collection_id: str,
+    request_data: AddWordRequest,
+    request: Request
+):
+    """Add a single word to a collection."""
+    supabase = get_supabase_client()
+    
+    # Verify collection ownership through project
+    existing = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .eq("id", collection_id)\
+        .eq("projects.user_id", request.state.user_id)\
+        .single()\
+        .execute()
+    
+    if not existing.data:
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    # Check if word already exists in the collection
+    existing_word = supabase.table("saved_words")\
+        .select("word")\
+        .eq("collection_id", collection_id)\
+        .eq("word", request_data.word)\
+        .execute()
+    
+    # Only add the word if it doesn't already exist
+    if not existing_word.data:
+        # Insert the new word
+        supabase.table("saved_words").insert({
+            "word": request_data.word,
+            "collection_id": collection_id
+        }).execute()
+    
+    # Get updated collection with words
+    result = supabase.table("collections")\
+        .select("*, saved_words(*)")\
+        .eq("id", collection_id)\
+        .single()\
+        .execute()
+    
+    return result.data 

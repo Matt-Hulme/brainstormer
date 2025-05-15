@@ -2,7 +2,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { HamburgerSidebar } from '../../../components/HamburgerSidebar'
 import { ProjectsListContent } from './ProjectsListContent'
 import { ProjectsListContentEmpty } from './ProjectsListContentEmpty'
-import { useGetProjectsQuery } from './hooks'
+import { useGetProjectsQuery } from '@/hooks'
 
 export const ProjectsList = () => {
   const { projects, isLoading, hasError } = useGetProjectsQuery()
@@ -32,7 +32,7 @@ export const ProjectsList = () => {
         </div>
       </div>
     )
-}
+  }
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
