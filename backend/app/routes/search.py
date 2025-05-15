@@ -10,7 +10,7 @@ router = APIRouter(prefix="/search", tags=["search"])
 
 class SearchRequest(BaseModel):
     query: str
-    project_id: str
+    project_name: str
 
 class KeywordSuggestion(BaseModel):
     word: str
@@ -28,16 +28,20 @@ async def search_keywords(
     """Search for keyword suggestions based on a query."""
     supabase = get_supabase_client()
     
-    # Verify project ownership
-    project = supabase.table("projects")\
+    # Get the most recently updated project with the given name
+    projects = supabase.table("projects")\
         .select("id")\
-        .eq("id", search.project_id)\
+        .eq("name", search.project_name)\
         .eq("user_id", request.state.user_id)\
-        .single()\
+        .order("updated_at", desc=True)\
+        .limit(1)\
         .execute()
     
-    if not project.data:
+    if not projects.data or len(projects.data) == 0:
         raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Get the project ID from the most recent result
+    project_id = projects.data[0]["id"]
     
     # Generate a unique search ID
     search_id = str(uuid.uuid4())
@@ -71,10 +75,10 @@ async def search_keywords(
             if word.strip()
         ]
         
-        # Store search session
+        # Store search session using project_id
         supabase.table("search_sessions").insert({
             "id": search_id,
-            "project_id": search.project_id,
+            "project_id": project_id,
             "query": search.query,
             "user_id": request.state.user_id
         }).execute()
@@ -85,7 +89,4 @@ async def search_keywords(
         )
         
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate suggestions: {str(e)}"
-        ) 
+        raise HTTPException(status_code=500, detail=str(e)) 

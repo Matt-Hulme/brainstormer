@@ -27,7 +27,7 @@ export interface SaveWordRequest {
 }
 
 export interface SearchRequest {
-  projectId: string
+  projectName: string
   query: string
 }
 

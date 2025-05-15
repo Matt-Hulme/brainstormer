@@ -1,5 +1,5 @@
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { ProjectDetailsHeader } from './ProjectDetailsHeader'
+// import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 // import { Fragment } from 'react'
 // import { Button } from '@/components/design-system/Button'
 // import { ArrowRight } from 'lucide-react'

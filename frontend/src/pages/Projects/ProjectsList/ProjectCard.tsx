@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
 import { useNavigate } from 'react-router-dom'
 import { ResultsCard } from '@/components/design-system/ResultsCard'
+import { useDeleteProjectMutation } from './hooks/useDeleteProjectMutation'
 
 interface ProjectCardProps {
   name: string
@@ -12,12 +13,18 @@ interface ProjectCardProps {
 
 export const ProjectCard = ({ name, lastEdited, collections, savedWords }: ProjectCardProps) => {
   const navigate = useNavigate()
-  const projectName = 'winter-is-calling' // fixed for now
+  const deleteProject = useDeleteProjectMutation()
 
   const onCardClick = () => {
-    const projectUrl = `/projects/${projectName}`
-    console.log(projectUrl)
+    const projectUrl = `/projects/${name}`
     navigate(projectUrl)
+  }
+
+  const onDelete = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click when deleting
+    if (confirm('Are you sure you want to delete this project?')) {
+      deleteProject.mutate(name)
+    }
   }
 
   return (
@@ -46,9 +53,14 @@ export const ProjectCard = ({ name, lastEdited, collections, savedWords }: Proje
           </span>
         </div>
       </div>
-      <Button variant="icon" className="rounded-full">
-        <ArrowRight className="w-7 h-7 text-gray-500" />
-      </Button>
+      <div className="flex items-center gap-2 relative">
+        <Button variant="text" onClick={onDelete}>
+          Delete
+        </Button>
+        <Button variant="icon" className="rounded-full">
+          <ArrowRight className="w-7 h-7 text-gray-500" />
+        </Button>
+      </div>
     </ResultsCard>
   )
 }

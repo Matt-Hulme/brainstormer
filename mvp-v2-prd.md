@@ -23,6 +23,9 @@ It helps users generate and organize keyword ideas.
 - **Authentication**: Anonymous via Supabase
 - **Routing**: `/userId/projects`, `/userId/projects/:projectName`, `/userId/projects/:projectName/search?q=searchterm`
 - **Security**: RLS, rate limiting, environment variable management
+- **API Data Shape**:
+  - `GET /projects` returns a list of projects (no collections or saved words included)
+  - `GET /projects/{project_name}` returns the project, its collections, and all saved words within those collections (nested)
 
 ## User Roles
 
@@ -40,6 +43,7 @@ It helps users generate and organize keyword ideas.
 ### 3. Project Details Page
 - Header (title, last edited, profile pic)
 - Two-column: collections (left), saved words (right)
+- **Data:** Loaded from a single API call to `/projects/{project_name}` which returns the project, its collections, and all saved words within those collections
 
 ### 4. Search Results Page
 - Search bar, view toggles, loading state, keyword suggestions, multi-select, collections sidebar

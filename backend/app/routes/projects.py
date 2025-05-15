@@ -54,14 +54,14 @@ async def list_projects(request: Request):
     
     return result.data
 
-@router.get("/{project_id}", response_model=Project)
-async def get_project(project_id: str, request: Request):
-    """Get a specific project by ID."""
+@router.get("/{project_name}/", response_model=Project)
+async def get_project(project_name: str, request: Request):
+    """Get a specific project by name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
         .select("*")\
-        .eq("id", project_id)\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .single()\
         .execute()
@@ -71,9 +71,9 @@ async def get_project(project_id: str, request: Request):
     
     return result.data
 
-@router.put("/{project_id}", response_model=Project)
+@router.put("/{project_name}/", response_model=Project)
 async def update_project(
-    project_id: str,
+    project_name: str,
     project: ProjectBase,
     request: Request
 ):
@@ -82,7 +82,7 @@ async def update_project(
     
     result = supabase.table("projects")\
         .update({"name": project.name})\
-        .eq("id", project_id)\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .execute()
     
@@ -91,14 +91,14 @@ async def update_project(
     
     return result.data[0]
 
-@router.delete("/{project_id}")
-async def delete_project(project_id: str, request: Request):
-    """Delete a project."""
+@router.delete("/{project_name}/")
+async def delete_project(project_name: str, request: Request):
+    """Delete a project by name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
         .delete()\
-        .eq("id", project_id)\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .execute()
     
