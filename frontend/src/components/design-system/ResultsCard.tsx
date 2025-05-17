@@ -24,8 +24,6 @@ export const ResultsCard = ({
 }: ResultsCardProps) => {
   return (
     <>
-      <div className={classNames("flex flex-row items-center relative w-full", className)}>
-      </div>
       <button
         type="button"
         onClick={onClick}

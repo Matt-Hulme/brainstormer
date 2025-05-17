@@ -23,7 +23,7 @@ export const projectsApi = {
     if (!projectName) {
       throw new Error('Project name is required')
     }
-    const response = await api.get<Project>(`${BASE_PATH}${projectName}`)
+    const response = await api.get<Project>(`${BASE_PATH}${projectName}/`)
     return response.data
   },
 
@@ -32,7 +32,7 @@ export const projectsApi = {
     if (!projectName) {
       throw new Error('Project name is required')
     }
-    const response = await api.put<Project>(`${BASE_PATH}${projectName}`, data)
+    const response = await api.put<Project>(`${BASE_PATH}${projectName}/`, data)
     return response.data
   },
 
@@ -41,7 +41,7 @@ export const projectsApi = {
     if (!projectName) {
       throw new Error('Project name is required')
     }
-    const response = await api.delete(`${BASE_PATH}${projectName}`)
+    const response = await api.delete(`${BASE_PATH}${projectName}/`)
     return response.data
   },
 }

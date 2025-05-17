@@ -29,15 +29,17 @@ export interface SaveWordRequest {
 export interface SearchRequest {
   projectName: string
   query: string
+  searchMode?: 'or' | 'and' | 'both'
 }
 
 export interface KeywordSuggestion {
   word: string
+  matchType?: 'and' | 'or'
 }
 
 export interface SearchResponse {
   suggestions: KeywordSuggestion[]
-  searchId: string
+  searchId?: string
 }
 
 export interface BulkUpdateCollectionsRequest {
