@@ -39,6 +39,12 @@ export const collectionsApi = {
     return response.data
   },
 
+  // Add a single word to a collection
+  addWord: async (collectionId: string, word: string) => {
+    const response = await api.post<Collection>(`${BASE_PATH}/${collectionId}/word`, { word })
+    return response.data
+  },
+
   // Bulk update collections
   bulkUpdate: async (data: BulkUpdateCollectionsRequest) => {
     const response = await api.put<Collection[]>(`${BASE_PATH}/bulk/update`, {

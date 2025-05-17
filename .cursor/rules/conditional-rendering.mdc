@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Conditional Rendering Guide
+<!-- # Conditional Rendering Guide
 
 ## Best Practices
 1. Prefer logical AND (`&&`) over ternary operators for simple conditionals
@@ -43,4 +43,4 @@ alwaysApply: true
 2. Avoid nested ternaries
 3. Use logical operators for boolean conditions
 4. Consider extracting complex conditions to variables
-5. Document complex conditional logic
+5. Document complex conditional logic -->

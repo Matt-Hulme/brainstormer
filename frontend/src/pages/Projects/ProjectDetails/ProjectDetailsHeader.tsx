@@ -13,7 +13,7 @@ export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => 
   return (
     <header className="flex flex-row py-[30px] border-b-[.5px] border-secondary-2/20">
       <div className="grow space-y-[4px]">
-        <h1 className="text-h3 text-secondary-4">{project.title}</h1>
+        <h1 className="text-h3 text-secondary-4">{project.name}</h1>
         <div className="flex flex-row items-center gap-[10px]">
           <img
             src={profilePicture}

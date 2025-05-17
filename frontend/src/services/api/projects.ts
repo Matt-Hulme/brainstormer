@@ -19,20 +19,29 @@ export const projectsApi = {
   },
 
   // Get a specific project
-  get: async (projectId: string) => {
-    const response = await api.get<Project>(`${BASE_PATH}/${projectId}`)
+  get: async (projectName: string) => {
+    if (!projectName) {
+      throw new Error('Project name is required')
+    }
+    const response = await api.get<Project>(`${BASE_PATH}${projectName}/`)
     return response.data
   },
 
   // Update a project
-  update: async (projectId: string, data: CreateProjectRequest) => {
-    const response = await api.put<Project>(`${BASE_PATH}/${projectId}`, data)
+  update: async (projectName: string, data: CreateProjectRequest) => {
+    if (!projectName) {
+      throw new Error('Project name is required')
+    }
+    const response = await api.put<Project>(`${BASE_PATH}${projectName}/`, data)
     return response.data
   },
 
   // Delete a project
-  delete: async (projectId: string) => {
-    const response = await api.delete(`${BASE_PATH}/${projectId}`)
+  delete: async (projectName: string) => {
+    if (!projectName) {
+      throw new Error('Project name is required')
+    }
+    const response = await api.delete(`${BASE_PATH}${projectName}/`)
     return response.data
   },
 }

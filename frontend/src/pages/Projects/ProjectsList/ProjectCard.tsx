@@ -1,49 +1,70 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Trash } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
 import { useNavigate } from 'react-router-dom'
 import { ResultsCard } from '@/components/design-system/ResultsCard'
+import { useDeleteProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {
-  title: string
+  name: string
   lastEdited: string
   collections: string[]
   savedWords: string[]
 }
 
-export const ProjectCard = ({ title, lastEdited, collections, savedWords }: ProjectCardProps) => {
+export const ProjectCard = ({ name, lastEdited, collections, savedWords }: ProjectCardProps) => {
   const navigate = useNavigate()
-  const userId = 'userId' // fixed for now
-  const projectName = 'winter-is-calling' // fixed for now
+  const deleteProject = useDeleteProjectMutation()
+
+  const onCardClick = () => {
+    const projectUrl = `/projects/${name}`
+    navigate(projectUrl)
+  }
+
+  const onDelete = (e: React.MouseEvent) => {
+    if (confirm('Are you sure you want to delete this project?')) {
+      deleteProject.mutate(name)
+    }
+  }
 
   return (
-    <ResultsCard onClick={() => navigate(`/${userId}/projects/${projectName}`)}>
+    <ResultsCard onClick={onCardClick}>
       <div className="space-y-[4px]">
-        <h3 className="text-h3 text-secondary-4 line-clamp-1">{title ? title : 'New Project'}</h3>
-        <div className="flex flex-row items-center gap-[10px]">
+        <h3 className="line-clamp-1 text-h3 text-secondary-4">{name ? name : 'New Project'}</h3>
+        <div className="flex flex-row gap-[10px] items-center">
           {lastEdited && (
             <>
-              <span className="text-p3 text-secondary-2 line-clamp-1">
+              <span className="line-clamp-1 text-p3 text-secondary-2">
                 Last edited {lastEdited}
               </span>
-              <div className="h-[15px] w-[1px] bg-secondary-1" />
+              <div className="bg-secondary-1 h-[15px] w-[1px]" />
             </>
           )}
           {collections.length > 0 && (
             <>
-              <span className="text-p3 text-secondary-2 line-clamp-1">
+              <span className="line-clamp-1 text-p3 text-secondary-2">
                 Collections: {collections.join(', ')}
               </span>
-              <div className="h-[15px] w-[1px] bg-secondary-1" />
+              <div className="bg-secondary-1 h-[15px] w-[1px]" />
             </>
           )}
-          <span className="text-p3 text-secondary-2 line-clamp-1">
+          <span className="line-clamp-1 text-p3 text-secondary-2">
             {savedWords.length > 0 ? `Saved words: ${savedWords.join(', ')}` : 'Nothing yet'}
           </span>
         </div>
       </div>
-      <Button variant="icon" className="rounded-full">
-        <ArrowRight className="w-7 h-7 text-gray-500" />
-      </Button>
+      <div className="flex gap-2 items-center relative">
+        <Button
+          variant="icon"
+          onClick={onDelete}
+          aria-label="Delete project"
+          className="mr-[4px]"
+        >
+          <Trash className="h-5 text-gray-500 w-5" />
+        </Button>
+        <Button variant="icon" className="rounded-full">
+          <ArrowRight className="h-7 text-gray-500 w-7" />
+        </Button>
+      </div>
     </ResultsCard>
   )
 }

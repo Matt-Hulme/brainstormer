@@ -1,24 +1,24 @@
 from fastapi import APIRouter, HTTPException, Request
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
-from datetime import datetime
-import uuid
 from ..core.database import get_supabase_client
 from ..core.openai_client import get_openai_client
+import re
 
 router = APIRouter(prefix="/search", tags=["search"])
 
 class SearchRequest(BaseModel):
     query: str
-    project_id: str
+    project_name: str
+    search_mode: Optional[str] = "or"  # "or" or "and" or "both"
 
 class KeywordSuggestion(BaseModel):
     word: str
-    score: float
+    match_type: Optional[str] = None  # "and", "or", or None for single phrase search
 
 class SearchResponse(BaseModel):
-    search_id: str
     suggestions: List[KeywordSuggestion]
+    search_id: Optional[str] = None
 
 @router.post("/", response_model=SearchResponse)
 async def search_keywords(
@@ -28,64 +28,108 @@ async def search_keywords(
     """Search for keyword suggestions based on a query."""
     supabase = get_supabase_client()
     
-    # Verify project ownership
-    project = supabase.table("projects")\
+    # Verify the project exists and user has access to it
+    projects = supabase.table("projects")\
         .select("id")\
-        .eq("id", search.project_id)\
+        .eq("name", search.project_name)\
         .eq("user_id", request.state.user_id)\
-        .single()\
+        .order("updated_at", desc=True)\
+        .limit(1)\
         .execute()
     
-    if not project.data:
+    if not projects.data or len(projects.data) == 0:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Generate a unique search ID
-    search_id = str(uuid.uuid4())
+    # Parse multiple phrases
+    phrases = [phrase.strip() for phrase in search.query.split("||") if phrase.strip()]
     
     # Get keyword suggestions from OpenAI
     openai = get_openai_client()
     try:
-        response = await openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": """You are a keyword suggestion expert. 
-                    Given a search query, generate relevant keyword suggestions.
-                    Return only the keywords, one per line, with no additional text."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Generate keyword suggestions for: {search.query}"
-                }
-            ],
-            temperature=0.7,
-            max_tokens=150
-        )
+        suggestions = []
         
-        # Process suggestions
-        suggestions_text = response.choices[0].message.content.strip()
-        suggestions = [
-            KeywordSuggestion(word=word.strip(), score=1.0)  # Score is 1.0 for now
-            for word in suggestions_text.split('\n')
-            if word.strip()
-        ]
+        if len(phrases) == 1 or search.search_mode == "or":
+            # Single phrase or OR mode - use the standard approach
+            if len(phrases) == 1:
+                or_query = search.query
+                system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to "{or_query}".
+                    Instructions:
+                    - Generate at least 100 words or phrases related to "{or_query}"
+                    - Include both single words and multi-word phrases, evenly mixed
+                    - The words should not be organized in any particular order
+                    - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
+                    - Each item should be on its own line with NO prefix characters (no bullet points, no dashes)
+                    - Do not number your list
+                    - Separate items using ONLY line breaks
+
+                    The goal is to provide a wide range of potential connections to "{or_query}" across different domains and contexts."""
+            else:
+                # For multiple phrases in OR mode, create a more specific prompt
+                phrases_list = ", ".join([f'"{phrase}"' for phrase in phrases])
+                system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to ANY of these phrases: {phrases_list}.
+                    Instructions:
+                    - Generate at least 100 words or phrases related to ONE OR MORE of these phrases: {phrases_list}
+                    - Each suggestion should clearly relate to at least one of the phrases
+                    - Include both single words and multi-word phrases, evenly mixed
+                    - The words should not be organized in any particular order
+                    - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
+                    - Each item should be on its own line with NO prefix characters (no bullet points, no dashes)
+                    - Do not number your list
+                    - Separate items using ONLY line breaks
+
+                    The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
+            
+            response = await openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": system_message}],
+                temperature=0.7,
+            )
+            
+            # Process suggestions
+            suggestions_text = response.choices[0].message.content.strip()
+            # Split by newlines and clean each item
+            or_suggestions = [
+                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
+                for word in suggestions_text.split('\n')
+                if word.strip()
+            ]
+            suggestions.extend(or_suggestions)
         
-        # Store search session
-        supabase.table("search_sessions").insert({
-            "id": search_id,
-            "project_id": search.project_id,
-            "query": search.query,
-            "user_id": request.state.user_id
-        }).execute()
+        if len(phrases) > 1 and (search.search_mode == "and" or search.search_mode == "both"):
+            # For AND mode or BOTH mode, we need to find words that relate to all phrases
+            all_phrases = " AND ".join([f'"{phrase}"' for phrase in phrases])
+            
+            system_message = f"""You are a Focused Brainstormer. Your job is to generate keywords that MUST be strongly related to ALL of the following concepts simultaneously: {all_phrases}.
+                Instructions:
+                - Generate words or phrases that have a DIRECT and MEANINGFUL connection to EACH of these concepts: {all_phrases}
+                - Each suggestion MUST strongly relate to ALL concepts, not just one or some of them
+                - Be extremely strict about this requirement - if a word only relates to one phrase but not others, DO NOT include it
+                - Aim for quality over quantity - it's better to provide fewer results that truly connect all concepts
+                - Prefer more specific terms that clearly demonstrate the intersection of all concepts
+                - Include both single words and multi-word phrases
+                - Each item should be on its own line with NO prefix characters
+                - Do not number your list
+                - Separate items using ONLY line breaks
+                
+                The goal is to find the TRUE intersection of these different concepts - words that genuinely relate to ALL of them simultaneously."""
+            
+            response = await openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": system_message}],
+                temperature=0.7,
+            )
+            
+            # Process suggestions
+            suggestions_text = response.choices[0].message.content.strip()
+            # Split by newlines and clean each item
+            and_suggestions = [
+                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="and") 
+                for word in suggestions_text.split('\n')
+                if word.strip()
+            ]
+            suggestions.extend(and_suggestions)
         
-        return SearchResponse(
-            search_id=search_id,
-            suggestions=suggestions
-        )
+        return SearchResponse(suggestions=suggestions)
         
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate suggestions: {str(e)}"
-        ) 
+        raise HTTPException(status_code=500, detail=str(e)) 

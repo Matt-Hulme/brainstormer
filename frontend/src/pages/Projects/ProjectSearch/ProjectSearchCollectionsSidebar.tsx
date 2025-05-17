@@ -2,61 +2,91 @@ import { AddCollectionChip } from '@/components'
 import { useSearchParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
-import { useGetCollectionsQuery } from '../ProjectsList/hooks/useGetCollectionsQuery'
-import { useCollectionMutations } from '../ProjectsList/hooks/useCollectionMutations'
-import { useSavedWordMutations } from '../ProjectsList/hooks/useSavedWordMutations'
-import { useState } from 'react'
+import {
+  useGetCollectionsQuery,
+  useCreateCollectionMutation,
+  useAddWordToCollectionMutation
+} from '@/hooks'
+import { Collection, Project } from '@/types'
+import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
 interface ProjectSearchCollectionsSidebarProps {
-  projectId: string
+  projectName: string
   activeWords: string[]
   onRemoveWord?: (word: string) => void
+  onWordAdded?: (word: string) => void
+  project?: Project
 }
 
 export const ProjectSearchCollectionsSidebar = ({
-  projectId,
+  projectName,
   activeWords,
   onRemoveWord,
+  onWordAdded,
+  project
 }: ProjectSearchCollectionsSidebarProps) => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('q') || ''
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+  const [lastProcessedWords, setLastProcessedWords] = useState<string[]>([])
 
   // Fetch collections for the project
   const {
     collections,
     loading: collectionsLoading,
     error: collectionsError,
-  } = useGetCollectionsQuery(projectId)
-  const { createCollection, loading: createLoading } = useCollectionMutations()
-  const { bulkSaveWords, loading: saveLoading } = useSavedWordMutations()
+  } = useGetCollectionsQuery(project?.id || '')
+
+  const { createCollection, loading: createLoading } = useCreateCollectionMutation()
+  const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
+
+  // Reset selected collection when project changes
+  useEffect(() => {
+    setSelectedCollectionId(null)
+    setLastProcessedWords([])
+  }, [projectName])
+
+  // Auto-save words to collection when activeWords changes
+  useEffect(() => {
+    if (!selectedCollectionId || addWordLoading) return
+
+    // Find new words that need to be saved
+    const newWords = activeWords.filter(word => !lastProcessedWords.includes(word))
+
+    // Save new words to collection
+    if (newWords.length > 0) {
+      const saveWord = async (word: string) => {
+        try {
+          await addWordToCollection(word, selectedCollectionId)
+          if (onWordAdded) {
+            onWordAdded(word)
+          }
+        } catch (error) {
+          // Error handling in hook
+        }
+      }
+
+      // Save each new word
+      newWords.forEach(word => saveWord(word))
+
+      // Update processed words
+      setLastProcessedWords(prevWords => [...prevWords, ...newWords])
+    }
+  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection, onWordAdded, addWordLoading])
 
   const handleCreateCollection = async () => {
-    try {
-      const newCollection = await createCollection({
-        name: searchQuery,
-        projectId,
-      })
-      setSelectedCollectionId(newCollection.id)
-      toast.success('Collection created')
-    } catch {
-      // Error is already handled by the mutation hook and displayed via toast
-    }
-  }
-
-  const handleSaveWords = async () => {
-    if (!selectedCollectionId) {
-      toast.error('Please select a collection first')
+    if (!project) {
+      toast.error('Project not found')
       return
     }
 
     try {
-      await bulkSaveWords(activeWords, selectedCollectionId)
-      toast.success('Words saved successfully')
-      if (onRemoveWord) {
-        activeWords.forEach(word => onRemoveWord(word))
-      }
+      const newCollection = await createCollection({
+        name: searchQuery,
+        projectId: project.id,
+      })
+      setSelectedCollectionId(newCollection.id)
     } catch {
       // Error is already handled by the mutation hook and displayed via toast
     }
@@ -78,15 +108,14 @@ export const ProjectSearchCollectionsSidebar = ({
       <div className="w-full h-[1px] bg-secondary-1/20" />
 
       {/* Collections List */}
-      {!collectionsLoading && collections.length > 0 && (
+      {!collectionsLoading && collections && collections.length > 0 && (
         <div className="space-y-[10px]">
           <p className="text-p3 text-secondary-2">SELECT COLLECTION</p>
-          {collections.map(collection => (
+          {collections.map((collection: Collection) => (
             <div
               key={collection.id}
-              className={`cursor-pointer p-2 rounded ${
-                selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''
-              }`}
+              className={`cursor-pointer p-2 rounded ${selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''
+                }`}
               onClick={() => setSelectedCollectionId(collection.id)}
             >
               <p className="text-p3 text-secondary-4">{collection.name}</p>
@@ -116,16 +145,8 @@ export const ProjectSearchCollectionsSidebar = ({
             ))}
           </div>
 
-          {/* Save Actions */}
+          {/* Collection Management */}
           <div className="space-y-[10px]">
-            <Button
-              variant="primary"
-              className="w-full"
-              onClick={handleSaveWords}
-              disabled={!selectedCollectionId || saveLoading}
-            >
-              Save to Collection
-            </Button>
             <AddCollectionChip
               onClick={handleCreateCollection}
               className="w-full"

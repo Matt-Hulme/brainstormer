@@ -7,7 +7,7 @@ from ..core.database import get_supabase_client
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 class ProjectBase(BaseModel):
-    title: str
+    name: str
 
 class ProjectCreate(ProjectBase):
     pass
@@ -30,7 +30,7 @@ async def create_project(
     supabase = get_supabase_client()
     
     data = {
-        "title": project.title,
+        "name": project.name,
         "user_id": request.state.user_id
     }
     
@@ -54,14 +54,14 @@ async def list_projects(request: Request):
     
     return result.data
 
-@router.get("/{project_id}", response_model=Project)
-async def get_project(project_id: str, request: Request):
-    """Get a specific project by ID."""
+@router.get("/{project_name}/", response_model=Project)
+async def get_project(project_name: str, request: Request):
+    """Get a specific project by name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
         .select("*")\
-        .eq("id", project_id)\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .single()\
         .execute()
@@ -71,18 +71,18 @@ async def get_project(project_id: str, request: Request):
     
     return result.data
 
-@router.put("/{project_id}", response_model=Project)
+@router.put("/{project_name}/", response_model=Project)
 async def update_project(
-    project_id: str,
+    project_name: str,
     project: ProjectBase,
     request: Request
 ):
-    """Update a project's title."""
+    """Update a project's name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
-        .update({"title": project.title})\
-        .eq("id", project_id)\
+        .update({"name": project.name})\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .execute()
     
@@ -91,14 +91,14 @@ async def update_project(
     
     return result.data[0]
 
-@router.delete("/{project_id}")
-async def delete_project(project_id: str, request: Request):
-    """Delete a project."""
+@router.delete("/{project_name}/")
+async def delete_project(project_name: str, request: Request):
+    """Delete a project by name."""
     supabase = get_supabase_client()
     
     result = supabase.table("projects")\
         .delete()\
-        .eq("id", project_id)\
+        .eq("name", project_name)\
         .eq("user_id", request.state.user_id)\
         .execute()
     

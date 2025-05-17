@@ -12,7 +12,7 @@ export interface ApiResponse<T> {
 
 // API request/response types
 export interface CreateProjectRequest {
-  title: string
+  name: string
 }
 
 export interface CreateCollectionRequest {
@@ -27,18 +27,19 @@ export interface SaveWordRequest {
 }
 
 export interface SearchRequest {
-  projectId: string
+  projectName: string
   query: string
+  searchMode?: 'or' | 'and' | 'both'
 }
 
 export interface KeywordSuggestion {
   word: string
-  score: number
+  matchType?: 'and' | 'or'
 }
 
 export interface SearchResponse {
   suggestions: KeywordSuggestion[]
-  searchId: string
+  searchId?: string
 }
 
 export interface BulkUpdateCollectionsRequest {

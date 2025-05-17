@@ -11,6 +11,7 @@ Key directories and their purposes:
 - @frontend/src/pages - Page components (routes)
 - @frontend/src/utils - Utility functions
 - @frontend/src/config - Configuration and API setup
+- @frontend/src/hooks - Nested folders that contain commonly used hooks
 
 ## Component Guidelines
 1. One component per file
@@ -19,7 +20,7 @@ Key directories and their purposes:
 4. Use composition over inheritance
 5. No index.ts files - use direct imports
 
-## Code Organization
+## Component Organization
 1. React hooks at the top of components
 2. State hooks alphabetized by variable name
 3. Custom functions after hooks in alphabetical order
@@ -43,6 +44,11 @@ Key directories and their purposes:
 1. Keep hooks colocated with their related components/pages
 2. Name query hooks with verb prefix and Query suffix (e.g., useGetProjectsQuery)
 3. Name mutation hooks with verb prefix and Mutation suffix (e.g., useCreateProjectMutation)
+4. Keep prefixes in the following format:
+    - Get
+    - Create
+    - Update
+    - Delete
 4. Keep hooks focused and single-responsibility
 5. Place hooks in the same directory as their related component/page
 
