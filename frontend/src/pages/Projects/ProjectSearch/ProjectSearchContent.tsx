@@ -44,7 +44,7 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
     // If a word is successfully added to a collection, we can optionally remove it from active words
     // Uncomment this if you want to clear words after they're added to a collection automatically
     // handleRemoveWord(word)
-  }, [])
+  }, [handleRemoveWord])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {
