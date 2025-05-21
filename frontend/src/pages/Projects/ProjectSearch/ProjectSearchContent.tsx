@@ -48,16 +48,16 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {
-    const matchType = result.matchType || 'or';
+    const matchType = result.matchType ?? 'or'
     if (!acc[matchType]) {
-      acc[matchType] = [];
+      acc[matchType] = []
     }
-    acc[matchType].push(result);
-    return acc;
-  }, {} as Record<string, KeywordSuggestion[]>);
+    acc[matchType].push(result)
+    return acc
+  }, {} as Record<string, KeywordSuggestion[]>)
 
   // Check if we have multiple match types
-  const hasMultipleMatchTypes = Object.keys(groupedResults).length > 1;
+  const hasMultipleMatchTypes = Object.keys(groupedResults).length > 1
 
   return (
     <div className="flex flex-row pt-[25px]">

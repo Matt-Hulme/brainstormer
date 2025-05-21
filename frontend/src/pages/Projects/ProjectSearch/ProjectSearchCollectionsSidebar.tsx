@@ -27,7 +27,7 @@ export const ProjectSearchCollectionsSidebar = ({
   project
 }: ProjectSearchCollectionsSidebarProps) => {
   const [searchParams] = useSearchParams()
-  const searchQuery = searchParams.get('q') || ''
+  const searchQuery = searchParams.get('q') ?? ''
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [lastProcessedWords, setLastProcessedWords] = useState<string[]>([])
 
@@ -36,7 +36,7 @@ export const ProjectSearchCollectionsSidebar = ({
     collections,
     loading: collectionsLoading,
     error: collectionsError,
-  } = useGetCollectionsQuery(project?.id || '')
+  } = useGetCollectionsQuery(project?.id ?? '')
 
   const { createCollection, loading: createLoading } = useCreateCollectionMutation()
   const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
@@ -59,9 +59,7 @@ export const ProjectSearchCollectionsSidebar = ({
       const saveWord = async (word: string) => {
         try {
           await addWordToCollection(word, selectedCollectionId)
-          if (onWordAdded) {
-            onWordAdded(word)
-          }
+          onWordAdded?.(word)
         } catch (error) {
           // Error handling in hook
         }
@@ -108,14 +106,13 @@ export const ProjectSearchCollectionsSidebar = ({
       <div className="w-full h-[1px] bg-secondary-1/20" />
 
       {/* Collections List */}
-      {!collectionsLoading && collections && collections.length > 0 && (
+      {!collectionsLoading && collections?.length > 0 && (
         <div className="space-y-[10px]">
           <p className="text-p3 text-secondary-2">SELECT COLLECTION</p>
           {collections.map((collection: Collection) => (
             <div
               key={collection.id}
-              className={`cursor-pointer p-2 rounded ${selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''
-                }`}
+              className={`cursor-pointer p-2 rounded ${selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''}`}
               onClick={() => setSelectedCollectionId(collection.id)}
             >
               <p className="text-p3 text-secondary-4">{collection.name}</p>
@@ -135,7 +132,7 @@ export const ProjectSearchCollectionsSidebar = ({
                 <Button
                   variant="text"
                   className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => onRemoveWord && onRemoveWord(word)}
+                  onClick={() => onRemoveWord?.(word)}
                   aria-label={`Remove ${word}`}
                   tabIndex={-1}
                 >

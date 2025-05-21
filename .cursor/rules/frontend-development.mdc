@@ -40,6 +40,41 @@ Key directories and their purposes:
 4. Export types from the same file they're defined in
 5. Use interfaces for public APIs and types for internal use
 
+## Defensive Programming
+1. Always use optional chaining (`?.`) and nullish coalescing (`??`) operators when accessing potentially undefined or null values
+2. Examples of good practices:
+   ```typescript
+   // Accessing nested properties
+   const projectName = project?.name ?? 'Untitled Project'
+   const collections = project?.collections?.map(c => c.name) ?? []
+
+   // Function calls
+   const result = obj?.method?.() ?? defaultValue
+
+   // Array access
+   const firstItem = array?.[0] ?? null
+   ```
+3. Avoid direct access without checks:
+   ```typescript
+   // Bad
+   const projectName = project.name  // Could throw if project is undefined
+   const collections = project.collections.map(c => c.name)  // Could throw
+
+   // Bad - using || for null/undefined checks
+   const value = obj.prop || defaultValue  // This will use defaultValue for falsy values like 0 or ''
+   ```
+4. Use cases for optional chaining and nullish coalescing:
+   - Accessing nested object properties
+   - Calling methods that might not exist
+   - Accessing array elements
+   - Dealing with API responses
+   - Working with optional parameters
+   - Handling user input
+5. When not to use:
+   - When you're certain a value exists
+   - When you want to throw an error for missing values
+   - When dealing with required parameters in function signatures
+
 ## Hook Organization
 1. Keep hooks colocated with their related components/pages
 2. Name query hooks with verb prefix and Query suffix (e.g., useGetProjectsQuery)

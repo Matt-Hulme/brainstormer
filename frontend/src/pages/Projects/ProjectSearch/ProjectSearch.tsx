@@ -5,7 +5,7 @@ import { ProjectSearchContent } from './ProjectSearchContent'
 import { ProjectSearchContentEmpty } from './ProjectSearchContentEmpty'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
-import { Button, VennDiagramIcon } from '@/components'
+import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
 import { useSearchQuery, useGetProjectQuery } from '@/hooks'
 import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
 import { useCallback } from 'react'
@@ -18,8 +18,8 @@ export const ProjectSearch = () => {
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
 
-  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName!, searchValue, searchMode)
-  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName!)
+  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
+  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName ?? '')
 
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading
@@ -31,8 +31,8 @@ export const ProjectSearch = () => {
   }, [navigate, projectName, searchParams])
 
   // Display information about match types
-  const hasAndMatches = data?.suggestions.some(s => s.matchType === 'and')
-  const hasOrMatches = data?.suggestions.some(s => s.matchType === 'or')
+  const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
+  const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
 
   return (
@@ -43,7 +43,7 @@ export const ProjectSearch = () => {
             variant="icon"
             className={`w-[35px] h-[35px] rounded-md ${activeView === 'list' ? 'bg-secondary-0' : 'bg-transparent'
               } hover:bg-secondary-0/50`}
-            onClick={() => { }}
+            onClick={showUndevelopedFeatureToast}
           >
             <AlignLeft
               className={`${activeView === 'list' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
@@ -53,7 +53,7 @@ export const ProjectSearch = () => {
             variant="icon"
             className={`w-[35px] h-[35px] rounded-md ${activeView === 'connections' ? 'bg-secondary-0' : 'bg-transparent'
               } hover:bg-secondary-0/50`}
-            onClick={() => { }}
+            onClick={showUndevelopedFeatureToast}
           >
             <VennDiagramIcon
               className={`${activeView === 'connections' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
@@ -63,7 +63,7 @@ export const ProjectSearch = () => {
             variant="icon"
             className={`w-[35px] h-[35px] rounded-md ${activeView === 'focus' ? 'bg-secondary-0' : 'bg-transparent'
               } hover:bg-secondary-0/50`}
-            onClick={() => { }}
+            onClick={showUndevelopedFeatureToast}
           >
             <Target
               className={`${activeView === 'focus' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}

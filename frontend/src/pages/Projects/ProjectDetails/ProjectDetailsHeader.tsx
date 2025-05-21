@@ -1,5 +1,6 @@
 import profilePicture from '@/assets/profile-picture.png'
 import { Project } from '@/types'
+import { format } from 'date-fns'
 
 interface ProjectDetailsHeaderProps {
   project: Project | null
@@ -8,6 +9,16 @@ interface ProjectDetailsHeaderProps {
 export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => {
   if (!project) {
     return null
+  }
+
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString)
+      return format(date, 'MMM d, yyyy')
+    } catch (error) {
+      console.error('Date parsing error:', error)
+      return 'Unknown date'
+    }
   }
 
   return (
@@ -20,8 +31,8 @@ export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => 
             alt="Profile"
             className="rounded-full border-1 border-secondary-4 h-[20px] w-[20px]"
           />
-          <p className="text-p3 text-secondary-2">
-            Last edited {new Date(project.updated_at).toLocaleDateString()}
+          <p className="text-p3 color-secondary-2">
+            Last edited {formatDate(project.updatedAt)}
           </p>
         </div>
       </div>

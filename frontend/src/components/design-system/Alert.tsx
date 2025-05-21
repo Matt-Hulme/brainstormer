@@ -6,8 +6,8 @@ interface AlertProps {
 
 export const Alert = ({ title, description, variant = 'default' }: AlertProps) => {
   const variantClasses = {
-    default: 'bg-secondary-1 text-secondary-4',
-    destructive: 'bg-red-100 text-red-900',
+    default: 'bg-secondary-1 color-secondary-4',
+    destructive: 'bg-red-100 color-red-900',
   }
 
   return (

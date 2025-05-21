@@ -6,7 +6,7 @@ import type {
   BulkMoveCollectionsRequest,
 } from '@/config/api/types'
 
-const BASE_PATH = '/collections/'
+const BASE_PATH = 'collections/'
 
 export const collectionsApi = {
   // Create a new collection
@@ -17,7 +17,7 @@ export const collectionsApi = {
 
   // List collections in a project
   listByProject: async (projectId: string) => {
-    const response = await api.get<Collection[]>(`${BASE_PATH}/project/${projectId}`)
+    const response = await api.get<Collection[]>(`${BASE_PATH}project/${projectId}`)
     return response.data
   },
 

@@ -150,16 +150,29 @@ export default {
   plugins: [
     require('tailwindcss-animate'),
     function ({ addUtilities, theme }) {
-      const colorUtilities = {}
-      const colors = theme('colors.color')
-
-      for (const colorName in colors) {
-        colorUtilities[`.color-${colorName}`] = {
-          color: colors[colorName],
+      // Merge custom and default colors for .color-{color} utilities
+      const flattenColors = (colorsObj, prefix = '') => {
+        const result = {};
+        for (const [key, value] of Object.entries(colorsObj)) {
+          if (typeof value === 'string') {
+            result[`${prefix}${key}`] = value;
+          } else if (typeof value === 'object' && value !== null) {
+            Object.assign(result, flattenColors(value, `${prefix}${key}-`));
+          }
         }
+        return result;
+      };
+      // Get all colors from theme (custom and default)
+      const allColors = {
+        ...flattenColors(theme('colors')),
+      };
+      const colorUtilities = {};
+      for (const colorName in allColors) {
+        colorUtilities[`.color-${colorName}`] = {
+          color: allColors[colorName],
+        };
       }
-
-      addUtilities(colorUtilities)
+      addUtilities(colorUtilities);
     },
     function ({ addUtilities }) {
       const fontUtilities = {
@@ -172,9 +185,8 @@ export default {
         '.text-h4, .text-active-term, .text-p1, .text-p2, .text-p3, .text-p3-caps': {
           fontFamily: 'Chivo, sans-serif',
         },
-      }
-
-      addUtilities(fontUtilities)
+      };
+      addUtilities(fontUtilities);
     },
   ],
 }

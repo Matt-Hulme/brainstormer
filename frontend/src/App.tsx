@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
 import { ProtectedRoute } from './components'
+import { Toast } from './components/design-system/Toast'
 
 export const App = () => {
   return (
@@ -35,6 +36,7 @@ export const App = () => {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Toast />
       </div>
     </Router>
   )
