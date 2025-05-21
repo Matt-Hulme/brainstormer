@@ -18,8 +18,8 @@ export const ProjectSearch = () => {
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
 
-  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName!, searchValue, searchMode)
-  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName!)
+  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
+  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName ?? '')
 
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading
@@ -31,8 +31,8 @@ export const ProjectSearch = () => {
   }, [navigate, projectName, searchParams])
 
   // Display information about match types
-  const hasAndMatches = data?.suggestions.some(s => s.matchType === 'and')
-  const hasOrMatches = data?.suggestions.some(s => s.matchType === 'or')
+  const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
+  const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
 
   return (

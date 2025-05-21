@@ -7,8 +7,6 @@ interface ProjectsListContentProps {
 }
 
 export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
-
-
   return (
     <div className="flex flex-col gap-[72px] justify-center pt-[70px]">
       <header>
@@ -28,11 +26,11 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
           <div>
             {projects?.map((project: Project) => (
               <ProjectCard
-                key={project?.id}
-                name={project?.name}
-                lastEdited={new Date(project?.updatedAt).toLocaleDateString()}
-                collections={project?.collections?.map((c: Collection) => c.name) || []}
-                savedWords={project?.savedWords?.map((w: SavedWord) => w.word) || []}
+                key={project?.id ?? ''}
+                name={project?.name ?? 'Untitled Project'}
+                lastEdited={new Date(project?.updatedAt ?? '').toLocaleDateString()}
+                collections={project?.collections?.map((c: Collection) => c.name) ?? []}
+                savedWords={project?.savedWords?.map((w: SavedWord) => w.word) ?? []}
               />
             ))}
           </div>
