@@ -23,7 +23,7 @@ export const Home = () => {
         <span className="color-secondary-3 text-h4">AI tools for the creative minded</span>
         <Button
           variant="outline"
-          className="border-secondary-1 text-secondary-4"
+          className="border-secondary-1 color-secondary-4"
           onClick={handleLogin}
         >
           Log in

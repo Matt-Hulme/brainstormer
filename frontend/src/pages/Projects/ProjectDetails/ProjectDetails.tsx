@@ -36,14 +36,14 @@ export const ProjectDetails = () => {
       <div className="flex flex-col w-full gap-[30px]">
         {/* <ProjectDetailsHeader project={project} /> */}
         <main className="grid [grid-template-columns:minmax(220px,auto)_1fr] gap-x-[120px]">
-          <div className="text-p3 text-secondary-4">COLLECTIONS</div>
-          <div className="text-p3 text-secondary-4">SAVED WORDS</div>
+          <div className="text-p3 color-secondary-4">COLLECTIONS</div>
+          <div className="text-p3 color-secondary-4">SAVED WORDS</div>
           {/* {collections?.map((collection, idx) => (
             <Fragment key={collection.id}>
               {idx !== 0 && <div className="col-span-2 w-full h-[1px] bg-secondary-2/20" />}
               <div className="pt-[30px]">
                 <div className="flex flex-row items-center gap-[4px]">
-                  <h3 className="text-h3 text-secondary-4">{collection.name}</h3>
+                  <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
                   <Button variant="icon" className="color-secondary-3">
                     <ArrowRight size={24} className="" />
                   </Button>
@@ -53,14 +53,14 @@ export const ProjectDetails = () => {
                 {collection.savedWords && collection.savedWords.length > 0 && (
                   <ul className="space-y-[10px]">
                     {collection.savedWords.map(word => (
-                      <li className="text-p1 text-secondary-4" key={word.id}>
+                      <li className="text-p1 color-secondary-4" key={word.id}>
                         {word.word}
                       </li>
                     ))}
                   </ul>
                 )}
                 {(!collection.savedWords || collection.savedWords.length === 0) && (
-                  <span className="text-secondary-1">No words (yet)</span>
+                  <span className="color-secondary-1">No words (yet)</span>
                 )}
               </div>
             </Fragment>
