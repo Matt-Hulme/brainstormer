@@ -28,8 +28,7 @@ export const SearchTerm = ({
         ? 'text-h4 font-bold color-secondary-4'
         : matchType === 'and'
           ? 'text-h4 font-medium color-primary-1 hover:color-primary-1/90'
-            ? 'text-h4 font-medium text-primary-1 hover:text-primary-1/90'
-            : 'text-h4 text-secondary-2 hover:text-secondary-3'
+          : 'text-h4 text-secondary-2 hover:text-secondary-3'
         }`}
       onClick={onClick}
     >
