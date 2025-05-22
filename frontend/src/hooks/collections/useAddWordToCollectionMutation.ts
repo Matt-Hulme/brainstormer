@@ -13,7 +13,6 @@ export const useAddWordToCollectionMutation = () => {
             queryClient.invalidateQueries({ queryKey: ['collection', variables.collectionId] })
             // Invalidate collections list for the project
             queryClient.invalidateQueries({ queryKey: ['collections'] })
-
             toast.success('Word saved successfully')
         },
         onError: (error: Error) => {

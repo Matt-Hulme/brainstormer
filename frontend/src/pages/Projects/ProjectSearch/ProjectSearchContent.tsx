@@ -61,7 +61,7 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
 
   return (
     <div className="flex flex-row pt-[25px]">
-      <div className="flex-1 pb-[35px]">
+      <main className="flex-1 pb-[35px]">
         {/* Show AND matches first if they exist */}
         {groupedResults['and'] && (
           <div className="mb-8">
@@ -123,8 +123,8 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
             </div>
           </div>
         )}
-      </div>
-      <div className="ml-5">
+      </main>
+      <aside className="ml-5">
         <ProjectSearchCollectionsSidebar
           projectName={projectName}
           activeWords={activeWords}
@@ -132,7 +132,7 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
           onWordAdded={handleWordAdded}
           project={project}
         />
-      </div>
+      </aside>
     </div>
   )
 }

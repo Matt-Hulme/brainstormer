@@ -4,7 +4,6 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
 import {
   useGetCollectionsQuery,
-  useCreateCollectionMutation,
   useAddWordToCollectionMutation
 } from '@/hooks'
 import { Collection, Project } from '@/types'
@@ -38,7 +37,6 @@ export const ProjectSearchCollectionsSidebar = ({
     error: collectionsError,
   } = useGetCollectionsQuery(project?.id ?? '')
 
-  const { createCollection, loading: createLoading } = useCreateCollectionMutation()
   const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
 
   // Reset selected collection when project changes
@@ -49,18 +47,25 @@ export const ProjectSearchCollectionsSidebar = ({
 
   // Auto-save words to collection when activeWords changes
   useEffect(() => {
-    if (!selectedCollectionId || addWordLoading) return
+    if (!selectedCollectionId || addWordLoading) {
+      console.log('Skipping word save - no collection selected or already loading')
+      return
+    }
 
     // Find new words that need to be saved
     const newWords = activeWords.filter(word => !lastProcessedWords.includes(word))
+    console.log('New words to save:', newWords)
 
     // Save new words to collection
     if (newWords.length > 0) {
       const saveWord = async (word: string) => {
         try {
+          console.log('Saving word to collection:', word, selectedCollectionId)
           await addWordToCollection(word, selectedCollectionId)
           onWordAdded?.(word)
+          console.log('Word saved successfully:', word)
         } catch (error) {
+          console.error('Error saving word:', error)
           // Error handling in hook
         }
       }
@@ -72,23 +77,6 @@ export const ProjectSearchCollectionsSidebar = ({
       setLastProcessedWords(prevWords => [...prevWords, ...newWords])
     }
   }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection, onWordAdded, addWordLoading])
-
-  const handleCreateCollection = async () => {
-    if (!project) {
-      toast.error('Project not found')
-      return
-    }
-
-    try {
-      const newCollection = await createCollection({
-        name: searchQuery,
-        projectId: project.id,
-      })
-      setSelectedCollectionId(newCollection.id)
-    } catch {
-      // Error is already handled by the mutation hook and displayed via toast
-    }
-  }
 
   if (collectionsError) {
     return (
@@ -113,7 +101,10 @@ export const ProjectSearchCollectionsSidebar = ({
             <div
               key={collection.id}
               className={`cursor-pointer p-2 rounded ${selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''}`}
-              onClick={() => setSelectedCollectionId(collection.id)}
+              onClick={() => {
+                setSelectedCollectionId(collection.id)
+                toast.info('Collection selected! Click words to save them here.')
+              }}
             >
               <p className="text-p3 text-secondary-4">{collection.name}</p>
             </div>
@@ -145,9 +136,9 @@ export const ProjectSearchCollectionsSidebar = ({
           {/* Collection Management */}
           <div className="space-y-[10px]">
             <AddCollectionChip
-              onClick={handleCreateCollection}
+              onClick={() => { }}
               className="w-full"
-              disabled={createLoading}
+              disabled={true}
             />
           </div>
         </>
