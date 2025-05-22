@@ -16,6 +16,7 @@ interface ProjectSearchCollectionsSidebarProps {
   onRemoveWord?: (word: string) => void
   onWordAdded?: (word: string) => void
   project?: Project
+  onCollectionSelect?: (collectionId: string) => void
 }
 
 export const ProjectSearchCollectionsSidebar = ({
@@ -23,7 +24,8 @@ export const ProjectSearchCollectionsSidebar = ({
   activeWords,
   onRemoveWord,
   onWordAdded,
-  project
+  project,
+  onCollectionSelect
 }: ProjectSearchCollectionsSidebarProps) => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('q') ?? ''
@@ -45,72 +47,59 @@ export const ProjectSearchCollectionsSidebar = ({
     setLastProcessedWords([])
   }, [projectName])
 
-  // Auto-save words to collection when activeWords changes
+  // Auto-save words when they change
   useEffect(() => {
-    if (!selectedCollectionId || addWordLoading) {
-      console.log('Skipping word save - no collection selected or already loading')
-      return
-    }
+    if (!selectedCollectionId || !activeWords.length) return
 
-    // Find new words that need to be saved
     const newWords = activeWords.filter(word => !lastProcessedWords.includes(word))
-    console.log('New words to save:', newWords)
+    if (newWords.length === 0) return
 
-    // Save new words to collection
-    if (newWords.length > 0) {
-      const saveWord = async (word: string) => {
-        try {
-          console.log('Saving word to collection:', word, selectedCollectionId)
+    const saveWords = async () => {
+      try {
+        for (const word of newWords) {
           await addWordToCollection(word, selectedCollectionId)
           onWordAdded?.(word)
-          console.log('Word saved successfully:', word)
-        } catch (error) {
-          console.error('Error saving word:', error)
-          // Error handling in hook
         }
+        setLastProcessedWords(activeWords)
+      } catch (error) {
+        console.error('Error saving words:', error)
+        toast.error('Failed to save words to collection')
       }
-
-      // Save each new word
-      newWords.forEach(word => saveWord(word))
-
-      // Update processed words
-      setLastProcessedWords(prevWords => [...prevWords, ...newWords])
     }
-  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection, onWordAdded, addWordLoading])
+
+    saveWords()
+  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection, onWordAdded])
+
+  const handleCollectionSelect = (collectionId: string) => {
+    setSelectedCollectionId(collectionId)
+    onCollectionSelect?.(collectionId)
+  }
+
+  if (collectionsLoading) {
+    return <div>Loading collections...</div>
+  }
 
   if (collectionsError) {
-    return (
-      <aside className="px-[30px] py-[10px] space-y-[15px] min-w-[244px] h-full">
-        <p className="text-p3 text-red-500">Failed to load collections</p>
-      </aside>
-    )
+    return <div>Error loading collections</div>
   }
 
   return (
-    <aside className="px-[30px] py-[10px] space-y-[15px] min-w-[244px] h-full">
-      <div className="flex justify-between items-center">
-        <p className="text-p3 text-secondary-2">SAVED WORDS</p>
-      </div>
-      <div className="w-full h-[1px] bg-secondary-1/20" />
+    <aside className="w-[300px] p-4 border-l border-secondary-1/20">
+      <h4 className="text-h4 text-secondary-4 mb-4">Collections</h4>
 
-      {/* Collections List */}
-      {!collectionsLoading && collections?.length > 0 && (
-        <div className="space-y-[10px]">
-          <p className="text-p3 text-secondary-2">SELECT COLLECTION</p>
-          {collections.map((collection: Collection) => (
-            <div
-              key={collection.id}
-              className={`cursor-pointer p-2 rounded ${selectedCollectionId === collection.id ? 'bg-secondary-1/10' : ''}`}
-              onClick={() => {
-                setSelectedCollectionId(collection.id)
-                toast.info('Collection selected! Click words to save them here.')
-              }}
-            >
-              <p className="text-p3 text-secondary-4">{collection.name}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Collection List */}
+      <div className="space-y-2 mb-6">
+        {collections?.map((collection: Collection) => (
+          <Button
+            key={collection.id}
+            variant="text"
+            className={`w-full justify-start ${selectedCollectionId === collection.id ? 'bg-secondary-0' : ''}`}
+            onClick={() => handleCollectionSelect(collection.id)}
+          >
+            {collection.name}
+          </Button>
+        ))}
+      </div>
 
       {/* Active Words */}
       {activeWords.length > 0 && (

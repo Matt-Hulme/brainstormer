@@ -3,48 +3,46 @@ import { useState, useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 import { Project } from '@/types'
+import { useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation } from '@/hooks'
 
 interface ProjectSearchContentProps {
   projectName: string
   results: KeywordSuggestion[]
-  project: Project | undefined
+  project?: Project
 }
 
 export const ProjectSearchContent = ({ projectName, results, project }: ProjectSearchContentProps) => {
-  const [activeTermIds, setActiveTermIds] = useState<Set<string>>(new Set())
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+  const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
+  const { removeWordFromCollection, loading: removeWordLoading } = useRemoveWordFromCollectionMutation()
 
-  const handleSelectWord = useCallback((termId: string) => {
-    setActiveTermIds(prevActiveTermIds => {
-      const newActiveTermIds = new Set(prevActiveTermIds)
-      newActiveTermIds.add(termId)
-      return newActiveTermIds
-    })
-  }, [])
+  const onSelectWord = useCallback(async (termId: string) => {
+    if (!selectedCollectionId) {
+      console.log('No collection selected')
+      return
+    }
 
-  const handleUnselectWord = useCallback((termId: string) => {
-    setActiveTermIds(prevActiveTermIds => {
-      const newActiveTermIds = new Set(prevActiveTermIds)
-      newActiveTermIds.delete(termId)
-      return newActiveTermIds
-    })
-  }, [])
+    const word = termId.split('-')[0]
+    try {
+      await addWordToCollection(word, selectedCollectionId)
+    } catch (error) {
+      console.error('Error adding word to collection:', error)
+    }
+  }, [selectedCollectionId, addWordToCollection])
 
-  const activeWords = Array.from(activeTermIds).map(id => id.split('-')[0])
+  const onUnselectWord = useCallback(async (termId: string) => {
+    if (!selectedCollectionId) {
+      console.log('No collection selected')
+      return
+    }
 
-  const handleRemoveWord = useCallback((word: string) => {
-    setActiveTermIds(prevActiveTermIds => {
-      const newActiveTermIds = new Set(
-        Array.from(prevActiveTermIds).filter(id => id.split('-')[0] !== word)
-      )
-      return newActiveTermIds
-    })
-  }, [])
-
-  const handleWordAdded = useCallback((word: string) => {
-    // If a word is successfully added to a collection, we can optionally remove it from active words
-    // Uncomment this if you want to clear words after they're added to a collection automatically
-    // handleRemoveWord(word)
-  }, [handleRemoveWord])
+    const word = termId.split('-')[0]
+    try {
+      await removeWordFromCollection(word, selectedCollectionId)
+    } catch (error) {
+      console.error('Error removing word from collection:', error)
+    }
+  }, [selectedCollectionId, removeWordFromCollection])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {
@@ -79,10 +77,8 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
                 return (
                   <SearchTerm
                     key={termId}
-                    isActive={activeTermIds.has(termId)}
-                    onClick={() =>
-                      activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
-                    }
+                    isActive={false}
+                    onClick={() => onSelectWord(termId)}
                     matchType="and"
                   >
                     {result.word}
@@ -110,10 +106,8 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
                 return (
                   <SearchTerm
                     key={termId}
-                    isActive={activeTermIds.has(termId)}
-                    onClick={() =>
-                      activeTermIds.has(termId) ? handleUnselectWord(termId) : handleSelectWord(termId)
-                    }
+                    isActive={false}
+                    onClick={() => onSelectWord(termId)}
                     matchType="or"
                   >
                     {result.word}
@@ -127,10 +121,11 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
       <aside className="ml-5">
         <ProjectSearchCollectionsSidebar
           projectName={projectName}
-          activeWords={activeWords}
-          onRemoveWord={handleRemoveWord}
-          onWordAdded={handleWordAdded}
+          activeWords={[]}
+          onRemoveWord={onUnselectWord}
+          onWordAdded={() => { }}
           project={project}
+          onCollectionSelect={setSelectedCollectionId}
         />
       </aside>
     </div>
