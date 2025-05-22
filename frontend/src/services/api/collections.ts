@@ -45,6 +45,12 @@ export const collectionsApi = {
     return response.data
   },
 
+  // Remove a word from a collection
+  removeWord: async (collectionId: string, word: string) => {
+    const response = await api.delete<Collection>(`${BASE_PATH}/${collectionId}/word`, { data: { word } })
+    return response.data
+  },
+
   // Bulk update collections
   bulkUpdate: async (data: BulkUpdateCollectionsRequest) => {
     const response = await api.put<Collection[]>(`${BASE_PATH}/bulk/update`, {

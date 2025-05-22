@@ -26,7 +26,19 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     setPhrases(newPhrases)
   }, [searchValue])
 
-  const handlePhraseChange = (index: number, value: string) => {
+  const onAddPhrase = () => {
+    if (phrases.length < 3) {
+      setPhrases([...phrases, ''])
+    }
+  }
+
+  const onKeyDown = (e: KeyboardEvent, index: number) => {
+    if (e.key === 'Enter') {
+      onSearch()
+    }
+  }
+
+  const onPhraseChange = (index: number, value: string) => {
     const newPhrases = [...phrases]
     newPhrases[index] = value
     setPhrases(newPhrases)
@@ -36,13 +48,7 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     onChange?.(joinedValue)
   }
 
-  const handleAddPhrase = () => {
-    if (phrases.length < 3) {
-      setPhrases([...phrases, ''])
-    }
-  }
-
-  const handleRemovePhrase = (index: number) => {
+  const onRemovePhrase = (index: number) => {
     if (phrases.length > 1) {
       const newPhrases = phrases.filter((_, i) => i !== index)
       setPhrases(newPhrases)
@@ -53,13 +59,7 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     }
   }
 
-  const handleKeyDown = (e: KeyboardEvent, index: number) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    }
-  }
-
-  const handleSearch = async () => {
+  const onSearch = async () => {
     // Filter out empty phrases
     const validPhrases = phrases.filter(p => p.trim())
     if (validPhrases.length === 0) return
@@ -92,15 +92,15 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
               type="text"
               placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
               value={phrase}
-              onChange={(e) => handlePhraseChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
+              onChange={(e) => onPhraseChange(index, e.target.value)}
+              onKeyDown={(e) => onKeyDown(e, index)}
               className={className}
               maxLength={20} // Limiting to ~3 words
             />
             {phrases.length > 1 && (
               <Button
                 variant="icon"
-                onClick={() => handleRemovePhrase(index)}
+                onClick={() => onRemovePhrase(index)}
                 className="h-10 w-10 rounded-full"
               >
                 <X size={16} />
@@ -114,7 +114,7 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
         {phrases.length < 3 && (
           <Button
             variant="outline"
-            onClick={handleAddPhrase}
+            onClick={onAddPhrase}
             className="flex items-center gap-1"
             disabled={phrases.length >= 3}
           >
@@ -122,7 +122,7 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
           </Button>
         )}
         <div className="ml-auto">
-          <Button variant="outline" onClick={handleSearch}>
+          <Button variant="outline" onClick={onSearch}>
             Search
           </Button>
         </div>

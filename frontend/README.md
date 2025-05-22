@@ -1,6 +1,75 @@
 # Brainstormer Frontend
 
-This is the frontend application for Brainstormer, an LLM-powered brainstorming tool that helps users generate and organize keyword ideas.
+This is the frontend application for Brainstormer, built with React, TypeScript, and Vite.
+
+## Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+2. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+## Running the Development Server
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+The application will start at `http://localhost:5173`
+
+## Building for Production
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+The built files will be in the `dist` directory.
+
+## Project Structure
+
+```
+frontend/
+├── src/                    # Source code
+│   ├── components/        # Reusable components
+│   ├── pages/            # Page components
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # API services
+│   └── types/            # TypeScript types
+├── public/               # Static assets
+├── package.json          # Dependencies and scripts
+└── vite.config.ts        # Vite configuration
+```
+
+## Development
+
+- The development server supports hot module replacement (HMR)
+- Use the browser's developer tools for debugging
+- Check the console for any errors or warnings
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
 
 ## Tech Stack
 
@@ -10,71 +79,6 @@ This is the frontend application for Brainstormer, an LLM-powered brainstorming 
 - Axios for API requests
 - Tailwind CSS for styling
 - shadcn/ui component library
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18 or later)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-2. Navigate to the frontend directory:
-   ```
-   cd brainstormer/frontend
-   ```
-3. Install dependencies:
-   ```
-   npm install
-   ```
-
-### Environment Setup
-
-Create a `.env.local` file in the frontend directory with the following variables:
-
-```
-# Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# API Configuration
-VITE_API_URL=http://localhost:8000
-```
-
-For local development with Supabase:
-
-- VITE_SUPABASE_URL is typically http://localhost:54321
-- Get your local VITE_SUPABASE_ANON_KEY from the Supabase dashboard
-
-### Development
-
-Run the development server:
-
-```
-npm run dev
-```
-
-The application will be available at http://localhost:5173
-
-### Building for Production
-
-Build the application:
-
-```
-npm run build
-```
-
-## Project Structure
-
-- `src/` - Main source code
-  - `components/` - Reusable UI components
-  - `lib/` - Utility functions, API clients, and types
-  - `pages/` - Page components
-    - `Projects/` - Project-related pages
-  - `App.tsx` - Main application component with routing
-  - `main.tsx` - Application entry point
 
 ## Routes
 

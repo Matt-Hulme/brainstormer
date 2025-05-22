@@ -11,3 +11,4 @@ export { useSearchQuery } from './search/useSearchQuery';
 export { useCreateCollectionMutation } from './collections/useCreateCollectionMutation';
 export { useGetCollectionsQuery } from './collections/useGetCollectionsQuery';
 export { useAddWordToCollectionMutation } from './collections/useAddWordToCollectionMutation';
+export { useRemoveWordFromCollectionMutation } from './collections/useRemoveWordFromCollectionMutation';

@@ -9,7 +9,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -62,7 +62,7 @@ export const Login = () => {
       </div>
       <main className="flex-grow flex items-center justify-center">
         <div className="w-[400px] p-[40px] bg-white rounded-lg shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={onSubmit} className="space-y-6">
             <div>
               <h2 className="text-h3 color-secondary-4 mb-6">Sign in to Brainstormer</h2>
               {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
