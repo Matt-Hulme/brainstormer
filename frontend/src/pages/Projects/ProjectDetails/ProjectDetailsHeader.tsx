@@ -1,6 +1,6 @@
+import { format } from 'date-fns'
 import profilePicture from '@/assets/profile-picture.png'
 import { Project } from '@/types'
-import { format } from 'date-fns'
 
 interface ProjectDetailsHeaderProps {
   project: Project | null
@@ -27,9 +27,9 @@ export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => 
         <h1 className="text-h3 text-secondary-4">{project?.name}</h1>
         <div className="flex flex-row items-center gap-[10px]">
           <img
-            src={profilePicture}
             alt="Profile"
             className="rounded-full border-1 border-secondary-4 h-[20px] w-[20px]"
+            src={profilePicture}
           />
           <p className="text-p3 color-secondary-2">
             Last edited {formatDate(project?.updatedAt ?? '')}

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
-import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { toast } from 'react-toastify'
 
 // Ensure the API URL has the correct format
 const getApiBaseUrl = () => {

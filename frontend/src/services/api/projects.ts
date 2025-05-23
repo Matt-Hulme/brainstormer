@@ -1,6 +1,6 @@
 import api from '@/config/api/client'
-import type { Project } from '@/types'
 import type { CreateProjectRequest } from '@/config/api/types'
+import type { Project } from '@/types'
 import camelcaseKeys from 'camelcase-keys'
 
 const BASE_PATH = '/projects/'

@@ -3,6 +3,11 @@ description:
 globs: 
 alwaysApply: true
 ---
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Frontend Development Guide
 
 ## Project Structure
@@ -21,45 +26,118 @@ Key directories and their purposes:
 5. No index.ts files - use direct imports
 
 ## Component Organization
-1. React hooks at the top of components, alphabetized by hook name:
+1. All imports should be alphabetically ordered, with no section comments
+2. Component structure should follow this order, with alphabetical ordering within each section:
+   - React hooks (useState, useEffect, etc.)
+   - State hooks (useState, useReducer)
+   - Custom functions (event handlers, helpers, etc.)
+3. The above order and alphabetization can be broken only when necessary for variable scope
+4. Example of proper organization:
    ```typescript
-   // React hooks first, alphabetized
-   const { data: collections } = useGetCollectionsQuery()
-   const { data: project } = useGetProjectQuery()
-   const { mutate: addWord } = useAddWordMutation()
-   const { mutate: removeWord } = useRemoveWordMutation()
+   import { useCallback, useEffect, useState } from 'react'
+   import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+   import { AlignLeft, GitBranch, Layers, Target } from 'lucide-react'
+   import { Button } from '@/components/design-system/Button'
+   import { HamburgerSidebar } from '@/components/HamburgerSidebar'
+   import { SearchBar } from '@/components/SearchBar'
+   import { useGetProjectQuery } from '@/hooks/projects/useGetProjectQuery'
+   import { useSearchQuery } from '@/hooks/search/useSearchQuery'
+
+   export const Search = () => {
+     // React hooks (alphabetized)
+     const navigate = useNavigate()
+     const { projectName } = useParams<{ projectName: string }>()
+     const [searchParams] = useSearchParams()
+
+     // Variables needed for hooks (breaking order for scope)
+     const searchValue = searchParams.get('q') ?? ''
+     const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+
+     // React hooks (alphabetized)
+     const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
+     const { project, isLoading: projectLoading } = useGetProjectQuery(projectName ?? '')
+
+     // State variables (alphabetized)
+     const activeView = searchParams.get('view') ?? 'list'
+     const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
+     const hasMultiplePhrases = searchValue.includes('||')
+     const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
+     const isLoading = searchLoading || projectLoading
+
+     // Custom functions (alphabetized)
+     const onSearchModeChange = useCallback((mode: 'or' | 'and' | 'both') => {
+       const newParams = new URLSearchParams(searchParams)
+       newParams.set('mode', mode)
+       navigate(`/projects/${projectName}/search?${newParams.toString()}`)
+     }, [navigate, projectName, searchParams])
+
+     return (
+       // ...
+     )
+   }
    ```
 
-2. State hooks after React hooks, alphabetized by variable name:
-   ```typescript
-   // State hooks next, alphabetized
-   const [activeWords, setActiveWords] = useState<string[]>([])
-   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
-   const [searchQuery, setSearchQuery] = useState('')
-   ```
-
-3. All custom functions after hooks, alphabetized by function name:
-   - Event handlers (onClick, onChange, etc.)
-   - Helper functions
-   - Utility functions
-   - Render functions
-   ```typescript
-   // Then all custom functions alphabetically
-   const onAddItem = () => { ... }
-   const onRemoveItem = () => { ... }
-   const onUpdateItem = () => { ... }
-   const formatData = () => { ... }
-   const validateInput = () => { ... }
-   ```
-
-4. Use proper TypeScript types and interfaces
-5. Follow import order:
+5. Use proper TypeScript types and interfaces
+6. Follow import order:
    - React and external libraries
    - Types
    - Components
    - Hooks
    - Utils
    - Styles
+
+7. Variable Declaration Rules:
+   - Variables must be declared before they are used
+   - After declaration, related variables can be grouped together even if it breaks strict alphabetization and component section order.
+
+   ```typescript
+   // Variables declared before use
+   const searchValue = searchParams.get('q') ?? ''
+   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+   
+   // Related variables grouped together
+   const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
+   const hasMultiplePhrases = searchValue.includes('||')
+   const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
+   const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
+   ```
+
+8. When grouping related code, maintain alphabetical order within each group
+9. Use descriptive variable names instead of comments to explain intent
+
+## Comments
+1. Only add comments for particularly complex logic, such as:
+   - Complex useEffect dependencies or side effects
+   - Non-obvious business logic
+   - Complex state management patterns
+   - Performance optimizations
+2. DO NOT EVER ADD section comments like "React hooks", "State hooks", etc. If you see these, remove them.
+3. DO NOT EVER add import comments like "External library imports". If you see these, remove them.
+4. Use comments to explain "why" not "what" - the code should be self-documenting
+4. Examples of good comments:
+   ```typescript
+   // This effect needs to run after the DOM is ready because it uses getBoundingClientRect
+   useEffect(() => {
+     // ...
+   }, [])
+
+   // We're using a workaround here because the API doesn't support batch updates
+   const handleBatchUpdate = () => {
+     // ...
+   }
+   ```
+5. Examples of unnecessary comments:
+   ```typescript
+   // Bad - comment just repeats what the code says
+   // Set the search value
+   const searchValue = searchParams.get('q')
+
+   // Bad - code is self-documenting
+   // Function to add a new item
+   const onAddItem = () => {
+     // ...
+   }
+   ```
 
 ## Event Handler Naming
 1. Use `on` prefix for event handlers and props that handle events

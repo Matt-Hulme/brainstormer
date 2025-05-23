@@ -1,18 +1,18 @@
 export const projectDetailsMock = [
   {
-    name: 'Winter',
-    savedWords: ['Backcountry', 'Snow', 'Hot cocoa', 'Snow angel', 'Hibernation'],
+    name: 'Adventure',
+    savedWords: ['Bravery', 'Fearless'],
   },
   {
-    name: 'Adventure',
-    savedWords: ['Fearless', 'Bravery'],
+    name: 'Cold + Adventure',
+    savedWords: ['Ice climbing', 'Snowdrifts', 'Snowmobiling'],
   },
   {
     name: 'Mountain',
     savedWords: [],
   },
   {
-    name: 'Cold + Adventure',
-    savedWords: ['Snowmobiling', 'Ice climbing', 'Snowdrifts'],
+    name: 'Winter',
+    savedWords: ['Backcountry', 'Hot cocoa', 'Hibernation', 'Snow', 'Snow angel'],
   },
 ]

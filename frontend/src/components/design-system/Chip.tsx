@@ -2,15 +2,14 @@ import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react'
 import classNames from 'classnames'
 
 export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline'
   icon?: ReactNode
+  variant?: 'default' | 'outline'
 }
 
 export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
-  ({ className, variant = 'default', icon, children, ...props }, ref) => {
+  ({ children, className, icon, variant = 'default', ...props }, ref) => {
     return (
       <button
-        ref={ref}
         className={classNames(
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           'gap-1 inline-flex items-center px-[10px] py-[5px] rounded-full text-sm',
@@ -19,6 +18,7 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
           'border color-secondary-2 border-secondary-1/40 hover:bg-secondary-1/10 bg-transparent',
           className
         )}
+        ref={ref}
         {...props}
       >
         {icon && <span className="mr-1">{icon}</span>}
