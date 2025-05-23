@@ -1,8 +1,8 @@
 import { Button } from './design-system/Button'
 import { Input } from './design-system/Input'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'
-import { useCreateProjectMutation } from '@/hooks'
+import { useState, KeyboardEvent, useEffect } from 'react'
+import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
 import { Plus, X } from 'lucide-react'
 
 interface SearchBarProps {
@@ -19,6 +19,7 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
   const navigate = useNavigate()
   const { projectName } = useParams<{ projectName?: string }>()
   const createProjectMutation = useCreateProjectMutation()
+  const { projects } = useGetProjectsQuery()
 
   useEffect(() => {
     // When searchValue changes externally, update phrases
@@ -59,6 +60,24 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     }
   }
 
+  const generateProjectName = () => {
+    const baseName = 'Untitled Project'
+    const existingUntitledProjects = projects?.filter(p => p.name.startsWith(baseName)) ?? []
+
+    if (existingUntitledProjects.length === 0) {
+      return baseName
+    }
+
+    // Find the highest number used
+    const numbers = existingUntitledProjects.map(p => {
+      const match = p.name.match(/\((\d+)\)$/)
+      return match ? parseInt(match[1]) : 0
+    })
+    const maxNumber = Math.max(...numbers, 0)
+
+    return `${baseName} (${maxNumber + 1})`
+  }
+
   const onSearch = async () => {
     // Filter out empty phrases
     const validPhrases = phrases.filter(p => p.trim())
@@ -70,10 +89,9 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     if (projectName) {
       navigate(`/projects/${projectName}/search?q=${encodeURIComponent(searchQuery)}`)
     } else {
-      // Create a new project, then navigate
-      // Use first phrase as project name
+      // Create a new project with the generated name
       createProjectMutation.mutate(
-        { name: validPhrases[0].trim() },
+        { name: generateProjectName() },
         {
           onSuccess: (project) => {
             navigate(`/projects/${project.name}/search?q=${encodeURIComponent(searchQuery)}`)

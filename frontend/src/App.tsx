@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
+import { Home, ProjectsList, ProjectDetails, Login, Search } from './pages'
 import { ProtectedRoute } from './components'
 import { Toast } from './components/design-system/Toast'
 
@@ -30,7 +30,7 @@ export const App = () => {
             path="/projects/:projectName/search"
             element={
               <ProtectedRoute>
-                <ProjectSearch />
+                <Search />
               </ProtectedRoute>
             }
           />

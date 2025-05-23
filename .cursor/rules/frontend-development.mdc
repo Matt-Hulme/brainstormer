@@ -146,3 +146,46 @@ Key directories and their purposes:
 3. Handle errors consistently
 4. Use environment variables for endpoints
 5. Implement proper error handling
+
+## Alphabetization Rules
+
+1. **Props:** When passing props to a component (JSX or function), list them in alphabetical order.
+   ```tsx
+   // Good
+   <Button
+     className="btn-primary"
+     disabled={isDisabled}
+     onClick={onClick}
+     type="submit"
+   />
+   
+   // Bad
+   <Button
+     onClick={onClick}
+     type="submit"
+     className="btn-primary"
+     disabled={isDisabled}
+   />
+   ```
+2. **Variables and State:** Declare variables, state hooks, and function parameters in alphabetical order when possible.
+   ```tsx
+   // Good
+   const [activeWords, setActiveWords] = useState<string[]>([])
+   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+   
+   // Good (function params)
+   function doSomething(activeWords, projectName, selectedCollectionId) { ... }
+   ```
+3. **className Values:** When using multiple Tailwind or CSS classes, list them alphabetically for consistency.
+   ```tsx
+   // Good
+   <div className="bg-white p-4 rounded shadow" />
+   
+   // Bad
+   <div className="shadow rounded p-4 bg-white" />
+   ```
+
+**Benefits:**
+- Improves code readability and maintainability
+- Reduces merge conflicts
+- Makes code reviews easier
