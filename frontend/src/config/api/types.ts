@@ -1,8 +1,8 @@
 // API-specific types for request/response handling
 export interface ApiError {
+  details?: unknown
   message: string
   status: number
-  details?: unknown
 }
 
 export interface ApiResponse<T> {
@@ -21,25 +21,25 @@ export interface CreateCollectionRequest {
 }
 
 export interface SaveWordRequest {
-  word: string
   collectionId: string
   projectId: string
+  word: string
 }
 
 export interface SearchRequest {
   projectName: string
   query: string
-  searchMode?: 'or' | 'and' | 'both'
+  searchMode?: 'and' | 'both' | 'or'
 }
 
 export interface KeywordSuggestion {
-  word: string
   matchType?: 'and' | 'or'
+  word: string
 }
 
 export interface SearchResponse {
-  suggestions: KeywordSuggestion[]
   searchId?: string
+  suggestions: KeywordSuggestion[]
 }
 
 export interface BulkUpdateCollectionsRequest {
@@ -53,6 +53,6 @@ export interface BulkMoveCollectionsRequest {
 }
 
 export interface BulkMoveWordsRequest {
-  wordIds: string[]
   targetCollectionId: string
+  wordIds: string[]
 }

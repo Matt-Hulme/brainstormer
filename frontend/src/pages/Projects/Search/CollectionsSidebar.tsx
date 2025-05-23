@@ -1,34 +1,29 @@
 import { AddCollectionChip } from '@/components'
-import { useSearchParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { Button } from '@/components/design-system/Button'
 import {
   useGetCollectionsQuery,
   useAddWordToCollectionMutation
 } from '@/hooks'
-import { Collection, Project } from '@/types'
+import { Project } from '@/types'
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
-interface ProjectSearchCollectionsSidebarProps {
+interface CollectionsSidebarProps {
   projectName: string
   activeWords: string[]
   onRemoveWord?: (word: string) => void
-  onWordAdded?: (word: string) => void
   project?: Project
   onCollectionSelect?: (collectionId: string) => void
 }
 
-export const ProjectSearchCollectionsSidebar = ({
+export const CollectionsSidebar = ({
   projectName,
   activeWords,
   onRemoveWord,
-  onWordAdded,
   project,
   onCollectionSelect
-}: ProjectSearchCollectionsSidebarProps) => {
-  const [searchParams] = useSearchParams()
-  const searchQuery = searchParams.get('q') ?? ''
+}: CollectionsSidebarProps) => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [lastProcessedWords, setLastProcessedWords] = useState<string[]>([])
 
@@ -58,7 +53,6 @@ export const ProjectSearchCollectionsSidebar = ({
       try {
         for (const word of newWords) {
           await addWordToCollection(word, selectedCollectionId)
-          onWordAdded?.(word)
         }
         setLastProcessedWords(activeWords)
       } catch (error) {
@@ -68,7 +62,7 @@ export const ProjectSearchCollectionsSidebar = ({
     }
 
     saveWords()
-  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection, onWordAdded])
+  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection])
 
   const handleCollectionSelect = (collectionId: string) => {
     setSelectedCollectionId(collectionId)
@@ -84,57 +78,47 @@ export const ProjectSearchCollectionsSidebar = ({
   }
 
   return (
-    <aside className="w-[300px] p-4 border-l border-secondary-1/20">
-      <h4 className="text-h4 text-secondary-4 mb-4">Collections</h4>
-
-      {/* Collection List */}
-      <div className="space-y-2 mb-6">
-        {collections?.map((collection: Collection) => (
-          <Button
+    <div className="p-4 w-[300px]">
+      <div className="flex flex-col h-full items-center justify-between gap-[16px]">
+        <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
+        <AddCollectionChip />
+      </div>
+      <div className="flex flex-col gap-[10px]">
+        {collections?.map((collection) => (
+          <div
             key={collection.id}
-            variant="text"
-            className={`w-full justify-start ${selectedCollectionId === collection.id ? 'bg-secondary-0' : ''}`}
+            className={`p-2 rounded cursor-pointer ${selectedCollectionId === collection.id ? 'bg-secondary-0' : 'hover:bg-secondary-0/50'
+              }`}
             onClick={() => handleCollectionSelect(collection.id)}
           >
-            {collection.name}
-          </Button>
-        ))}
-      </div>
-
-      {/* Active Words */}
-      {activeWords.length > 0 && (
-        <>
-          <h5 className="text-h5 text-secondary-4">{searchQuery}</h5>
-          <div className="space-y-[10px]">
-            {activeWords.map((word, index) => (
-              <div key={`${word}-${index}`} className="flex items-center group">
-                <span className="text-p3 text-secondary-4 grow">{word}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold">{collection.name}</span>
+              {selectedCollectionId === collection.id && (
                 <Button
-                  variant="text"
-                  className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => onRemoveWord?.(word)}
-                  aria-label={`Remove ${word}`}
-                  tabIndex={-1}
+                  variant="icon"
+                  className="w-6 h-6"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRemoveWord?.()
+                  }}
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </Button>
-              </div>
-            ))}
+              )}
+            </div>
+            <div className="ml-4 mt-1">
+              {collection?.savedWords?.length > 0 ? (
+                collection?.savedWords?.map((word: string) => (
+                  <div key={word} className="text-p3 color-secondary-2">{word}</div>
+                ))
+              ) : (
+                <div className="text-p3 color-secondary-1">No words (yet)</div>
+              )}
+            </div>
           </div>
-
-          {/* Collection Management */}
-          <div className="space-y-[10px]">
-            <AddCollectionChip
-              onClick={() => { }}
-              className="w-full"
-              disabled={true}
-            />
-          </div>
-        </>
-      )}
-
-      {/* Empty State */}
-      {activeWords.length === 0 && <p className="text-p3 text-secondary-1">No words (yet)</p>}
-    </aside>
+        ))}
+        <span className='text-p3 color-secondary-1'>Add word</span>
+      </div>
+    </div>
   )
 }

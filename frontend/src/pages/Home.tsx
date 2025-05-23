@@ -1,6 +1,6 @@
-import { Button } from '@/components'
-import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components'
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -13,7 +13,7 @@ export const Home = () => {
     }
   }, [navigate])
 
-  const handleLogin = () => {
+  const onLogin = () => {
     navigate('/login')
   }
 
@@ -22,9 +22,9 @@ export const Home = () => {
       <div className="flex flex-row items-center justify-between p-[30px] w-full">
         <span className="color-secondary-3 text-h4">AI tools for the creative minded</span>
         <Button
-          variant="outline"
           className="border-secondary-1 color-secondary-4"
-          onClick={handleLogin}
+          onClick={onLogin}
+          variant="outline"
         >
           Log in
         </Button>
@@ -57,9 +57,9 @@ export const Home = () => {
       <footer className="pl-[320px] h-[100px] w-full">
         <div className="bg-white h-full flex flex-row items-center justify-end pr-[50px]">
           <Button
-            variant="text"
+            onClick={onLogin}
             textClass="text-[25px] leading-[40px] font-serif color-secondary-4"
-            onClick={handleLogin}
+            variant="text"
           >
             Give it a try
           </Button>

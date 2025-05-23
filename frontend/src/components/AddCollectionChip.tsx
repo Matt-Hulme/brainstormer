@@ -2,19 +2,19 @@ import { Plus } from 'lucide-react'
 import { Chip } from './design-system/Chip'
 
 interface AddCollectionChipProps {
-  onClick?: () => void
   className?: string
   disabled?: boolean
+  onClick?: () => void
 }
 
-export const AddCollectionChip = ({ onClick, className, disabled }: AddCollectionChipProps) => {
+export const AddCollectionChip = ({ className, disabled, onClick }: AddCollectionChipProps) => {
   return (
     <Chip
-      onClick={onClick}
       className={className}
-      variant="outline"
-      icon={<Plus size={16} />}
       disabled={disabled}
+      icon={<Plus size={16} />}
+      onClick={onClick}
+      variant="outline"
     >
       Add collection
     </Chip>

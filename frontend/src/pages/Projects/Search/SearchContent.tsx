@@ -1,48 +1,56 @@
-import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
+import { CollectionsSidebar } from './CollectionsSidebar'
 import { useState, useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 import { Project } from '@/types'
 import { useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation } from '@/hooks'
+import { toast } from 'react-toastify'
 
-interface ProjectSearchContentProps {
+interface SearchContentProps {
   projectName: string
   results: KeywordSuggestion[]
   project?: Project
 }
 
-export const ProjectSearchContent = ({ projectName, results, project }: ProjectSearchContentProps) => {
+export const SearchContent = ({ projectName, results, project }: SearchContentProps) => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
   const { removeWordFromCollection, loading: removeWordLoading } = useRemoveWordFromCollectionMutation()
 
   const onSelectWord = useCallback(async (termId: string) => {
-    if (!selectedCollectionId) {
-      console.log('No collection selected')
-      return
-    }
-
     const word = termId.split('-')[0]
     try {
-      await addWordToCollection(word, selectedCollectionId)
+      // If no collection is selected, use the first collection from the project
+      const targetCollectionId = selectedCollectionId || (project?.collections && project.collections.length > 0 ? project.collections[0].id : null)
+      if (!targetCollectionId) {
+        toast.error('Please select a collection first')
+        return
+      }
+      await addWordToCollection(word, targetCollectionId)
+      // Set the selected collection if it wasn't already set
+      if (!selectedCollectionId) {
+        setSelectedCollectionId(targetCollectionId)
+      }
     } catch (error) {
       console.error('Error adding word to collection:', error)
+      toast.error('Failed to add word to collection')
     }
-  }, [selectedCollectionId, addWordToCollection])
+  }, [selectedCollectionId, addWordToCollection, project?.collections])
 
   const onUnselectWord = useCallback(async (termId: string) => {
-    if (!selectedCollectionId) {
-      console.log('No collection selected')
-      return
-    }
-
     const word = termId.split('-')[0]
     try {
-      await removeWordFromCollection(word, selectedCollectionId)
+      const targetCollectionId = selectedCollectionId || (project?.collections && project.collections.length > 0 ? project.collections[0].id : null)
+      if (!targetCollectionId) {
+        toast.error('Please select a collection first')
+        return
+      }
+      await removeWordFromCollection(word, targetCollectionId)
     } catch (error) {
       console.error('Error removing word from collection:', error)
+      toast.error('Failed to remove word from collection')
     }
-  }, [selectedCollectionId, removeWordFromCollection])
+  }, [selectedCollectionId, removeWordFromCollection, project?.collections])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {
@@ -119,11 +127,10 @@ export const ProjectSearchContent = ({ projectName, results, project }: ProjectS
         )}
       </main>
       <aside className="ml-5">
-        <ProjectSearchCollectionsSidebar
+        <CollectionsSidebar
           projectName={projectName}
           activeWords={[]}
           onRemoveWord={onUnselectWord}
-          onWordAdded={() => { }}
           project={project}
           onCollectionSelect={setSelectedCollectionId}
         />

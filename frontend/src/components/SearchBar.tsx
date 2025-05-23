@@ -1,30 +1,46 @@
+import { KeyboardEvent, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Plus, X } from 'lucide-react'
+import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
 import { Button } from './design-system/Button'
 import { Input } from './design-system/Input'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react'
-import { useCreateProjectMutation } from '@/hooks'
-import { Plus, X } from 'lucide-react'
 
 interface SearchBarProps {
-  searchValue: string
-  onChange?: (value: string) => void
   className?: string
+  onChange?: (value: string) => void
+  searchValue: string
 }
 
-export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarProps) => {
-  // Parse search value into phrases if it contains the delimiter
-  const initialPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
-  const [phrases, setPhrases] = useState<string[]>(initialPhrases)
-
+export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarProps) => {
   const navigate = useNavigate()
   const { projectName } = useParams<{ projectName?: string }>()
   const createProjectMutation = useCreateProjectMutation()
+  const { projects } = useGetProjectsQuery()
+
+  const initialPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
+  const [phrases, setPhrases] = useState<string[]>(initialPhrases)
 
   useEffect(() => {
-    // When searchValue changes externally, update phrases
     const newPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
     setPhrases(newPhrases)
   }, [searchValue])
+
+  const generateProjectName = () => {
+    const baseName = 'Untitled Project'
+    const existingUntitledProjects = projects?.filter(p => p.name.startsWith(baseName)) ?? []
+
+    if (existingUntitledProjects.length === 0) {
+      return baseName
+    }
+
+    const numbers = existingUntitledProjects.map(p => {
+      const match = p.name.match(/\((\d+)\)$/)
+      return match ? parseInt(match[1]) : 0
+    })
+    const maxNumber = Math.max(...numbers, 0)
+
+    return `${baseName} (${maxNumber + 1})`
+  }
 
   const onAddPhrase = () => {
     if (phrases.length < 3) {
@@ -43,7 +59,6 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
     newPhrases[index] = value
     setPhrases(newPhrases)
 
-    // Call parent onChange with joined phrases
     const joinedValue = newPhrases.filter(Boolean).join(' || ')
     onChange?.(joinedValue)
   }
@@ -53,27 +68,22 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
       const newPhrases = phrases.filter((_, i) => i !== index)
       setPhrases(newPhrases)
 
-      // Call parent onChange with joined phrases
       const joinedValue = newPhrases.filter(Boolean).join(' || ')
       onChange?.(joinedValue)
     }
   }
 
   const onSearch = async () => {
-    // Filter out empty phrases
     const validPhrases = phrases.filter(p => p.trim())
     if (validPhrases.length === 0) return
 
-    // Join all phrases with delimiter
     const searchQuery = validPhrases.join(' || ')
 
     if (projectName) {
       navigate(`/projects/${projectName}/search?q=${encodeURIComponent(searchQuery)}`)
     } else {
-      // Create a new project, then navigate
-      // Use first phrase as project name
       createProjectMutation.mutate(
-        { name: validPhrases[0].trim() },
+        { name: generateProjectName() },
         {
           onSuccess: (project) => {
             navigate(`/projects/${project.name}/search?q=${encodeURIComponent(searchQuery)}`)
@@ -89,19 +99,19 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
         {phrases.map((phrase, index) => (
           <div key={index} className="flex items-center gap-2 w-full">
             <Input
-              type="text"
-              placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
-              value={phrase}
+              className={className}
+              maxLength={20}
               onChange={(e) => onPhraseChange(index, e.target.value)}
               onKeyDown={(e) => onKeyDown(e, index)}
-              className={className}
-              maxLength={20} // Limiting to ~3 words
+              placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
+              type="text"
+              value={phrase}
             />
             {phrases.length > 1 && (
               <Button
-                variant="icon"
-                onClick={() => onRemovePhrase(index)}
                 className="h-10 w-10 rounded-full"
+                onClick={() => onRemovePhrase(index)}
+                variant="icon"
               >
                 <X size={16} />
               </Button>
@@ -113,16 +123,16 @@ export const SearchBar = ({ searchValue, onChange, className = '' }: SearchBarPr
       <div className="flex justify-between w-full mt-4">
         {phrases.length < 3 && (
           <Button
-            variant="outline"
-            onClick={onAddPhrase}
             className="flex items-center gap-1"
             disabled={phrases.length >= 3}
+            onClick={onAddPhrase}
+            variant="outline"
           >
             <Plus size={16} /> Add Phrase
           </Button>
         )}
         <div className="ml-auto">
-          <Button variant="outline" onClick={onSearch}>
+          <Button onClick={onSearch} variant="outline">
             Search
           </Button>
         </div>

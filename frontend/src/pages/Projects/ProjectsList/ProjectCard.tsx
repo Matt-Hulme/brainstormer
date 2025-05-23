@@ -1,17 +1,17 @@
 import { ArrowRight, Trash } from 'lucide-react'
-import { Button } from '@/components/design-system/Button'
 import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/design-system/Button'
 import { ResultsCard } from '@/components/design-system/ResultsCard'
 import { useDeleteProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {
-  name: string
-  lastEdited: string
   collections: string[]
+  lastEdited: string
+  name: string
   savedWords: string[]
 }
 
-export const ProjectCard = ({ name, lastEdited, collections, savedWords }: ProjectCardProps) => {
+export const ProjectCard = ({ collections, lastEdited, name, savedWords }: ProjectCardProps) => {
   const navigate = useNavigate()
   const deleteProject = useDeleteProjectMutation()
 
@@ -54,14 +54,14 @@ export const ProjectCard = ({ name, lastEdited, collections, savedWords }: Proje
       </div>
       <div className="flex gap-2 items-center relative">
         <Button
-          variant="icon"
-          onClick={onDelete}
           aria-label="Delete project"
           className="mr-[4px]"
+          onClick={onDelete}
+          variant="icon"
         >
           <Trash className="h-5 text-gray-500 w-5" />
         </Button>
-        <Button variant="icon" className="rounded-full">
+        <Button className="rounded-full" variant="icon">
           <ArrowRight className="h-7 text-gray-500 w-7" />
         </Button>
       </div>

@@ -1,16 +1,15 @@
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { SearchBar } from '@/components/SearchBar'
-import { ProjectSearchContentLoading } from './ProjectSearchContentLoading'
-import { ProjectSearchContent } from './ProjectSearchContent'
-import { ProjectSearchContentEmpty } from './ProjectSearchContentEmpty'
+import { SearchContentLoading } from './SearchContentLoading'
+import { SearchContent } from './SearchContent'
+import { SearchContentEmpty } from './SearchContentEmpty'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
 import { useSearchQuery, useGetProjectQuery } from '@/hooks'
-import { ProjectSearchCollectionsSidebar } from './ProjectSearchCollectionsSidebar'
 import { useCallback } from 'react'
 
-export const ProjectSearch = () => {
+export const Search = () => {
   const { projectName } = useParams<{ projectName: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -130,10 +129,10 @@ export const ProjectSearch = () => {
         )}
 
         <main className="flex-1 h-full">
-          {isLoading && <ProjectSearchContentLoading />}
-          {searchError && <ProjectSearchContentEmpty />}
+          {isLoading && <SearchContentLoading />}
+          {searchError && <SearchContentEmpty />}
           {!isLoading && !searchError && (
-            <ProjectSearchContent
+            <SearchContent
               projectName={projectName!}
               results={data?.suggestions ?? []}
               project={project}

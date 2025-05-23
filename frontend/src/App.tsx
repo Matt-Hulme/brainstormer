@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { Home, ProjectsList, ProjectDetails, ProjectSearch, Login } from './pages'
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
+import { Home, Login, ProjectDetails, ProjectsList, Search } from './pages'
 import { ProtectedRoute } from './components'
 import { Toast } from './components/design-system/Toast'
 
@@ -8,33 +8,33 @@ export const App = () => {
     <Router>
       <div className="bg-background">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route element={<Home />} path="/" />
+          <Route element={<Login />} path="/login" />
           <Route
-            path="/projects"
             element={
               <ProtectedRoute>
                 <ProjectsList />
               </ProtectedRoute>
             }
+            path="/projects"
           />
           <Route
-            path="/projects/:projectName"
             element={
               <ProtectedRoute>
                 <ProjectDetails />
               </ProtectedRoute>
             }
+            path="/projects/:projectName"
           />
           <Route
-            path="/projects/:projectName/search"
             element={
               <ProtectedRoute>
-                <ProjectSearch />
+                <Search />
               </ProtectedRoute>
             }
+            path="/projects/:projectName/search"
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route element={<Navigate replace to="/" />} path="*" />
         </Routes>
         <Toast />
       </div>

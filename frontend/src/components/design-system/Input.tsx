@@ -9,14 +9,15 @@ const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>
 
     return (
       <input
-        type={type}
         className={className ? `${baseStyles} ${className}` : `${baseStyles} ${defaultTypography}`}
         ref={ref}
+        type={type}
         {...props}
       />
     )
   }
 )
+
 Input.displayName = 'Input'
 
 export { Input }

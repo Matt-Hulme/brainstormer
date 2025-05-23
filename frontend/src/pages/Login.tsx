@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/design-system/Button'
 
 export const Login = () => {
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -15,24 +15,20 @@ export const Login = () => {
     setLoading(true)
 
     try {
-      // The token endpoint is at the root level, not under /api/v1
       const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-      // Remove /api/v1 if it's included in the URL
       const tokenUrl = baseUrl.includes('/api/v1')
         ? baseUrl.replace('/api/v1', '/token')
         : `${baseUrl}/token`
 
-      console.log('Making token request to:', tokenUrl)
-
       const response = await fetch(tokenUrl, {
-        method: 'POST',
+        body: new URLSearchParams({
+          password,
+          username,
+        }),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          username,
-          password,
-        }),
+        method: 'POST',
       })
 
       if (!response.ok) {
@@ -40,12 +36,7 @@ export const Login = () => {
       }
 
       const data = await response.json()
-
-      // Store the token and anonymous ID
-      localStorage.setItem('token', data.access_token)
       localStorage.setItem('anonymousId', data.anonymous_id)
-
-      // Navigate to projects page
       navigate('/projects')
     } catch (err) {
       console.error('Login error:', err)

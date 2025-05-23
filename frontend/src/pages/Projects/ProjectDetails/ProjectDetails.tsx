@@ -1,19 +1,15 @@
-import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 import { Fragment } from 'react'
-import { Button } from '@/components/design-system/Button'
 import { ArrowRight } from 'lucide-react'
 import { useParams } from 'react-router-dom'
+import { Button } from '@/components/design-system/Button'
+import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
+import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 
 export const ProjectDetails = () => {
   const { projectName } = useParams<{ projectName: string }>()
-  const { project, isLoading: projectLoading, error: projectError } = useGetProjectQuery(projectName ?? '')
-  const {
-    collections,
-    loading: collectionsLoading,
-    error: collectionsError,
-  } = useGetCollectionsQuery(project?.id ?? '')
+  const { error: projectError, isLoading: projectLoading, project } = useGetProjectQuery(projectName ?? '')
+  const { collections, error: collectionsError, loading: collectionsLoading } = useGetCollectionsQuery(project?.id ?? '')
 
   if (projectLoading || collectionsLoading) {
     return (
@@ -43,8 +39,8 @@ export const ProjectDetails = () => {
               <div className="pt-[30px]">
                 <div className="flex flex-row items-center gap-[4px]">
                   <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
-                  <Button variant="icon" className="color-secondary-3">
-                    <ArrowRight size={24} className="" />
+                  <Button className="color-secondary-3" variant="icon">
+                    <ArrowRight className="" size={24} />
                   </Button>
                 </div>
               </div>
