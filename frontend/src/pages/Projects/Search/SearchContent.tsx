@@ -1,56 +1,75 @@
 import { CollectionsSidebar } from './CollectionsSidebar'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 import { Project } from '@/types'
-import { useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation } from '@/hooks'
+import { useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
 import { toast } from 'react-toastify'
+import { useSearchParams } from 'react-router-dom'
 
 interface SearchContentProps {
-  projectName: string
+  projectId: string
   results: KeywordSuggestion[]
   project?: Project
 }
 
-export const SearchContent = ({ projectName, results, project }: SearchContentProps) => {
+export const SearchContent = ({ projectId, results, project }: SearchContentProps) => {
+  const [searchParams] = useSearchParams()
+  const searchQuery = searchParams.get('q') ?? ''
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
   const { removeWordFromCollection, loading: removeWordLoading } = useRemoveWordFromCollectionMutation()
+  const { createCollection, loading: createCollectionLoading } = useCreateCollectionMutation()
+
+  // Create a collection when search is performed
+  useEffect(() => {
+    const createSearchCollection = async () => {
+      if (!searchQuery || !projectId || !project) return
+
+      try {
+        const collection = await createCollection({
+          name: searchQuery,
+          projectId
+        })
+        setSelectedCollectionId(collection.id)
+      } catch (error: any) {
+        console.error('Error creating collection:', error)
+        // Show the specific error message from the backend if available
+        const errorMessage = error.response?.data?.detail || 'Failed to create collection'
+        toast.error(errorMessage)
+      }
+    }
+
+    createSearchCollection()
+  }, [searchQuery, projectId, project])
 
   const onSelectWord = useCallback(async (termId: string) => {
     const word = termId.split('-')[0]
     try {
-      // If no collection is selected, use the first collection from the project
-      const targetCollectionId = selectedCollectionId || (project?.collections && project.collections.length > 0 ? project.collections[0].id : null)
-      if (!targetCollectionId) {
-        toast.error('Please select a collection first')
+      if (!selectedCollectionId) {
+        toast.error('Please wait for collection to be created')
         return
       }
-      await addWordToCollection(word, targetCollectionId)
-      // Set the selected collection if it wasn't already set
-      if (!selectedCollectionId) {
-        setSelectedCollectionId(targetCollectionId)
-      }
+      await addWordToCollection(word, selectedCollectionId)
     } catch (error) {
       console.error('Error adding word to collection:', error)
       toast.error('Failed to add word to collection')
     }
-  }, [selectedCollectionId, addWordToCollection, project?.collections])
+  }, [selectedCollectionId, addWordToCollection])
 
   const onUnselectWord = useCallback(async (termId: string) => {
     const word = termId.split('-')[0]
     try {
-      const targetCollectionId = selectedCollectionId || (project?.collections && project.collections.length > 0 ? project.collections[0].id : null)
-      if (!targetCollectionId) {
-        toast.error('Please select a collection first')
+      if (!selectedCollectionId) {
+        toast.error('Please wait for collection to be created')
         return
       }
-      await removeWordFromCollection(word, targetCollectionId)
+      await removeWordFromCollection(word, selectedCollectionId)
     } catch (error) {
       console.error('Error removing word from collection:', error)
       toast.error('Failed to remove word from collection')
     }
-  }, [selectedCollectionId, removeWordFromCollection, project?.collections])
+  }, [selectedCollectionId, removeWordFromCollection])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {
@@ -128,7 +147,7 @@ export const SearchContent = ({ projectName, results, project }: SearchContentPr
       </main>
       <aside className="ml-5">
         <CollectionsSidebar
-          projectName={projectName}
+          projectId={projectId}
           activeWords={[]}
           onRemoveWord={onUnselectWord}
           project={project}

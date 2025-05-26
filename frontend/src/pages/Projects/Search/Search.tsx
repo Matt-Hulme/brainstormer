@@ -10,15 +10,15 @@ import { useSearchQuery, useGetProjectQuery } from '@/hooks'
 import { useCallback } from 'react'
 
 export const Search = () => {
-  const { projectName } = useParams<{ projectName: string }>()
+  const { projectId } = useParams<{ projectId: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
 
-  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
-  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName ?? '')
+  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
+  const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
 
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading
@@ -26,8 +26,8 @@ export const Search = () => {
   const setSearchMode = useCallback((mode: 'or' | 'and' | 'both') => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('mode', mode)
-    navigate(`/projects/${projectName}/search?${newParams.toString()}`)
-  }, [navigate, projectName, searchParams])
+    navigate(`/projects/${projectId}/search?${newParams.toString()}`)
+  }, [navigate, projectId, searchParams])
 
   // Display information about match types
   const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
@@ -133,7 +133,7 @@ export const Search = () => {
           {searchError && <SearchContentEmpty />}
           {!isLoading && !searchError && (
             <SearchContent
-              projectName={projectName!}
+              projectId={projectId!}
               results={data?.suggestions ?? []}
               project={project}
             />

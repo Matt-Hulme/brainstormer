@@ -9,7 +9,7 @@ router = APIRouter(prefix="/search", tags=["search"])
 
 class SearchRequest(BaseModel):
     query: str
-    project_name: str
+    project_id: str
     search_mode: Optional[str] = "or"  # "or" or "and" or "both"
 
 class KeywordSuggestion(BaseModel):
@@ -20,7 +20,7 @@ class SearchResponse(BaseModel):
     suggestions: List[KeywordSuggestion]
     search_id: Optional[str] = None
 
-@router.post("/", response_model=SearchResponse)
+@router.post("", response_model=SearchResponse)
 async def search_keywords(
     search: SearchRequest,
     request: Request
@@ -29,15 +29,14 @@ async def search_keywords(
     supabase = get_supabase_client()
     
     # Verify the project exists and user has access to it
-    projects = supabase.table("projects")\
+    project = supabase.table("projects")\
         .select("id")\
-        .eq("name", search.project_name)\
+        .eq("id", search.project_id)\
         .eq("user_id", request.state.user_id)\
-        .order("updated_at", desc=True)\
-        .limit(1)\
+        .single()\
         .execute()
     
-    if not projects.data or len(projects.data) == 0:
+    if not project.data:
         raise HTTPException(status_code=404, detail="Project not found")
     
     # Parse multiple phrases

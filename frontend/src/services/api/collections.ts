@@ -6,7 +6,7 @@ import type {
 } from '@/config/api/types'
 import type { Collection } from '@/types'
 
-const BASE_PATH = 'collections/'
+const BASE_PATH = '/collections'
 
 export const collectionsApi = {
   addWord: async (collectionId: string, word: string) => {
@@ -38,7 +38,10 @@ export const collectionsApi = {
   },
 
   create: async (data: CreateCollectionRequest) => {
-    const response = await api.post<Collection>(BASE_PATH, data)
+    const response = await api.post<Collection>(BASE_PATH, {
+      name: data.name,
+      project_id: data.projectId
+    })
     return response.data
   },
 
@@ -53,7 +56,7 @@ export const collectionsApi = {
   },
 
   listByProject: async (projectId: string) => {
-    const response = await api.get<Collection[]>(`${BASE_PATH}project/${projectId}`)
+    const response = await api.get<Collection[]>(`${BASE_PATH}/project/${projectId}`)
     return response.data
   },
 

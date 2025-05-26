@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
 interface CollectionsSidebarProps {
-  projectName: string
+  projectId: string
   activeWords: string[]
   onRemoveWord?: (word: string) => void
   project?: Project
@@ -18,7 +18,7 @@ interface CollectionsSidebarProps {
 }
 
 export const CollectionsSidebar = ({
-  projectName,
+  projectId,
   activeWords,
   onRemoveWord,
   project,
@@ -40,7 +40,7 @@ export const CollectionsSidebar = ({
   useEffect(() => {
     setSelectedCollectionId(null)
     setLastProcessedWords([])
-  }, [projectName])
+  }, [projectId])
 
   // Auto-save words when they change
   useEffect(() => {
@@ -62,7 +62,7 @@ export const CollectionsSidebar = ({
     }
 
     saveWords()
-  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection])
+  }, [activeWords, selectedCollectionId, lastProcessedWords])
 
   const handleCollectionSelect = (collectionId: string) => {
     setSelectedCollectionId(collectionId)

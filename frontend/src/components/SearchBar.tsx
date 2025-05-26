@@ -13,7 +13,7 @@ interface SearchBarProps {
 
 export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarProps) => {
   const navigate = useNavigate()
-  const { projectName } = useParams<{ projectName?: string }>()
+  const { projectId } = useParams<{ projectId?: string }>()
   const createProjectMutation = useCreateProjectMutation()
   const { projects } = useGetProjectsQuery()
 
@@ -79,14 +79,14 @@ export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarPr
 
     const searchQuery = validPhrases.join(' || ')
 
-    if (projectName) {
-      navigate(`/projects/${projectName}/search?q=${encodeURIComponent(searchQuery)}`)
+    if (projectId) {
+      navigate(`/projects/${projectId}/search?q=${encodeURIComponent(searchQuery)}`)
     } else {
       createProjectMutation.mutate(
         { name: generateProjectName() },
         {
           onSuccess: (project) => {
-            navigate(`/projects/${project.name}/search?q=${encodeURIComponent(searchQuery)}`)
+            navigate(`/projects/${project.id}/search?q=${encodeURIComponent(searchQuery)}`)
           },
         }
       )

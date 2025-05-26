@@ -32,6 +32,12 @@ It helps users generate and organize keyword ideas.
 - **Authentication**: Anonymous via Supabase
 - **Routing**: `/userId/projects`, `/userId/projects/:projectName`, `/userId/projects/:projectName/search?q=searchterm`
 - **Security**: RLS, rate limiting, environment variable management
+- **API Path Conventions**:
+  - Base paths are defined without trailing slashes (e.g., `/projects`, `/collections`)
+  - Resource paths use forward slashes for path segments (e.g., `/projects/{id}`, `/collections/{id}/word`)
+  - Nested resources use explicit path segments (e.g., `/collections/project/{projectId}`)
+  - Bulk operations use `/bulk` suffix (e.g., `/collections/bulk`, `/saved-words/bulk`)
+  - All paths are relative to the API base URL (e.g., `http://localhost:8000/api/v1`)
 - **API Data Shape**:
   - `GET /projects` returns a list of projects (with `projectId`, no collections or saved words included)
   - `GET /projects/{project_id}` returns the project (by `projectId`), its collections (by `collectionId`), and all saved words (by `savedWordId`) within those collections (nested)
@@ -134,4 +140,11 @@ It helps users generate and organize keyword ideas.
 
 ## References
 - See `mvp-v2-roadmap.md` for implementation phases, milestones, and tactical planning.
+
+# API Route Path Convention
+
+- The API version prefix (API_V1_STR) must never have a trailing slash (e.g., use '/api/v1', not '/api/v1/').
+- All FastAPI route decorators must avoid trailing slashes (e.g., use @router.get('/resource'), not @router.get('/resource/')).
+- All frontend API calls must match the backend route exactly, with no double slashes and no trailing slashes unless explicitly required.
+- This convention ensures consistent routing, avoids 405 errors, and prevents accidental double slashes in URLs.
 

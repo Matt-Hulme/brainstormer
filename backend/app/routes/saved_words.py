@@ -28,7 +28,7 @@ class BulkMoveWords(BaseModel):
     word_ids: List[str]
     target_collection_id: str
 
-@router.post("/", response_model=SavedWord)
+@router.post("", response_model=SavedWord)
 async def create_saved_word(
     saved_word: SavedWordCreate,
     request: Request

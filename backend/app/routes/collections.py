@@ -32,7 +32,7 @@ class BulkMoveCollections(BaseModel):
 class AddWordRequest(BaseModel):
     word: str
 
-@router.post("/", response_model=Collection)
+@router.post("", response_model=Collection)
 async def create_collection(
     collection: CollectionCreate,
     request: Request

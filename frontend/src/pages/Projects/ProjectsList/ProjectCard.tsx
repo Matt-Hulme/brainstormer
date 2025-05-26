@@ -5,24 +5,25 @@ import { ResultsCard } from '@/components/design-system/ResultsCard'
 import { useDeleteProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {
+  id: string
   collections: string[]
   lastEdited: string
   name: string
   savedWords: string[]
 }
 
-export const ProjectCard = ({ collections, lastEdited, name, savedWords }: ProjectCardProps) => {
+export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: ProjectCardProps) => {
   const navigate = useNavigate()
   const deleteProject = useDeleteProjectMutation()
 
   const onCardClick = () => {
-    const projectUrl = `/projects/${name}`
+    const projectUrl = `/projects/${id}`
     navigate(projectUrl)
   }
 
   const onDelete = (e: React.MouseEvent) => {
     if (confirm('Are you sure you want to delete this project?')) {
-      deleteProject.mutate(name)
+      deleteProject.mutate(id)
     }
   }
 

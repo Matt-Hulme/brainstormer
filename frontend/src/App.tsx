@@ -24,7 +24,7 @@ export const App = () => {
                 <ProjectDetails />
               </ProtectedRoute>
             }
-            path="/projects/:projectName"
+            path="/projects/:projectId"
           />
           <Route
             element={
@@ -32,7 +32,7 @@ export const App = () => {
                 <Search />
               </ProtectedRoute>
             }
-            path="/projects/:projectName/search"
+            path="/projects/:projectId/search"
           />
           <Route element={<Navigate replace to="/" />} path="*" />
         </Routes>

@@ -27,6 +27,7 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
             {projects?.map((project: Project) => (
               <ProjectCard
                 key={project?.id ?? ''}
+                id={project?.id ?? ''}
                 name={project?.name ?? 'Untitled Project'}
                 lastEdited={new Date(project?.updatedAt ?? '').toLocaleDateString()}
                 collections={project?.collections?.map((c: Collection) => c.name) ?? []}
