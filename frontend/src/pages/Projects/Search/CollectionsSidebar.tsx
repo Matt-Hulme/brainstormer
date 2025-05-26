@@ -5,7 +5,7 @@ import {
   useGetCollectionsQuery,
   useAddWordToCollectionMutation
 } from '@/hooks'
-import { Project } from '@/types'
+import { Project, SavedWord } from '@/types'
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
@@ -108,8 +108,8 @@ export const CollectionsSidebar = ({
             </div>
             <div className="ml-4 mt-1">
               {collection?.savedWords?.length > 0 ? (
-                collection?.savedWords?.map((word: string) => (
-                  <div key={word} className="text-p3 color-secondary-2">{word}</div>
+                collection?.savedWords?.map((savedWord: SavedWord) => (
+                  <div key={savedWord.id} className="text-p3 color-secondary-2">{savedWord.word}</div>
                 ))
               ) : (
                 <div className="text-p3 color-secondary-1">No words (yet)</div>
