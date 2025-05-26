@@ -1,4 +1,9 @@
 ---
+description: 
+globs: 
+alwaysApply: true
+---
+---
 description: Frontend development rules including component organization, defensive programming, styling guidelines, conditional rendering, and export patterns
 globs: ["frontend/src/**/*.{ts,tsx}"]
 alwaysApply: true
@@ -213,6 +218,13 @@ Key directories and their purposes:
 3. Use CSS variables for theming
 4. Avoid inline styles
 5. Use classnames package for conditional classes
+6. CSS Class Naming Conventions:
+   - Use `color-{name}` for text colors (e.g., `color-secondary-2`, `color-primary-1`)
+   - Use `text-{name}` for text-related utilities (e.g., `text-p2`, `text-h4`)
+   - Use `bg-{name}` for background colors
+   - Use `border-{name}` for border colors
+   - DO NOT change existing class names without explicit direction
+   - DO NOT assume Tailwind conventions (like `text-{color}`) unless explicitly specified
 
 ## API Integration
 1. All API configuration in config directory

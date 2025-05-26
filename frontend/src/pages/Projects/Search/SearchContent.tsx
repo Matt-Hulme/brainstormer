@@ -13,6 +13,7 @@ interface SearchContentProps {
   isCreatingCollection: boolean
   onAddWord: (word: string, collectionId: string) => Promise<void>
   onRemoveWord: (word: string, collectionId: string) => Promise<void>
+  localActiveWords: Set<string>
 }
 
 export const SearchContent = ({
@@ -23,11 +24,12 @@ export const SearchContent = ({
   selectedCollectionId,
   isCreatingCollection,
   onAddWord,
-  onRemoveWord
+  onRemoveWord,
+  localActiveWords
 }: SearchContentProps) => {
-
   const onSelectWord = useCallback(async (termId: string) => {
-    const word = termId.split('-')[0]
+    // Get the full word/phrase by removing the match type and index
+    const word = termId.split('-').slice(0, -2).join('-')
     try {
       if (!selectedCollectionId && isCreatingCollection) {
         toast.error('Please wait for collection to be created')
@@ -56,12 +58,9 @@ export const SearchContent = ({
   // Check if we have multiple match types
   const hasMultipleMatchTypes = Object.keys(groupedResults).length > 1
 
-  // Find the selected collection
-  const selectedCollection = collections?.find(c => c?.id === selectedCollectionId)
-
-  // Check if a word is in the selected collection
+  // Check if a word is in the selected collection (using local state)
   const isWordInCollection = (word: string) => {
-    return selectedCollection?.savedWords?.some(sw => sw.word === word) ?? false
+    return localActiveWords?.has(word)
   }
 
   return (

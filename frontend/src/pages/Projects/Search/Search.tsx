@@ -29,6 +29,20 @@ export const Search = () => {
   const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
   const { createCollection } = useCreateCollectionMutation()
 
+  // Local state for optimistic updates
+  const [localCollections, setLocalCollections] = useState<Record<string, Set<string>>>({})
+
+  // Initialize local state from collections data
+  useEffect(() => {
+    if (collections) {
+      const initialCollections: Record<string, Set<string>> = {}
+      collections.forEach(collection => {
+        initialCollections[collection.id] = new Set(collection.savedWords?.map(sw => sw.word) || [])
+      })
+      setLocalCollections(initialCollections)
+    }
+  }, [collections])
+
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading || collectionsLoading
 
@@ -80,18 +94,54 @@ export const Search = () => {
   }, [searchValue, projectId, project, collections, createCollection])
 
   const handleAddWord = async (word: string, collectionId: string) => {
+    // Optimistically update local state
+    setLocalCollections(prev => {
+      const newCollections = { ...prev }
+      const collectionWords = new Set(newCollections[collectionId])
+      collectionWords.add(word)
+      newCollections[collectionId] = collectionWords
+      return newCollections
+    })
+
     try {
       await addWordToCollection(word, collectionId)
     } catch (error) {
+      // Revert optimistic update on error
+      setLocalCollections(prev => {
+        const newCollections = { ...prev }
+        const collectionWords = new Set(newCollections[collectionId])
+        collectionWords.delete(word)
+        newCollections[collectionId] = collectionWords
+        return newCollections
+      })
+
       console.error('Error adding word to collection:', error)
       toast.error('Failed to add word to collection')
     }
   }
 
   const handleRemoveWord = async (word: string, collectionId: string) => {
+    // Optimistically update local state
+    setLocalCollections(prev => {
+      const newCollections = { ...prev }
+      const collectionWords = new Set(newCollections[collectionId])
+      collectionWords.delete(word)
+      newCollections[collectionId] = collectionWords
+      return newCollections
+    })
+
     try {
       await removeWordFromCollection(word, collectionId)
     } catch (error) {
+      // Revert optimistic update on error
+      setLocalCollections(prev => {
+        const newCollections = { ...prev }
+        const collectionWords = new Set(newCollections[collectionId])
+        collectionWords.add(word)
+        newCollections[collectionId] = collectionWords
+        return newCollections
+      })
+
       console.error('Error removing word from collection:', error)
       toast.error('Failed to remove word from collection')
     }
@@ -107,6 +157,9 @@ export const Search = () => {
   const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
   const hasOrMatches = data?.suggestions?.some(s => s?.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
+
+  // Get active words from the selected collection
+  const localActiveWords: Set<string> = selectedCollectionId ? localCollections[selectedCollectionId] || new Set<string>() : new Set<string>()
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -216,6 +269,7 @@ export const Search = () => {
                 isCreatingCollection={isCreatingCollection}
                 onAddWord={handleAddWord}
                 onRemoveWord={handleRemoveWord}
+                localActiveWords={localActiveWords}
               />
             )}
           </main>
@@ -227,6 +281,7 @@ export const Search = () => {
               onCollectionSelect={setSelectedCollectionId}
               onAddWord={handleAddWord}
               onRemoveWord={handleRemoveWord}
+              localCollections={localCollections}
             />
           </aside>
         </div>
