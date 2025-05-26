@@ -36,6 +36,7 @@ export const Login = () => {
       }
 
       const data = await response.json()
+      localStorage.setItem('token', data.access_token)
       localStorage.setItem('anonymousId', data.anonymous_id)
       navigate('/projects')
     } catch (err) {

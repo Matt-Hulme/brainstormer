@@ -40,7 +40,7 @@ export const Home = () => {
               , not to replace your creativity.
             </h1>
           </header>
-          <div>
+          <div className='flex flex-row gap-[45px]'>
             <p className="text-h4 color-secondary-4 max-w-[582px]">
               Instead of making art or writing for you, Creaitve helps you break out of your
               creative block so you can create even better—because creativity breeds culture. When

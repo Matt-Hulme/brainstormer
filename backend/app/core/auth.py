@@ -21,10 +21,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 if not settings.JWT_SECRET:
     raise ValueError("JWT_SECRET environment variable is not set")
 
-# Log environment variables (without sensitive values)
-logger.info(f"ADMIN_USERNAME from settings: {'*' * len(settings.ADMIN_USERNAME)}")
-logger.info(f"ADMIN_PASSWORD from settings: {'*' * len(settings.ADMIN_PASSWORD)}")
-logger.info(f"JWT_SECRET from settings: {'*' * len(settings.JWT_SECRET)}")
 
 class Token(BaseModel):
     access_token: str
@@ -36,22 +32,22 @@ class User(BaseModel):
     anonymous_id: str
     disabled: Optional[bool] = None
 
-# Get admin credentials from environment
-ADMIN_USERNAME = settings.ADMIN_USERNAME
-ADMIN_PASSWORD = settings.ADMIN_PASSWORD
-ADMIN_USER_ID = str(uuid.uuid4())  # Generate a unique UUID for admin at startup
+# Get guest credentials from environment
+GUEST_USERNAME = settings.GUEST_USERNAME
+GUEST_PASSWORD = settings.GUEST_PASSWORD
+GUEST_USER_ID = str(uuid.uuid4())  # Generate a unique UUID for guest at startup
 
 def get_user(username: str):
     """Get user by username"""
     logger.info(f"Attempting to get user with username: {username}")
-    if username == ADMIN_USERNAME:
-        logger.info("Username matches ADMIN_USERNAME")
+    if username == GUEST_USERNAME:
+        logger.info("Username matches GUEST_USERNAME")
         return {
-            "username": ADMIN_USERNAME,
-            "anonymous_id": ADMIN_USER_ID,  # Use UUID for admin
+            "username": GUEST_USERNAME,
+            "anonymous_id": GUEST_USER_ID,  # Use UUID for guest
             "disabled": False
         }
-    logger.info("Username does not match ADMIN_USERNAME")
+    logger.info("Username does not match GUEST_USERNAME")
     return None
 
 def authenticate_user(username: str, password: str):
@@ -63,7 +59,7 @@ def authenticate_user(username: str, password: str):
         logger.info(f"User not found: {username}")
         return False
     
-    if password != ADMIN_PASSWORD:
+    if password != GUEST_PASSWORD:
         logger.info(f"Password verification failed for user: {username}")
         return False
     
