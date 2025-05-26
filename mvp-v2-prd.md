@@ -8,13 +8,15 @@ Expect some rough edges. Post-MVP polish and extra functionality (editing Saved 
 
 ## Overview
 
-Brainstormer is an LLM-powered brainstorming tool where users manage **Projects**, **Collections**, and **Saved Words**.
+Brainstormer is an LLM-powered brainstorming tool where users manage **Projects**, **Collections** (search queries), and **Saved Words**.
 
 It helps users generate and organize keyword ideas.
 
 ### Core Object Model:
 
-- **Projects** → contain → **Collections** → contain → **Saved Words**.
+- **User** → has → **Projects** → contain → **Collections** → contain → **Saved Words**.
+- **Collections**: A collection is created as soon as a search query is performed within a project. Each collection represents a unique search query, and may contain zero or more saved words. This means collections exist even if no words have been saved yet.
+- **Search Queries**: When a user performs a search, it does **not** immediately create a collection. A collection is only created when the user saves a word from the search results. Thus, only search queries with at least one saved word become collections. This ensures collections represent meaningful, user-curated sets of keywords rather than every search performed.
 
 ## Technical Stack & High-Level Architecture
 
@@ -47,6 +49,7 @@ It helps users generate and organize keyword ideas.
 
 ### 4. Search Results Page
 - Search bar, view toggles, loading state, keyword suggestions, multi-select, collections sidebar
+- **Collection Creation:** A collection is created as soon as a user performs a search. Saved words can then be added to that collection, but collections may exist with zero saved words.
 
 ## Core Functionality
 - Anonymous authentication
