@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Product requirements document management and documentation guidelines
+globs: ["docs/**/*.md", ".cursor/rules/**/*.md"]
 alwaysApply: true
 ---
 # PRD Management Guide

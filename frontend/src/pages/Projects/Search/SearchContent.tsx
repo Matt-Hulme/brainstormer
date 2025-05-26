@@ -54,6 +54,14 @@ export const SearchContent = ({
   // Check if we have multiple match types
   const hasMultipleMatchTypes = Object.keys(groupedResults).length > 1
 
+  // Find the selected collection
+  const selectedCollection = project?.collections?.find(c => c.id === selectedCollectionId)
+
+  // Check if a word is in the selected collection
+  const isWordInCollection = (word: string) => {
+    return selectedCollection?.savedWords?.some(sw => sw.word === word) ?? false
+  }
+
   return (
     <div className="pb-[35px]">
       {/* Show AND matches first if they exist */}
@@ -73,7 +81,7 @@ export const SearchContent = ({
               return (
                 <SearchTerm
                   key={termId}
-                  isActive={false}
+                  isActive={isWordInCollection(result.word)}
                   onClick={() => onSelectWord(termId)}
                   matchType="and"
                 >
@@ -102,7 +110,7 @@ export const SearchContent = ({
               return (
                 <SearchTerm
                   key={termId}
-                  isActive={false}
+                  isActive={isWordInCollection(result.word)}
                   onClick={() => onSelectWord(termId)}
                   matchType="or"
                 >

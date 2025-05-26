@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Security best practices for both frontend and backend development
+globs: ["frontend/src/**/*.{ts,tsx}", "backend/app/**/*.py"]
 alwaysApply: true
 ---
 # Security Practices

@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Backend development guidelines including API structure, error handling, and database practices
+globs: ["backend/app/**/*.py"]
 alwaysApply: true
 ---
 # Backend Development Guide

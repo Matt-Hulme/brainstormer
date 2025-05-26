@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Shared development practices applicable across frontend and backend
+globs: ["frontend/src/**/*.{ts,tsx}", "backend/app/**/*.py"]
 alwaysApply: true
 ---
 # Shared Development Guide
