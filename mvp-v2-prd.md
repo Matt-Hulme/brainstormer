@@ -14,9 +14,16 @@ It helps users generate and organize keyword ideas.
 
 ### Core Object Model:
 
-- **User** → has → **Projects** → contain → **Collections** → contain → **Saved Words**.
-- **Collections**: A collection is created as soon as a search query is performed within a project. Each collection represents a unique search query, and may contain zero or more saved words. This means collections exist even if no words have been saved yet.
-- **Search Queries**: When a user performs a search, it does **not** immediately create a collection. A collection is only created when the user saves a word from the search results. Thus, only search queries with at least one saved word become collections. This ensures collections represent meaningful, user-curated sets of keywords rather than every search performed.
+- **Projects:** A project is a top-level container for collections. If a user initiates a search from the project details page and no project exists, a new project is created automatically.
+
+- **Collections:** A collection is created as soon as a search query is performed within a project. Each collection represents a unique search query (by `collectionId`), and may contain zero or more saved words. Collections exist even if no words have been saved yet.
+
+- **Saved Words:** Saved words are user-selected keywords associated with a specific collection. Each saved word is uniquely identified by a `savedWordId` and belongs to a single collection.
+
+- **ID as Source of Truth:** All relationships and lookups between entities (Projects, Collections, Saved Words) are based on unique IDs (`projectId`, `collectionId`, `savedWordId`), not names or search phrases. Names and search queries are for display and user context only; all operations and references use IDs as the canonical source of truth.
+
+- **Creation Flow:** When a user performs their first search from the project details page, both a new project (if needed) and a new collection (for that search query) are created simultaneously.
+
 
 ## Technical Stack & High-Level Architecture
 
@@ -26,8 +33,8 @@ It helps users generate and organize keyword ideas.
 - **Routing**: `/userId/projects`, `/userId/projects/:projectName`, `/userId/projects/:projectName/search?q=searchterm`
 - **Security**: RLS, rate limiting, environment variable management
 - **API Data Shape**:
-  - `GET /projects` returns a list of projects (no collections or saved words included)
-  - `GET /projects/{project_name}` returns the project, its collections, and all saved words within those collections (nested)
+  - `GET /projects` returns a list of projects (with `projectId`, no collections or saved words included)
+  - `GET /projects/{project_id}` returns the project (by `projectId`), its collections (by `collectionId`), and all saved words (by `savedWordId`) within those collections (nested)
 
 ## User Roles
 
@@ -45,11 +52,11 @@ It helps users generate and organize keyword ideas.
 ### 3. Project Details Page
 - Header (title, last edited, profile pic)
 - Two-column: collections (left), saved words (right)
-- **Data:** Loaded from a single API call to `/projects/{project_name}` which returns the project, its collections, and all saved words within those collections
+- **Data:** Loaded from a single API call to `/projects/{project_id}` which returns the project, its collections, and all saved words within those collections
 
 ### 4. Search Results Page
 - Search bar, view toggles, loading state, keyword suggestions, multi-select, collections sidebar
-- **Collection Creation:** A collection is created as soon as a user performs a search. Saved words can then be added to that collection, but collections may exist with zero saved words.
+- **Collection Creation:** A collection is created as soon as a user performs a search. Saved words can then be added to that collection, but collections may exist with zero saved words. All collection operations use `collectionId` as the source of truth, not the search phrase or collection name.
 
 ## Core Functionality
 - Anonymous authentication
