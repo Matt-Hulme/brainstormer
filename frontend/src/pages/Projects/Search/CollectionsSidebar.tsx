@@ -96,7 +96,9 @@ export const CollectionsSidebar = ({
             </div>
           ))
         )}
-        <AddCollectionChip />
+        <div>
+          <AddCollectionChip />
+        </div>
       </div>
     </div>
   )
