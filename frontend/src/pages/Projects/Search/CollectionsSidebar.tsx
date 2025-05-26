@@ -79,45 +79,24 @@ export const CollectionsSidebar = ({
 
   return (
     <div className="p-4 w-[300px]">
-      <div className="flex flex-col h-full items-center justify-between gap-[16px]">
-        <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
-        <AddCollectionChip />
-      </div>
-      <div className="flex flex-col gap-[10px]">
-        {collections?.map((collection) => (
-          <div
-            key={collection.id}
-            className={`p-2 rounded cursor-pointer ${selectedCollectionId === collection.id ? 'bg-secondary-0' : 'hover:bg-secondary-0/50'
-              }`}
-            onClick={() => handleCollectionSelect(collection.id)}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">{collection.name}</span>
-              {selectedCollectionId === collection.id && (
-                <Button
-                  variant="icon"
-                  className="w-6 h-6"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onRemoveWord?.()
-                  }}
-                >
-                  <X size={16} />
-                </Button>
-              )}
-            </div>
-            <div className="ml-4 mt-1">
-              {collection?.savedWords?.length > 0 ? (
-                collection?.savedWords?.map((savedWord: SavedWord) => (
+      <div className="flex flex-col h-full gap-[16px]">
+        <h3 className="color-secondary-2 text-p2 mb-2 border-b border-secondary-1/30 pb-2">SAVED WORDS</h3>
+        {collections?.length === 0 ? (
+          <div className="text-p3 color-secondary-1 mb-4">No words (yet)</div>
+        ) : (
+          collections.map((collection) => (
+            <div key={collection.id} className="mb-4">
+              <div className="font-semibold text-[16px] color-secondary-4 mb-1">{collection.name}</div>
+              {collection.savedWords && collection.savedWords.length > 0 ? (
+                collection.savedWords.map((savedWord: SavedWord) => (
                   <div key={savedWord.id} className="text-p3 color-secondary-2">{savedWord.word}</div>
                 ))
-              ) : (
-                <div className="text-p3 color-secondary-1">No words (yet)</div>
-              )}
+              ) : null}
+              <div className="text-p3 color-secondary-1 mt-1">Add word</div>
             </div>
-          </div>
-        ))}
-        <span className='text-p3 color-secondary-1'>Add word</span>
+          ))
+        )}
+        <AddCollectionChip />
       </div>
     </div>
   )
