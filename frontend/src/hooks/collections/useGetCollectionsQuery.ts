@@ -6,6 +6,10 @@ export const useGetCollectionsQuery = (projectId: string) => {
         queryKey: ['collections', projectId],
         queryFn: () => collectionsApi.listByProject(projectId),
         enabled: !!projectId,
+        select: (collections) => collections.map(collection => ({
+            ...collection,
+            savedWords: collection.savedWords || []
+        }))
     })
 
     return {

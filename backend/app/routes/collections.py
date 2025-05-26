@@ -51,6 +51,17 @@ async def create_collection(
     if not project.data:
         raise HTTPException(status_code=404, detail="Project not found")
     
+    # Check if collection with same name already exists in project
+    existing_collection = supabase.table("collections")\
+        .select("id")\
+        .eq("project_id", collection.project_id)\
+        .eq("name", collection.name)\
+        .single()\
+        .execute()
+    
+    if existing_collection.data:
+        raise HTTPException(status_code=400, detail="A collection with this name already exists in the project")
+    
     data = {
         "name": collection.name,
         "project_id": collection.project_id
@@ -80,7 +91,7 @@ async def list_collections(project_id: str, request: Request):
         raise HTTPException(status_code=404, detail="Project not found")
     
     result = supabase.table("collections")\
-        .select("*")\
+        .select("*, saved_words(*)")\
         .eq("project_id", project_id)\
         .order("updated_at", desc=True)\
         .execute()

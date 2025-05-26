@@ -9,8 +9,6 @@ export const useAddWordToCollectionMutation = () => {
         mutationFn: (params: { word: string, collectionId: string }) =>
             collectionsApi.addWord(params.collectionId, params.word),
         onSuccess: (_, variables) => {
-            // Invalidate the specific collection query
-            queryClient.invalidateQueries({ queryKey: ['collection', variables.collectionId] })
             // Invalidate collections list for the project
             queryClient.invalidateQueries({ queryKey: ['collections'] })
             toast.success('Word saved successfully')

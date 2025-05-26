@@ -3,11 +3,13 @@ import { SearchBar } from '@/components/SearchBar'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { SearchContentEmpty } from './SearchContentEmpty'
+import { CollectionsSidebar } from './CollectionsSidebar'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
-import { useSearchQuery, useGetProjectQuery } from '@/hooks'
-import { useCallback } from 'react'
+import { useSearchQuery, useGetProjectQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
+import { useCallback, useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 export const Search = () => {
   const { projectId } = useParams<{ projectId: string }>()
@@ -16,12 +18,66 @@ export const Search = () => {
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
 
   const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
+  const { addWordToCollection } = useAddWordToCollectionMutation()
+  const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
+  const { createCollection } = useCreateCollectionMutation()
 
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading
+
+  // Create a collection when search is performed
+  useEffect(() => {
+    const createSearchCollection = async () => {
+      if (!searchValue || !projectId || !project) return
+
+      try {
+        // First try to find an existing collection with this name
+        const existingCollection = project?.collections?.find(
+          c => c?.name?.toLowerCase() === searchValue.toLowerCase()
+        )
+
+        if (existingCollection) {
+          setSelectedCollectionId(existingCollection.id)
+          return
+        }
+
+        // If no existing collection found, create a new one
+        const collection = await createCollection({
+          name: searchValue,
+          projectId
+        })
+        setSelectedCollectionId(collection?.id ?? null)
+      } catch (error: any) {
+        console.error('Error creating collection:', error)
+        const errorMessage = error?.response?.data?.detail ?? 'Failed to create collection'
+        toast.error(errorMessage)
+      }
+    }
+
+    createSearchCollection()
+  }, [searchValue, projectId, project])
+
+  const handleAddWord = async (word: string, collectionId: string) => {
+    try {
+      await addWordToCollection(word, collectionId)
+    } catch (error) {
+      console.error('Error adding word to collection:', error)
+      toast.error('Failed to add word to collection')
+    }
+  }
+
+  const handleRemoveWord = async (word: string, collectionId: string) => {
+    try {
+      await removeWordFromCollection(word, collectionId)
+    } catch (error) {
+      console.error('Error removing word from collection:', error)
+      toast.error('Failed to remove word from collection')
+    }
+  }
 
   const setSearchMode = useCallback((mode: 'or' | 'and' | 'both') => {
     const newParams = new URLSearchParams(searchParams)
@@ -30,8 +86,8 @@ export const Search = () => {
   }, [navigate, projectId, searchParams])
 
   // Display information about match types
-  const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
-  const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
+  const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
+  const hasOrMatches = data?.suggestions?.some(s => s?.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
 
   return (
@@ -128,17 +184,32 @@ export const Search = () => {
           </div>
         )}
 
-        <main className="flex-1 h-full">
-          {isLoading && <SearchContentLoading />}
-          {searchError && <SearchContentEmpty />}
-          {!isLoading && !searchError && (
-            <SearchContent
-              projectId={projectId!}
-              results={data?.suggestions ?? []}
+        <div className="flex flex-row pt-[25px]">
+          <main className="flex-1 h-full">
+            {isLoading && <SearchContentLoading />}
+            {searchError && <SearchContentEmpty />}
+            {!isLoading && !searchError && (
+              <SearchContent
+                projectId={projectId ?? ''}
+                results={data?.suggestions ?? []}
+                project={project}
+                selectedCollectionId={selectedCollectionId}
+                onAddWord={handleAddWord}
+                onRemoveWord={handleRemoveWord}
+              />
+            )}
+          </main>
+          <aside className="ml-5">
+            <CollectionsSidebar
+              projectId={projectId ?? ''}
               project={project}
+              selectedCollectionId={selectedCollectionId}
+              onCollectionSelect={setSelectedCollectionId}
+              onAddWord={handleAddWord}
+              onRemoveWord={handleRemoveWord}
             />
-          )}
-        </main>
+          </aside>
+        </div>
       </div>
     </div>
   )
