@@ -6,6 +6,15 @@ from ..core.database import get_supabase_client
 
 router = APIRouter(prefix="/collections", tags=["collections"])
 
+class SavedWord(BaseModel):
+    id: str
+    word: str
+    collection_id: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class CollectionBase(BaseModel):
     name: str
     project_id: str
@@ -17,6 +26,7 @@ class Collection(CollectionBase):
     id: str
     created_at: datetime
     updated_at: datetime
+    saved_words: List[SavedWord] = []
 
     class Config:
         from_attributes = True
@@ -56,10 +66,9 @@ async def create_collection(
         .select("id")\
         .eq("project_id", collection.project_id)\
         .eq("name", collection.name)\
-        .single()\
         .execute()
     
-    if existing_collection.data:
+    if existing_collection.data and len(existing_collection.data) > 0:
         raise HTTPException(status_code=400, detail="A collection with this name already exists in the project")
     
     data = {
@@ -67,12 +76,15 @@ async def create_collection(
         "project_id": collection.project_id
     }
     
-    result = supabase.table("collections").insert(data).execute()
-    
-    if not result.data:
-        raise HTTPException(status_code=400, detail="Failed to create collection")
-    
-    return result.data[0]
+    try:
+        result = supabase.table("collections").insert(data).execute()
+        
+        if not result.data or len(result.data) == 0:
+            raise HTTPException(status_code=500, detail="Failed to create collection - no data returned")
+            
+        return result.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create collection: {str(e)}")
 
 @router.get("/project/{project_id}", response_model=List[Collection])
 async def list_collections(project_id: str, request: Request):

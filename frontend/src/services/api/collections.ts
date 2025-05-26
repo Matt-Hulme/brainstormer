@@ -5,68 +5,69 @@ import type {
   CreateCollectionRequest,
 } from '@/config/api/types'
 import type { Collection } from '@/types'
+import camelcaseKeys from 'camelcase-keys'
 
 const BASE_PATH = '/collections'
 
 export const collectionsApi = {
   addWord: async (collectionId: string, word: string) => {
-    const response = await api.post<Collection>(`${BASE_PATH}/${collectionId}/word`, { word })
-    return response.data
+    const response = await api.post(`${BASE_PATH}/${collectionId}/word`, { word })
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
 
   bulkDelete: async (collectionIds: string[]) => {
     const response = await api.delete(`${BASE_PATH}/bulk`, {
       data: collectionIds,
     })
-    return response.data
+    return camelcaseKeys(response.data, { deep: true })
   },
 
   bulkMove: async (data: BulkMoveCollectionsRequest) => {
-    const response = await api.put<Collection[]>(`${BASE_PATH}/bulk/move`, {
+    const response = await api.put(`${BASE_PATH}/bulk/move`, {
       collection_ids: data.collectionIds,
       target_project_id: data.targetProjectId,
     })
-    return response.data
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection[]
   },
 
   bulkUpdate: async (data: BulkUpdateCollectionsRequest) => {
-    const response = await api.put<Collection[]>(`${BASE_PATH}/bulk/update`, {
+    const response = await api.put(`${BASE_PATH}/bulk/update`, {
       collection_ids: data.collectionIds,
       name: data.name,
     })
-    return response.data
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection[]
   },
 
   create: async (data: CreateCollectionRequest) => {
-    const response = await api.post<Collection>(BASE_PATH, {
+    const response = await api.post(BASE_PATH, {
       name: data.name,
       project_id: data.projectId
     })
-    return response.data
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
 
   delete: async (collectionId: string) => {
     const response = await api.delete(`${BASE_PATH}/${collectionId}`)
-    return response.data
+    return camelcaseKeys(response.data, { deep: true })
   },
 
   get: async (collectionId: string) => {
-    const response = await api.get<Collection>(`${BASE_PATH}/${collectionId}`)
-    return response.data
+    const response = await api.get(`${BASE_PATH}/${collectionId}`)
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
 
   listByProject: async (projectId: string) => {
-    const response = await api.get<Collection[]>(`${BASE_PATH}/project/${projectId}`)
-    return response.data
+    const response = await api.get(`${BASE_PATH}/project/${projectId}`)
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection[]
   },
 
   removeWord: async (collectionId: string, word: string) => {
-    const response = await api.delete<Collection>(`${BASE_PATH}/${collectionId}/word`, { data: { word } })
-    return response.data
+    const response = await api.delete(`${BASE_PATH}/${collectionId}/word`, { data: { word } })
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
 
   update: async (collectionId: string, data: CreateCollectionRequest) => {
-    const response = await api.put<Collection>(`${BASE_PATH}/${collectionId}`, data)
-    return response.data
+    const response = await api.put(`${BASE_PATH}/${collectionId}`, data)
+    return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
 }

@@ -9,6 +9,7 @@ interface SearchContentProps {
   results: KeywordSuggestion[]
   project?: Project
   selectedCollectionId: string | null
+  isCreatingCollection: boolean
   onAddWord: (word: string, collectionId: string) => Promise<void>
   onRemoveWord: (word: string, collectionId: string) => Promise<void>
 }
@@ -18,14 +19,19 @@ export const SearchContent = ({
   results,
   project,
   selectedCollectionId,
+  isCreatingCollection,
   onAddWord,
   onRemoveWord
 }: SearchContentProps) => {
+
   const onSelectWord = useCallback(async (termId: string) => {
     const word = termId.split('-')[0]
     try {
-      if (!selectedCollectionId) {
+      if (!selectedCollectionId && isCreatingCollection) {
         toast.error('Please wait for collection to be created')
+        return
+      }
+      if (!selectedCollectionId) {
         return
       }
       await onAddWord(word, selectedCollectionId)
@@ -33,7 +39,7 @@ export const SearchContent = ({
       console.error('Error adding word to collection:', error)
       toast.error('Failed to add word to collection')
     }
-  }, [selectedCollectionId, onAddWord])
+  }, [selectedCollectionId, isCreatingCollection, onAddWord])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {

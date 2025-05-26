@@ -25,7 +25,7 @@ export const CollectionsSidebar = ({
     collections,
     loading: collectionsLoading,
     error: collectionsError,
-  } = useGetCollectionsQuery(project?.id ?? '')
+  } = useGetCollectionsQuery(projectId)
 
   if (collectionsLoading) {
     return <div>Loading collections...</div>
@@ -37,31 +37,33 @@ export const CollectionsSidebar = ({
 
   return (
     <div className="p-4 w-[300px]">
-      <div className="flex flex-col h-full gap-[16px]">
-        <h3 className="color-secondary-2 text-p2 mb-2 border-b border-secondary-1/30 pb-2">SAVED WORDS</h3>
+      <div className="flex flex-col gap-[16px] h-full">
+        <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
+        <div className="bg-secondary-1/30 h-[1px] w-full" />
+
         {collections?.length === 0 ? (
-          <div className="text-p3 color-secondary-1 mb-4">No words (yet)</div>
+          <div className="color-secondary-1 text-p3">No words (yet)</div>
         ) : (
           collections.map((collection) => (
-            <div key={collection.id} className="mb-4">
-              <div className="font-semibold text-[16px] color-secondary-4 mb-1">{collection.name}</div>
+            <div key={collection.id} className="space-y-[10px]">
+              <div className="color-secondary-4 font-semibold text-[16px]">{collection.name}</div>
               {collection.savedWords && collection.savedWords.length > 0 ? (
                 collection.savedWords.map((savedWord: SavedWord) => (
-                  <div key={savedWord.id} className="text-p3 color-secondary-2 flex items-center justify-between">
+                  <div key={savedWord.id} className="color-secondary-2 flex items-center justify-between text-p3">
                     <span>{savedWord.word}</span>
                     {onRemoveWord && (
                       <Button
                         variant="icon"
-                        className="h-6 w-6"
+                        className="h-[18px] w-[18px]"
                         onClick={() => onRemoveWord(savedWord.word, collection.id)}
                       >
-                        <X size={14} />
+                        <X size={18} />
                       </Button>
                     )}
                   </div>
                 ))
               ) : null}
-              <div className="text-p3 color-secondary-1 mt-1">Add word</div>
+              <div className="color-secondary-1 text-p3">Add word</div>
             </div>
           ))
         )}

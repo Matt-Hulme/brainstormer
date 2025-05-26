@@ -22,6 +22,7 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
   }
 
   const onDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (confirm('Are you sure you want to delete this project?')) {
       deleteProject.mutate(id)
     }

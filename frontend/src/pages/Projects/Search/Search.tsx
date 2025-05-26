@@ -8,7 +8,7 @@ import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
 import { useSearchQuery, useGetProjectQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 
 export const Search = () => {
@@ -19,6 +19,8 @@ export const Search = () => {
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false)
+  const lastAttemptedSearch = useRef<string | null>(null)
 
   const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
@@ -34,6 +36,12 @@ export const Search = () => {
     const createSearchCollection = async () => {
       if (!searchValue || !projectId || !project) return
 
+      // Skip if we've already attempted to create a collection for this search value
+      if (lastAttemptedSearch.current === searchValue) return
+
+      lastAttemptedSearch.current = searchValue
+      setIsCreatingCollection(true)
+
       try {
         // First try to find an existing collection with this name
         const existingCollection = project?.collections?.find(
@@ -42,6 +50,7 @@ export const Search = () => {
 
         if (existingCollection) {
           setSelectedCollectionId(existingCollection.id)
+          setIsCreatingCollection(false)
           return
         }
 
@@ -50,16 +59,24 @@ export const Search = () => {
           name: searchValue,
           projectId
         })
-        setSelectedCollectionId(collection?.id ?? null)
+
+        if (!collection?.id) {
+          throw new Error('Failed to create collection - no ID returned')
+        }
+
+        setSelectedCollectionId(collection.id)
       } catch (error: any) {
         console.error('Error creating collection:', error)
-        const errorMessage = error?.response?.data?.detail ?? 'Failed to create collection'
+        const errorMessage = error?.response?.data?.detail ?? error?.message ?? 'Failed to create collection'
         toast.error(errorMessage)
+        setSelectedCollectionId(null)
+      } finally {
+        setIsCreatingCollection(false)
       }
     }
 
     createSearchCollection()
-  }, [searchValue, projectId, project])
+  }, [searchValue, projectId, project, createCollection])
 
   const handleAddWord = async (word: string, collectionId: string) => {
     try {
@@ -194,6 +211,7 @@ export const Search = () => {
                 results={data?.suggestions ?? []}
                 project={project}
                 selectedCollectionId={selectedCollectionId}
+                isCreatingCollection={isCreatingCollection}
                 onAddWord={handleAddWord}
                 onRemoveWord={handleRemoveWord}
               />
