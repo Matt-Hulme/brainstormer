@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { collectionsApi } from '@/services/api/collections'
 import { toast } from 'react-toastify'
+import { Collection } from '@/types'
 
 export const useRemoveWordFromCollectionMutation = () => {
     const queryClient = useQueryClient()
@@ -8,11 +9,51 @@ export const useRemoveWordFromCollectionMutation = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: (params: { word: string, collectionId: string }) =>
             collectionsApi.removeWord(params.collectionId, params.word),
-        onSuccess: (_, variables) => {
-            // Invalidate the specific collection query
-            queryClient.invalidateQueries({ queryKey: ['collection', variables.collectionId] })
-            // Invalidate collections list for the project
-            queryClient.invalidateQueries({ queryKey: ['collections'] })
+        onSuccess: async (updatedCollection: Collection, variables) => {
+            // Ensure savedWords is always an array
+            const collectionWithWords = {
+                ...updatedCollection,
+                savedWords: updatedCollection.savedWords || []
+            }
+
+            // Get the project ID from the updated collection
+            const projectId = updatedCollection.projectId
+
+            // Update the specific collection in the cache
+            queryClient.setQueryData(
+                ['collection', variables.collectionId],
+                collectionWithWords
+            )
+
+            // Update the collections list in the cache
+            queryClient.setQueryData(
+                ['collections', projectId],
+                (oldData: Collection[] | undefined) => {
+                    if (!oldData) return [collectionWithWords]
+                    return oldData.map(collection =>
+                        collection.id === variables.collectionId
+                            ? collectionWithWords
+                            : collection
+                    )
+                }
+            )
+
+            // Update the project cache to reflect the collection changes
+            queryClient.setQueryData(
+                ['project', projectId],
+                (oldData: any) => {
+                    if (!oldData) return oldData
+                    return {
+                        ...oldData,
+                        collections: oldData.collections?.map((collection: Collection) =>
+                            collection.id === variables.collectionId
+                                ? collectionWithWords
+                                : collection
+                        )
+                    }
+                }
+            )
+
             toast.success('Word removed successfully')
         },
         onError: (error: Error) => {

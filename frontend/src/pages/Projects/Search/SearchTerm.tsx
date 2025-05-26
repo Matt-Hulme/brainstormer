@@ -14,6 +14,7 @@ export const SearchTerm = ({
   onClick,
   matchType
 }: SearchTermProps) => {
+
   return (
     <Button
       variant="text"

@@ -16,14 +16,14 @@ export const useAddWordToCollectionMutation = () => {
                 savedWords: updatedCollection.savedWords || []
             }
 
+            // Get the project ID from the updated collection
+            const projectId = updatedCollection.projectId
+
             // Update the specific collection in the cache
             queryClient.setQueryData(
                 ['collection', variables.collectionId],
                 collectionWithWords
             )
-
-            // Get the project ID from the updated collection
-            const projectId = updatedCollection.projectId
 
             // Update the collections list in the cache
             queryClient.setQueryData(
@@ -35,6 +35,22 @@ export const useAddWordToCollectionMutation = () => {
                             ? collectionWithWords
                             : collection
                     )
+                }
+            )
+
+            // Update the project cache to reflect the collection changes
+            queryClient.setQueryData(
+                ['project', projectId],
+                (oldData: any) => {
+                    if (!oldData) return oldData
+                    return {
+                        ...oldData,
+                        collections: oldData.collections?.map((collection: Collection) =>
+                            collection.id === variables.collectionId
+                                ? collectionWithWords
+                                : collection
+                        )
+                    }
                 }
             )
         },

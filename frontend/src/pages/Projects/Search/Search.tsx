@@ -7,7 +7,7 @@ import { CollectionsSidebar } from './CollectionsSidebar'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
-import { useSearchQuery, useGetProjectQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
+import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
 import { useCallback, useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 
@@ -24,12 +24,13 @@ export const Search = () => {
 
   const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
+  const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
   const { addWordToCollection } = useAddWordToCollectionMutation()
   const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
   const { createCollection } = useCreateCollectionMutation()
 
   // Determine overall loading state
-  const isLoading = searchLoading || projectLoading
+  const isLoading = searchLoading || projectLoading || collectionsLoading
 
   // Create a collection when search is performed
   useEffect(() => {
@@ -44,7 +45,7 @@ export const Search = () => {
 
       try {
         // First try to find an existing collection with this name
-        const existingCollection = project?.collections?.find(
+        const existingCollection = collections?.find(
           c => c?.name?.toLowerCase() === searchValue.toLowerCase()
         )
 
@@ -76,7 +77,7 @@ export const Search = () => {
     }
 
     createSearchCollection()
-  }, [searchValue, projectId, project, createCollection])
+  }, [searchValue, projectId, project, collections, createCollection])
 
   const handleAddWord = async (word: string, collectionId: string) => {
     try {
@@ -210,6 +211,7 @@ export const Search = () => {
                 projectId={projectId ?? ''}
                 results={data?.suggestions ?? []}
                 project={project}
+                collections={collections}
                 selectedCollectionId={selectedCollectionId}
                 isCreatingCollection={isCreatingCollection}
                 onAddWord={handleAddWord}

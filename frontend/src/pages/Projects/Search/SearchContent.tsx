@@ -1,13 +1,14 @@
 import { useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
-import { Project } from '@/types'
+import { Project, Collection } from '@/types'
 import { toast } from 'react-toastify'
 
 interface SearchContentProps {
   projectId: string
   results: KeywordSuggestion[]
   project?: Project
+  collections?: Collection[]
   selectedCollectionId: string | null
   isCreatingCollection: boolean
   onAddWord: (word: string, collectionId: string) => Promise<void>
@@ -16,8 +17,9 @@ interface SearchContentProps {
 
 export const SearchContent = ({
   projectId,
-  results,
+  results = [],
   project,
+  collections = [],
   selectedCollectionId,
   isCreatingCollection,
   onAddWord,
@@ -49,13 +51,13 @@ export const SearchContent = ({
     }
     acc[matchType].push(result)
     return acc
-  }, {} as Record<string, KeywordSuggestion[]>)
+  }, {} as Record<string, KeywordSuggestion[]>) ?? {}
 
   // Check if we have multiple match types
   const hasMultipleMatchTypes = Object.keys(groupedResults).length > 1
 
   // Find the selected collection
-  const selectedCollection = project?.collections?.find(c => c.id === selectedCollectionId)
+  const selectedCollection = collections?.find(c => c?.id === selectedCollectionId)
 
   // Check if a word is in the selected collection
   const isWordInCollection = (word: string) => {
@@ -65,7 +67,7 @@ export const SearchContent = ({
   return (
     <div className="pb-[35px]">
       {/* Show AND matches first if they exist */}
-      {groupedResults['and'] && (
+      {groupedResults['and']?.length > 0 && (
         <div className="mb-8">
           {hasMultipleMatchTypes && (
             <div className="ml-[20px] mb-3">
@@ -77,6 +79,7 @@ export const SearchContent = ({
           )}
           <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
             {groupedResults['and'].map((result, index) => {
+              if (!result?.word) return null
               const termId = `${result.word}-and-${index}`
               return (
                 <SearchTerm
@@ -94,7 +97,7 @@ export const SearchContent = ({
       )}
 
       {/* Then show OR matches */}
-      {groupedResults['or'] && (
+      {groupedResults['or']?.length > 0 && (
         <div>
           {hasMultipleMatchTypes && (
             <div className="ml-[20px] mb-3">
@@ -106,6 +109,7 @@ export const SearchContent = ({
           )}
           <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
             {groupedResults['or'].map((result, index) => {
+              if (!result?.word) return null
               const termId = `${result.word}-or-${index}`
               return (
                 <SearchTerm
