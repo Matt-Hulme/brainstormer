@@ -32,8 +32,8 @@ class Settings(BaseModel):
     # Security settings
     ANONYMOUS_USER_PREFIX: str = "anon_"
     JWT_SECRET: str = os.getenv("JWT_SECRET", "")
-    ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "")
-    ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "")
+    GUEST_USERNAME: str = os.getenv("GUEST_USERNAME", "admin")
+    GUEST_PASSWORD: str = os.getenv("GUEST_PASSWORD", "")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
     
     # Debug settings
@@ -50,7 +50,7 @@ class Settings(BaseModel):
 def get_settings() -> Settings:
     settings = Settings()
     # Print for debugging
-    print(f"ADMIN_USERNAME: {settings.ADMIN_USERNAME}")
-    print(f"ADMIN_PASSWORD length: {len(settings.ADMIN_PASSWORD)}")
+    print(f"GUEST_USERNAME: {settings.GUEST_USERNAME}")
+    print(f"GUEST_PASSWORD length: {len(settings.GUEST_PASSWORD)}")
     print(f"JWT_SECRET length: {len(settings.JWT_SECRET)}")
     return settings 
