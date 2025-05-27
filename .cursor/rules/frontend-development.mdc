@@ -4,10 +4,11 @@ globs:
 alwaysApply: true
 ---
 ---
-description: 
-globs: 
+description: Frontend development rules including component organization, defensive programming, styling guidelines, conditional rendering, and export patterns
+globs: ["frontend/src/**/*.{ts,tsx}"]
 alwaysApply: true
 ---
+
 # Frontend Development Guide
 
 ## Project Structure
@@ -217,6 +218,13 @@ Key directories and their purposes:
 3. Use CSS variables for theming
 4. Avoid inline styles
 5. Use classnames package for conditional classes
+6. CSS Class Naming Conventions:
+   - Use `color-{name}` for text colors (e.g., `color-secondary-2`, `color-primary-1`)
+   - Use `text-{name}` for text-related utilities (e.g., `text-p2`, `text-h4`)
+   - Use `bg-{name}` for background colors
+   - Use `border-{name}` for border colors
+   - DO NOT change existing class names without explicit direction
+   - DO NOT assume Tailwind conventions (like `text-{color}`) unless explicitly specified
 
 ## API Integration
 1. All API configuration in config directory
@@ -267,3 +275,88 @@ Key directories and their purposes:
 - Improves code readability and maintainability
 - Reduces merge conflicts
 - Makes code reviews easier
+
+## Conditional Rendering
+1. Prefer logical AND (`&&`) over ternary operators for simple conditionals
+2. Use ternary operators only for:
+   - Different values of the same prop
+   - Non-JSX values
+   - Complex inline conditions
+
+### Examples
+
+#### Simple Conditional (Preferred)
+```jsx
+{condition && <Component />}
+{!condition && <AlternativeComponent />}
+```
+
+#### Multiple Conditions (Preferred)
+```jsx
+{conditionA && <ComponentA />}
+{conditionB && <ComponentB />}
+{!(conditionA || conditionB) && <FallbackComponent />}
+```
+
+#### Inline Conditions
+```jsx
+<div className={`base-class ${isActive && 'active-class'}`}>
+  {text || 'Default text'}
+</div>
+```
+
+### Guidelines
+1. Keep conditional logic simple and readable
+2. Avoid nested ternaries
+3. Use logical operators for boolean conditions
+4. Consider extracting complex conditions to variables
+5. Document complex conditional logic
+
+## Export Patterns and Tree-Shaking
+
+### Avoid Barrel Files
+Do not create barrel files that re-export multiple components together. Barrel files typically look like this:
+
+```typescript
+// DO NOT DO THIS
+export * from './Component1';
+export * from './Component2';
+export * from './Component3';
+```
+
+### Proper index.ts Export Pattern
+Each component should be in its own file with a proper named export. The `index.ts` file should individually export components to ensure tree-shaking works correctly:
+
+```typescript
+// CORRECT APPROACH
+export { Component1 } from './Component1';
+export { Component2 } from './Component2';
+export { Component3 } from './Component3';
+```
+
+### Benefits
+1. **Better Tree-Shaking**: When using wildcard exports (`export *`), bundlers may struggle to properly tree-shake unused components
+2. **Smaller Bundle Size**: Proper named exports allow bundlers to only include what's actually used
+3. **Clear Component Dependencies**: Makes it easier to track which components are actually used in the application
+4. **Faster Build Times**: More efficient compilation due to clearer dependency graph
+
+### Example Component Structure
+```
+components/
+  |- Button/
+     |- Button.tsx       // Component implementation
+     |- Button.test.tsx  // Component tests
+     |- index.ts         // Exports just the Button component
+  |- Card/
+     |- Card.tsx         // Component implementation
+     |- Card.test.tsx    // Component tests
+     |- index.ts         // Exports just the Card component
+  |- index.ts            // Exports individual components, not using wildcards
+```
+
+In the top-level `index.ts`:
+```typescript
+export { Button } from './Button';
+export { Card } from './Card';
+// Not using: export * from './Button';
+```

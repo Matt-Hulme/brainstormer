@@ -3,36 +3,163 @@ import { SearchBar } from '@/components/SearchBar'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { SearchContentEmpty } from './SearchContentEmpty'
+import { CollectionsSidebar } from './CollectionsSidebar'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
-import { useSearchQuery, useGetProjectQuery } from '@/hooks'
-import { useCallback } from 'react'
+import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
+import { useCallback, useState, useEffect, useRef } from 'react'
+import { toast } from 'react-toastify'
 
 export const Search = () => {
-  const { projectName } = useParams<{ projectName: string }>()
+  const { projectId } = useParams<{ projectId: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false)
+  const lastAttemptedSearch = useRef<string | null>(null)
 
-  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
-  const { project, isLoading: projectLoading } = useGetProjectQuery(projectName ?? '')
+  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
+  const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
+  const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
+  const { addWordToCollection } = useAddWordToCollectionMutation()
+  const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
+  const { createCollection } = useCreateCollectionMutation()
+
+  // Local state for optimistic updates
+  const [localCollections, setLocalCollections] = useState<Record<string, Set<string>>>({})
+
+  // Initialize local state from collections data
+  useEffect(() => {
+    if (collections) {
+      const initialCollections: Record<string, Set<string>> = {}
+      collections.forEach(collection => {
+        initialCollections[collection.id] = new Set(collection.savedWords?.map(sw => sw.word) || [])
+      })
+      setLocalCollections(initialCollections)
+    }
+  }, [collections])
 
   // Determine overall loading state
-  const isLoading = searchLoading || projectLoading
+  const isLoading = searchLoading || projectLoading || collectionsLoading
+
+  // Create a collection when search is performed
+  useEffect(() => {
+    const createSearchCollection = async () => {
+      if (!searchValue || !projectId || !project) return
+
+      // Skip if we've already attempted to create a collection for this search value
+      if (lastAttemptedSearch.current === searchValue) return
+
+      lastAttemptedSearch.current = searchValue
+      setIsCreatingCollection(true)
+
+      try {
+        // First try to find an existing collection with this name
+        const existingCollection = collections?.find(
+          c => c?.name?.toLowerCase() === searchValue.toLowerCase()
+        )
+
+        if (existingCollection) {
+          setSelectedCollectionId(existingCollection.id)
+          setIsCreatingCollection(false)
+          return
+        }
+
+        // If no existing collection found, create a new one
+        const collection = await createCollection({
+          name: searchValue,
+          projectId
+        })
+
+        if (!collection?.id) {
+          throw new Error('Failed to create collection - no ID returned')
+        }
+
+        setSelectedCollectionId(collection.id)
+      } catch (error: any) {
+        console.error('Error creating collection:', error)
+        const errorMessage = error?.response?.data?.detail ?? error?.message ?? 'Failed to create collection'
+        toast.error(errorMessage)
+        setSelectedCollectionId(null)
+      } finally {
+        setIsCreatingCollection(false)
+      }
+    }
+
+    createSearchCollection()
+  }, [searchValue, projectId, project, collections, createCollection])
+
+  const handleAddWord = async (word: string, collectionId: string) => {
+    // Optimistically update local state
+    setLocalCollections(prev => {
+      const newCollections = { ...prev }
+      const collectionWords = new Set(newCollections[collectionId])
+      collectionWords.add(word)
+      newCollections[collectionId] = collectionWords
+      return newCollections
+    })
+
+    try {
+      await addWordToCollection(word, collectionId)
+    } catch (error) {
+      // Revert optimistic update on error
+      setLocalCollections(prev => {
+        const newCollections = { ...prev }
+        const collectionWords = new Set(newCollections[collectionId])
+        collectionWords.delete(word)
+        newCollections[collectionId] = collectionWords
+        return newCollections
+      })
+
+      console.error('Error adding word to collection:', error)
+      toast.error('Failed to add word to collection')
+    }
+  }
+
+  const handleRemoveWord = async (word: string, collectionId: string) => {
+    // Optimistically update local state
+    setLocalCollections(prev => {
+      const newCollections = { ...prev }
+      const collectionWords = new Set(newCollections[collectionId])
+      collectionWords.delete(word)
+      newCollections[collectionId] = collectionWords
+      return newCollections
+    })
+
+    try {
+      await removeWordFromCollection(word, collectionId)
+    } catch (error) {
+      // Revert optimistic update on error
+      setLocalCollections(prev => {
+        const newCollections = { ...prev }
+        const collectionWords = new Set(newCollections[collectionId])
+        collectionWords.add(word)
+        newCollections[collectionId] = collectionWords
+        return newCollections
+      })
+
+      console.error('Error removing word from collection:', error)
+      toast.error('Failed to remove word from collection')
+    }
+  }
 
   const setSearchMode = useCallback((mode: 'or' | 'and' | 'both') => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('mode', mode)
-    navigate(`/projects/${projectName}/search?${newParams.toString()}`)
-  }, [navigate, projectName, searchParams])
+    navigate(`/projects/${projectId}/search?${newParams.toString()}`)
+  }, [navigate, projectId, searchParams])
 
   // Display information about match types
-  const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
-  const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
+  const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
+  const hasOrMatches = data?.suggestions?.some(s => s?.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
+
+  // Get active words from the selected collection
+  const localActiveWords: Set<string> = selectedCollectionId ? localCollections[selectedCollectionId] || new Set<string>() : new Set<string>()
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -128,17 +255,36 @@ export const Search = () => {
           </div>
         )}
 
-        <main className="flex-1 h-full">
-          {isLoading && <SearchContentLoading />}
-          {searchError && <SearchContentEmpty />}
-          {!isLoading && !searchError && (
-            <SearchContent
-              projectName={projectName!}
-              results={data?.suggestions ?? []}
+        <div className="flex flex-row pt-[25px]">
+          <main className="flex-1 h-full">
+            {isLoading && <SearchContentLoading />}
+            {searchError && <SearchContentEmpty />}
+            {!isLoading && !searchError && (
+              <SearchContent
+                projectId={projectId ?? ''}
+                results={data?.suggestions ?? []}
+                project={project}
+                collections={collections}
+                selectedCollectionId={selectedCollectionId}
+                isCreatingCollection={isCreatingCollection}
+                onAddWord={handleAddWord}
+                onRemoveWord={handleRemoveWord}
+                localActiveWords={localActiveWords}
+              />
+            )}
+          </main>
+          <aside className="ml-5">
+            <CollectionsSidebar
+              projectId={projectId ?? ''}
               project={project}
+              selectedCollectionId={selectedCollectionId}
+              onCollectionSelect={setSelectedCollectionId}
+              onAddWord={handleAddWord}
+              onRemoveWord={handleRemoveWord}
+              localCollections={localCollections}
             />
-          )}
-        </main>
+          </aside>
+        </div>
       </div>
     </div>
   )

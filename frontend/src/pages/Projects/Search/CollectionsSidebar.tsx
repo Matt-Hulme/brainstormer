@@ -1,123 +1,80 @@
-import { AddCollectionChip } from '@/components'
+import { useCallback } from 'react'
 import { X } from 'lucide-react'
-import { Button } from '@/components/design-system/Button'
-import {
-  useGetCollectionsQuery,
-  useAddWordToCollectionMutation
-} from '@/hooks'
-import { Project, SavedWord } from '@/types'
-import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { AddCollectionChip } from '@/components'
+import { Button } from '@/components/design-system/Button'
+import { Project, SavedWord } from '@/types'
 
 interface CollectionsSidebarProps {
-  projectName: string
-  activeWords: string[]
-  onRemoveWord?: (word: string) => void
+  projectId: string
   project?: Project
-  onCollectionSelect?: (collectionId: string) => void
+  selectedCollectionId: string | null
+  onCollectionSelect: (collectionId: string) => void
+  onAddWord?: (word: string, collectionId: string) => Promise<void>
+  onRemoveWord?: (word: string, collectionId: string) => Promise<void>
+  localCollections: Record<string, Set<string>>
 }
 
 export const CollectionsSidebar = ({
-  projectName,
-  activeWords,
-  onRemoveWord,
+  projectId,
   project,
-  onCollectionSelect
+  selectedCollectionId,
+  onCollectionSelect,
+  onAddWord,
+  onRemoveWord,
+  localCollections
 }: CollectionsSidebarProps) => {
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
-  const [lastProcessedWords, setLastProcessedWords] = useState<string[]>([])
-
-  // Fetch collections for the project
-  const {
-    collections,
-    loading: collectionsLoading,
-    error: collectionsError,
-  } = useGetCollectionsQuery(project?.id ?? '')
-
-  const { addWordToCollection, loading: addWordLoading } = useAddWordToCollectionMutation()
-
-  // Reset selected collection when project changes
-  useEffect(() => {
-    setSelectedCollectionId(null)
-    setLastProcessedWords([])
-  }, [projectName])
-
-  // Auto-save words when they change
-  useEffect(() => {
-    if (!selectedCollectionId || !activeWords.length) return
-
-    const newWords = activeWords.filter(word => !lastProcessedWords.includes(word))
-    if (newWords.length === 0) return
-
-    const saveWords = async () => {
-      try {
-        for (const word of newWords) {
-          await addWordToCollection(word, selectedCollectionId)
-        }
-        setLastProcessedWords(activeWords)
-      } catch (error) {
-        console.error('Error saving words:', error)
-        toast.error('Failed to save words to collection')
-      }
+  const onRemoveWordClick = useCallback(async (word: string, collectionId: string) => {
+    if (!onRemoveWord) return
+    try {
+      await onRemoveWord(word, collectionId)
+    } catch (error) {
+      console.error('Error removing word from collection:', error)
+      toast.error('Failed to remove word from collection')
     }
+  }, [onRemoveWord])
 
-    saveWords()
-  }, [activeWords, selectedCollectionId, lastProcessedWords, addWordToCollection])
-
-  const handleCollectionSelect = (collectionId: string) => {
-    setSelectedCollectionId(collectionId)
-    onCollectionSelect?.(collectionId)
-  }
-
-  if (collectionsLoading) {
-    return <div>Loading collections...</div>
-  }
-
-  if (collectionsError) {
-    return <div>Error loading collections</div>
-  }
+  // Get collections from project but use localCollections for words
+  const collections = project?.collections || []
 
   return (
     <div className="p-4 w-[300px]">
-      <div className="flex flex-col h-full items-center justify-between gap-[16px]">
+      <div className="flex flex-col gap-[16px] h-full">
         <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
-        <AddCollectionChip />
-      </div>
-      <div className="flex flex-col gap-[10px]">
-        {collections?.map((collection) => (
-          <div
-            key={collection.id}
-            className={`p-2 rounded cursor-pointer ${selectedCollectionId === collection.id ? 'bg-secondary-0' : 'hover:bg-secondary-0/50'
-              }`}
-            onClick={() => handleCollectionSelect(collection.id)}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">{collection.name}</span>
-              {selectedCollectionId === collection.id && (
-                <Button
-                  variant="icon"
-                  className="w-6 h-6"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onRemoveWord?.()
-                  }}
-                >
-                  <X size={16} />
-                </Button>
-              )}
-            </div>
-            <div className="ml-4 mt-1">
-              {collection?.savedWords?.length > 0 ? (
-                collection?.savedWords?.map((savedWord: SavedWord) => (
-                  <div key={savedWord.id} className="text-p3 color-secondary-2">{savedWord.word}</div>
-                ))
-              ) : (
-                <div className="text-p3 color-secondary-1">No words (yet)</div>
-              )}
-            </div>
-          </div>
-        ))}
-        <span className='text-p3 color-secondary-1'>Add word</span>
+        <div className="bg-secondary-1/30 h-[1px] w-full" />
+
+        {collections?.length === 0 ? (
+          <div className="color-secondary-1 text-p3">No words (yet)</div>
+        ) : (
+          collections?.map((collection) => {
+            const words = localCollections[collection.id] || new Set()
+            return (
+              <div key={collection.id} className="space-y-[10px]">
+                <div className="color-secondary-4 font-semibold text-[16px]">{collection.name}</div>
+                {words.size > 0 ? (
+                  Array.from(words).map((word) => (
+                    <div key={word} className="color-secondary-2 flex items-center justify-between text-p3">
+                      <span>{word}</span>
+                      {onRemoveWord && (
+                        <Button
+                          variant="icon"
+                          className="h-[18px] w-[18px]"
+                          onClick={() => onRemoveWordClick(word, collection.id)}
+                        >
+                          <X size={18} />
+                        </Button>
+                      )}
+                    </div>
+                  ))
+                ) : null}
+                <div className="color-secondary-1 text-p3">Add word</div>
+              </div>
+            )
+          })
+        )}
+        <div>
+          <AddCollectionChip />
+        </div>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import type { CreateProjectRequest } from '@/config/api/types'
 import type { Project } from '@/types'
 import camelcaseKeys from 'camelcase-keys'
 
-const BASE_PATH = '/projects/'
+const BASE_PATH = '/projects'
 
 export const projectsApi = {
   // Create a new project
@@ -20,29 +20,29 @@ export const projectsApi = {
   },
 
   // Get a specific project
-  get: async (projectName: string) => {
-    if (!projectName) {
-      throw new Error('Project name is required')
+  get: async (projectId: string) => {
+    if (!projectId) {
+      throw new Error('Project ID is required')
     }
-    const response = await api.get(`${BASE_PATH}${projectName}/`)
+    const response = await api.get(`${BASE_PATH}/${projectId}`)
     return camelcaseKeys(response.data, { deep: true }) as Project
   },
 
   // Update a project
-  update: async (projectName: string, data: CreateProjectRequest) => {
-    if (!projectName) {
-      throw new Error('Project name is required')
+  update: async (projectId: string, data: CreateProjectRequest) => {
+    if (!projectId) {
+      throw new Error('Project ID is required')
     }
-    const response = await api.put(`${BASE_PATH}${projectName}/`, data)
+    const response = await api.put(`${BASE_PATH}/${projectId}`, data)
     return camelcaseKeys(response.data, { deep: true }) as Project
   },
 
   // Delete a project
-  delete: async (projectName: string) => {
-    if (!projectName) {
-      throw new Error('Project name is required')
+  delete: async (projectId: string) => {
+    if (!projectId) {
+      throw new Error('Project ID is required')
     }
-    const response = await api.delete(`${BASE_PATH}${projectName}/`)
+    const response = await api.delete(`${BASE_PATH}/${projectId}`)
     return camelcaseKeys(response.data, { deep: true }) as Project
   },
 }

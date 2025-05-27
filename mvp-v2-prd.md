@@ -8,13 +8,22 @@ Expect some rough edges. Post-MVP polish and extra functionality (editing Saved 
 
 ## Overview
 
-Brainstormer is an LLM-powered brainstorming tool where users manage **Projects**, **Collections**, and **Saved Words**.
+Brainstormer is an LLM-powered brainstorming tool where users manage **Projects**, **Collections** (search queries), and **Saved Words**.
 
 It helps users generate and organize keyword ideas.
 
 ### Core Object Model:
 
-- **Projects** → contain → **Collections** → contain → **Saved Words**.
+- **Projects:** A project is a top-level container for collections. If a user initiates a search from the project details page and no project exists, a new project is created automatically.
+
+- **Collections:** A collection is created as soon as a search query is performed within a project. Each collection represents a unique search query (by `collectionId`), and may contain zero or more saved words. Collections exist even if no words have been saved yet.
+
+- **Saved Words:** Saved words are user-selected keywords associated with a specific collection. Each saved word is uniquely identified by a `savedWordId` and belongs to a single collection.
+
+- **ID as Source of Truth:** All relationships and lookups between entities (Projects, Collections, Saved Words) are based on unique IDs (`projectId`, `collectionId`, `savedWordId`), not names or search phrases. Names and search queries are for display and user context only; all operations and references use IDs as the canonical source of truth.
+
+- **Creation Flow:** When a user performs their first search from the project details page, both a new project (if needed) and a new collection (for that search query) are created simultaneously.
+
 
 ## Technical Stack & High-Level Architecture
 
@@ -23,9 +32,15 @@ It helps users generate and organize keyword ideas.
 - **Authentication**: Anonymous via Supabase
 - **Routing**: `/userId/projects`, `/userId/projects/:projectName`, `/userId/projects/:projectName/search?q=searchterm`
 - **Security**: RLS, rate limiting, environment variable management
+- **API Path Conventions**:
+  - Base paths are defined without trailing slashes (e.g., `/projects`, `/collections`)
+  - Resource paths use forward slashes for path segments (e.g., `/projects/{id}`, `/collections/{id}/word`)
+  - Nested resources use explicit path segments (e.g., `/collections/project/{projectId}`)
+  - Bulk operations use `/bulk` suffix (e.g., `/collections/bulk`, `/saved-words/bulk`)
+  - All paths are relative to the API base URL (e.g., `http://localhost:8000/api/v1`)
 - **API Data Shape**:
-  - `GET /projects` returns a list of projects (no collections or saved words included)
-  - `GET /projects/{project_name}` returns the project, its collections, and all saved words within those collections (nested)
+  - `GET /projects` returns a list of projects (with `projectId`, no collections or saved words included)
+  - `GET /projects/{project_id}` returns the project (by `projectId`), its collections (by `collectionId`), and all saved words (by `savedWordId`) within those collections (nested)
 
 ## User Roles
 
@@ -43,10 +58,11 @@ It helps users generate and organize keyword ideas.
 ### 3. Project Details Page
 - Header (title, last edited, profile pic)
 - Two-column: collections (left), saved words (right)
-- **Data:** Loaded from a single API call to `/projects/{project_name}` which returns the project, its collections, and all saved words within those collections
+- **Data:** Loaded from a single API call to `/projects/{project_id}` which returns the project, its collections, and all saved words within those collections
 
 ### 4. Search Results Page
 - Search bar, view toggles, loading state, keyword suggestions, multi-select, collections sidebar
+- **Collection Creation:** A collection is created as soon as a user performs a search. Saved words can then be added to that collection, but collections may exist with zero saved words. All collection operations use `collectionId` as the source of truth, not the search phrase or collection name.
 
 ## Core Functionality
 - Anonymous authentication
@@ -124,4 +140,11 @@ It helps users generate and organize keyword ideas.
 
 ## References
 - See `mvp-v2-roadmap.md` for implementation phases, milestones, and tactical planning.
+
+# API Route Path Convention
+
+- The API version prefix (API_V1_STR) must never have a trailing slash (e.g., use '/api/v1', not '/api/v1/').
+- All FastAPI route decorators must avoid trailing slashes (e.g., use @router.get('/resource'), not @router.get('/resource/')).
+- All frontend API calls must match the backend route exactly, with no double slashes and no trailing slashes unless explicitly required.
+- This convention ensures consistent routing, avoids 405 errors, and prevents accidental double slashes in URLs.
 

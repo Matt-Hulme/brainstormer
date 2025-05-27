@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { projectsApi } from '@/services/api/projects'
 import type { Project } from '@/types'
 
-export const useGetProjectQuery = (projectName: string) => {
+export const useGetProjectQuery = (projectId: string) => {
     const { data, isLoading, error } = useQuery<Project, Error>({
-        queryKey: ['project', projectName],
-        queryFn: () => projectsApi.get(projectName),
-        enabled: !!projectName,
+        queryKey: ['project', projectId],
+        queryFn: () => projectsApi.get(projectId),
+        enabled: !!projectId,
     })
 
     return {

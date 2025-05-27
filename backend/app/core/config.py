@@ -24,7 +24,7 @@ class Settings(BaseModel):
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
     # API settings
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = "/api/v1"  # Never add a trailing slash here; all route decorators should also avoid trailing slashes
     PROJECT_NAME: str = "Brainstormer API"
     PORT: int = 8000
     HOST: str = "0.0.0.0"

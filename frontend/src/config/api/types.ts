@@ -27,7 +27,7 @@ export interface SaveWordRequest {
 }
 
 export interface SearchRequest {
-  projectName: string
+  projectId: string
   query: string
   searchMode?: 'and' | 'both' | 'or'
 }

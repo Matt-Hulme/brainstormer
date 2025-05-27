@@ -2,7 +2,7 @@ import api from '@/config/api/client'
 import type { BulkMoveWordsRequest, SaveWordRequest } from '@/config/api/types'
 import type { SavedWord } from '@/types'
 
-const BASE_PATH = '/saved-words/'
+const BASE_PATH = '/saved-words'
 
 export const savedWordsApi = {
   bulkDelete: async (wordIds: string[]) => {

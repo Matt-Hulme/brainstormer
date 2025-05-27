@@ -3,6 +3,11 @@ description:
 globs: 
 alwaysApply: true
 ---
+---
+description: Shared development practices applicable across frontend and backend
+globs: ["frontend/src/**/*.{ts,tsx}", "backend/app/**/*.py"]
+alwaysApply: true
+---
 # Shared Development Guide
 
 ## Project Structure
@@ -15,7 +20,7 @@ Key directories:
 1. No wildcard imports (export * or import *)
 2. Import directly from source files
 3. Use explicit, named imports
-4. Keep imports organized and grouped
+4. Keep imports organized and grouped, but without spaces between them
 5. Follow language-specific import conventions
 6. Avoid re-exporting from index files
 7. Use absolute imports when possible

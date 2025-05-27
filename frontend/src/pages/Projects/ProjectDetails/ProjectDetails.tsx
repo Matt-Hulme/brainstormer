@@ -7,8 +7,8 @@ import { useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 
 export const ProjectDetails = () => {
-  const { projectName } = useParams<{ projectName: string }>()
-  const { error: projectError, isLoading: projectLoading, project } = useGetProjectQuery(projectName ?? '')
+  const { projectId } = useParams<{ projectId: string }>()
+  const { error: projectError, isLoading: projectLoading, project } = useGetProjectQuery(projectId ?? '')
   const { collections, error: collectionsError, loading: collectionsLoading } = useGetCollectionsQuery(project?.id ?? '')
 
   if (projectLoading || collectionsLoading) {

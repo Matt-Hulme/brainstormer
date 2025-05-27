@@ -8,13 +8,19 @@ export const useCreateCollectionMutation = () => {
     const queryClient = useQueryClient()
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: CreateCollectionRequest) => collectionsApi.create(data),
+        mutationFn: async (data: CreateCollectionRequest) => {
+            const response = await collectionsApi.create(data)
+            if (!response?.id) {
+                throw new Error('Failed to create collection - no ID returned')
+            }
+            return response
+        },
         onSuccess: (newCollection) => {
             // Invalidate collections list queries
             queryClient.invalidateQueries({ queryKey: ['collections'] })
-            toast.success('Collection created')
         },
         onError: (error: Error) => {
+            console.error('Collection creation error:', error)
             toast.error(error.message || 'Failed to create collection')
         }
     })
