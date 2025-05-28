@@ -38,12 +38,20 @@ export const SearchContent = ({
       if (!selectedCollectionId) {
         return
       }
+
+      // If word is already in collection, remove it
+      if (localActiveWords.has(word)) {
+        await onRemoveWord(word, selectedCollectionId)
+        return
+      }
+
+      // Otherwise add it
       await onAddWord(word, selectedCollectionId)
     } catch (error) {
-      console.error('Error adding word to collection:', error)
-      toast.error('Failed to add word to collection')
+      console.error('Error updating word in collection:', error)
+      toast.error('Failed to update word in collection')
     }
-  }, [selectedCollectionId, isCreatingCollection, onAddWord])
+  }, [selectedCollectionId, isCreatingCollection, onAddWord, onRemoveWord, localActiveWords])
 
   // Group results by match type for efficient rendering
   const groupedResults = results.reduce((acc, result) => {

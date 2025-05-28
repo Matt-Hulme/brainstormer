@@ -1,8 +1,8 @@
 import { Menu } from 'lucide-react'
 import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import profilePicture from '../assets/profile-picture.png'
 import { Button } from './design-system/Button'
+import { ProfilePicture } from './ProfilePicture'
 
 interface HamburgerSidebarProps {
   children?: ReactNode
@@ -23,13 +23,7 @@ export const HamburgerSidebar = ({ children }: HamburgerSidebarProps) => {
         </Button>
         {children}
       </div>
-      <div className="flex justify-center">
-        <img
-          alt="Profile"
-          className="rounded-full border-1 border-secondary-4"
-          src={profilePicture}
-        />
-      </div>
+      <ProfilePicture />
     </aside>
   )
 }

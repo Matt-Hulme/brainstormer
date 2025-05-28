@@ -53,8 +53,6 @@ export const useRemoveWordFromCollectionMutation = () => {
                     }
                 }
             )
-
-            toast.success('Word removed successfully')
         },
         onError: (error: Error) => {
             toast.error(error.message || 'Failed to remove word')

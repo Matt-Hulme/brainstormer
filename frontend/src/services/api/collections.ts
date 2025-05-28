@@ -70,4 +70,6 @@ export const collectionsApi = {
     const response = await api.put(`${BASE_PATH}/${collectionId}`, data)
     return camelcaseKeys(response.data, { deep: true }) as unknown as Collection
   },
+
+
 }

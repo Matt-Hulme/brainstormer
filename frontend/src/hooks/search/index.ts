@@ -1,1 +1,2 @@
-export { useSearchQuery } from './useSearchQuery'; 
+export { useSearchQuery } from './useSearchQuery';
+export { useSearchResultsCache } from './useSearchResultsCache';
