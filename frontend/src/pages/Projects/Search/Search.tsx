@@ -357,12 +357,8 @@ export const Search = () => {
           </main>
           <aside className="ml-5">
             <CollectionsSidebar
-              projectId={projectId ?? ''}
               project={project}
               collections={collections}
-              selectedCollectionId={selectedCollectionId}
-              onCollectionSelect={setSelectedCollectionId}
-              onAddWord={handleAddWord}
               onRemoveWord={handleRemoveWord}
               localCollections={localCollections}
               isLoading={collectionsLoading}

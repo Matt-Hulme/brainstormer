@@ -7,7 +7,7 @@ export const useDeleteCollectionMutation = () => {
 
     return useMutation({
         mutationFn: (collectionId: string) => collectionsApi.delete(collectionId),
-        onSuccess: (_, collectionId) => {
+        onSuccess: () => {
             // Invalidate collections queries to trigger refetch
             queryClient.invalidateQueries({ queryKey: ['collections'] })
 

@@ -1,9 +1,9 @@
 import { Fragment } from 'react'
-import { ArrowRight, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/design-system/Button'
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
+import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery, useRemoveWordFromCollectionMutation } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 
 export const ProjectDetails = () => {
@@ -13,8 +13,9 @@ export const ProjectDetails = () => {
   const { collections, error: collectionsError, loading: collectionsLoading } = useGetCollectionsQuery(project?.id ?? '')
   const { getLastSearch } = useCollectionSearchCache()
   const deleteCollectionMutation = useDeleteCollectionMutation()
+  const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
 
-  const onCollectionClick = (collection: any) => {
+  const onCollectionClick = (collection: { id: string; name: string }) => {
     if (!projectId) return
 
     // Get the last search query from cache, fallback to collection name
@@ -28,6 +29,11 @@ export const ProjectDetails = () => {
     if (confirm(`Are you sure you want to delete the collection "${collectionName}"?`)) {
       deleteCollectionMutation.mutate(collectionId)
     }
+  }
+
+  const onDeleteWord = (e: React.MouseEvent, word: string, collectionId: string) => {
+    e.stopPropagation()
+    removeWordFromCollection(word, collectionId)
   }
 
   if (projectLoading || collectionsLoading) {
@@ -64,7 +70,7 @@ export const ProjectDetails = () => {
                     <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
                   </button>
                   <Button
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-6 w-6"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 max-h-6 max-w-6"
                     onClick={(e) => onDeleteCollection(e, collection.id, collection.name)}
                     variant="icon"
                   >
@@ -76,8 +82,15 @@ export const ProjectDetails = () => {
                 {collection.savedWords?.length > 0 ? (
                   <ul className="space-y-[10px]">
                     {collection.savedWords.map(word => (
-                      <li className="text-p1 color-secondary-4" key={word.id}>
-                        {word.word}
+                      <li className="text-p1 color-secondary-4 flex items-center gap-2 group" key={word.id}>
+                        <span>{word.word}</span>
+                        <Button
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-4 w-4 max-h-[18px] max-w-[18px] flex-shrink-0"
+                          onClick={(e) => onDeleteWord(e, word.word, collection.id)}
+                          variant="icon"
+                        >
+                          <X size={14} />
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -89,6 +102,6 @@ export const ProjectDetails = () => {
           ))}
         </main>
       </div>
-    </div>
+    </div >
   )
 }

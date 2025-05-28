@@ -4,15 +4,11 @@ import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
 import { Button } from '@/components/design-system/Button'
 import { useDeleteCollectionMutation } from '@/hooks'
-import { Project, SavedWord, Collection } from '@/types'
+import { Project, Collection } from '@/types'
 
 interface CollectionsSidebarProps {
-  projectId: string
   project?: Project
   collections?: Collection[]
-  selectedCollectionId: string | null
-  onCollectionSelect: (collectionId: string) => void
-  onAddWord?: (word: string, collectionId: string) => Promise<void>
   onRemoveWord?: (word: string, collectionId: string) => Promise<void>
   localCollections: Record<string, Set<string>>
   isLoading?: boolean
@@ -20,12 +16,8 @@ interface CollectionsSidebarProps {
 }
 
 export const CollectionsSidebar = ({
-  projectId,
   project,
   collections,
-  selectedCollectionId,
-  onCollectionSelect,
-  onAddWord,
   onRemoveWord,
   localCollections,
   isLoading = false,
@@ -85,7 +77,7 @@ export const CollectionsSidebar = ({
                 <div className="color-secondary-4 font-semibold text-[16px] flex items-center justify-between group">
                   <span>{collection.name}</span>
                   <Button
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-4 w-4 max-h-[18px] max-w-[18px]"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 !h-4 !w-4 !p-0"
                     onClick={() => onDeleteCollection(collection.id, collection.name)}
                     variant="icon"
                   >
@@ -100,7 +92,7 @@ export const CollectionsSidebar = ({
                         {onRemoveWord && (
                           <Button
                             variant="icon"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-4 w-4 max-h-[18px] max-w-[18px]"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 !h-4 !w-4 !p-0"
                             onClick={() => onRemoveWordClick(word, collection.id)}
                           >
                             <X size={14} />
