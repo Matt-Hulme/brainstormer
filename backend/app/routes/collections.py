@@ -42,6 +42,9 @@ class BulkMoveCollections(BaseModel):
 class AddWordRequest(BaseModel):
     word: str
 
+class RemoveWordRequest(BaseModel):
+    word: str
+
 @router.post("", response_model=Collection)
 async def create_collection(
     collection: CollectionCreate,
@@ -315,6 +318,45 @@ async def add_word_to_collection(
             "word": request_data.word,
             "collection_id": collection_id
         }).execute()
+    
+    # Get updated collection with words
+    result = supabase.table("collections")\
+        .select("*, saved_words(*)")\
+        .eq("id", collection_id)\
+        .single()\
+        .execute()
+    
+    return result.data
+
+@router.delete("/{collection_id}/word", response_model=Collection)
+async def remove_word_from_collection(
+    collection_id: str,
+    request_data: RemoveWordRequest,
+    request: Request
+):
+    """Remove a single word from a collection."""
+    supabase = get_supabase_client()
+    
+    # Verify collection ownership through project
+    existing = supabase.table("collections")\
+        .select("*, projects!inner(*)")\
+        .eq("id", collection_id)\
+        .eq("projects.user_id", request.state.user_id)\
+        .single()\
+        .execute()
+    
+    if not existing.data:
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    # Find and delete the word from the collection
+    word_result = supabase.table("saved_words")\
+        .delete()\
+        .eq("collection_id", collection_id)\
+        .eq("word", request_data.word)\
+        .execute()
+    
+    if not word_result.data:
+        raise HTTPException(status_code=404, detail="Word not found in collection")
     
     # Get updated collection with words
     result = supabase.table("collections")\

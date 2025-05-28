@@ -8,7 +8,7 @@ import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
 import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { toast } from 'react-toastify'
 
 export const Search = () => {
@@ -32,16 +32,28 @@ export const Search = () => {
   // Local state for optimistic updates
   const [localCollections, setLocalCollections] = useState<Record<string, Set<string>>>({})
 
-  // Initialize local state from collections data
+  // Initialize local state from collections data only once when collections first load
   useEffect(() => {
-    if (collections) {
-      const initialCollections: Record<string, Set<string>> = {}
-      collections.forEach(collection => {
-        initialCollections[collection.id] = new Set(collection.savedWords?.map(sw => sw.word) || [])
+    if (collections && collections.length > 0) {
+      setLocalCollections(prev => {
+        // Only initialize if we don't have any collections yet
+        if (Object.keys(prev).length === 0) {
+          const initialCollections: Record<string, Set<string>> = {}
+          collections.forEach(collection => {
+            initialCollections[collection.id] = new Set(collection.savedWords?.map(sw => sw.word) || [])
+          })
+          return initialCollections
+        }
+        return prev
       })
-      setLocalCollections(initialCollections)
     }
   }, [collections])
+
+  // Memoize active words for the selected collection
+  const localActiveWords = useMemo(() => {
+    if (!selectedCollectionId) return new Set<string>()
+    return localCollections[selectedCollectionId] || new Set<string>()
+  }, [selectedCollectionId, localCollections])
 
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading || collectionsLoading
@@ -64,6 +76,17 @@ export const Search = () => {
         )
 
         if (existingCollection) {
+          // Ensure the existing collection is in localCollections
+          setLocalCollections(prev => {
+            if (!prev[existingCollection.id]) {
+              return {
+                ...prev,
+                [existingCollection.id]: new Set(existingCollection.savedWords?.map(sw => sw.word) || [])
+              }
+            }
+            return prev
+          })
+
           setSelectedCollectionId(existingCollection.id)
           setIsCreatingCollection(false)
           return
@@ -78,6 +101,12 @@ export const Search = () => {
         if (!collection?.id) {
           throw new Error('Failed to create collection - no ID returned')
         }
+
+        // Initialize the new collection in localCollections
+        setLocalCollections(prev => ({
+          ...prev,
+          [collection.id]: new Set()
+        }))
 
         setSelectedCollectionId(collection.id)
       } catch (error: any) {
@@ -97,9 +126,8 @@ export const Search = () => {
     // Optimistically update local state
     setLocalCollections(prev => {
       const newCollections = { ...prev }
-      const collectionWords = new Set(newCollections[collectionId])
-      collectionWords.add(word)
-      newCollections[collectionId] = collectionWords
+      const existingWords = newCollections[collectionId] || new Set()
+      newCollections[collectionId] = new Set([...existingWords, word])
       return newCollections
     })
 
@@ -109,9 +137,10 @@ export const Search = () => {
       // Revert optimistic update on error
       setLocalCollections(prev => {
         const newCollections = { ...prev }
-        const collectionWords = new Set(newCollections[collectionId])
-        collectionWords.delete(word)
-        newCollections[collectionId] = collectionWords
+        const existingWords = newCollections[collectionId] || new Set()
+        const revertedWords = new Set(existingWords)
+        revertedWords.delete(word)
+        newCollections[collectionId] = revertedWords
         return newCollections
       })
 
@@ -124,9 +153,10 @@ export const Search = () => {
     // Optimistically update local state
     setLocalCollections(prev => {
       const newCollections = { ...prev }
-      const collectionWords = new Set(newCollections[collectionId])
-      collectionWords.delete(word)
-      newCollections[collectionId] = collectionWords
+      const existingWords = newCollections[collectionId] || new Set()
+      const updatedWords = new Set(existingWords)
+      updatedWords.delete(word)
+      newCollections[collectionId] = updatedWords
       return newCollections
     })
 
@@ -136,9 +166,8 @@ export const Search = () => {
       // Revert optimistic update on error
       setLocalCollections(prev => {
         const newCollections = { ...prev }
-        const collectionWords = new Set(newCollections[collectionId])
-        collectionWords.add(word)
-        newCollections[collectionId] = collectionWords
+        const existingWords = newCollections[collectionId] || new Set()
+        newCollections[collectionId] = new Set([...existingWords, word])
         return newCollections
       })
 
@@ -157,9 +186,6 @@ export const Search = () => {
   const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
   const hasOrMatches = data?.suggestions?.some(s => s?.matchType === 'or') ?? false
   const hasMultiplePhrases = searchValue.includes('||')
-
-  // Get active words from the selected collection
-  const localActiveWords: Set<string> = selectedCollectionId ? localCollections[selectedCollectionId] || new Set<string>() : new Set<string>()
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -277,6 +303,7 @@ export const Search = () => {
             <CollectionsSidebar
               projectId={projectId ?? ''}
               project={project}
+              collections={collections}
               selectedCollectionId={selectedCollectionId}
               onCollectionSelect={setSelectedCollectionId}
               onAddWord={handleAddWord}

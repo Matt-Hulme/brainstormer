@@ -1,13 +1,14 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
 import { Button } from '@/components/design-system/Button'
-import { Project, SavedWord } from '@/types'
+import { Project, SavedWord, Collection } from '@/types'
 
 interface CollectionsSidebarProps {
   projectId: string
   project?: Project
+  collections?: Collection[]
   selectedCollectionId: string | null
   onCollectionSelect: (collectionId: string) => void
   onAddWord?: (word: string, collectionId: string) => Promise<void>
@@ -18,6 +19,7 @@ interface CollectionsSidebarProps {
 export const CollectionsSidebar = ({
   projectId,
   project,
+  collections,
   selectedCollectionId,
   onCollectionSelect,
   onAddWord,
@@ -34,8 +36,8 @@ export const CollectionsSidebar = ({
     }
   }, [onRemoveWord])
 
-  // Get collections from project but use localCollections for words
-  const collections = project?.collections || []
+  // Use collections prop, fallback to project collections if not provided
+  const collectionsToRender = collections || project?.collections || []
 
   return (
     <div className="p-4 w-[300px]">
@@ -43,31 +45,35 @@ export const CollectionsSidebar = ({
         <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
         <div className="bg-secondary-1/30 h-[1px] w-full" />
 
-        {collections?.length === 0 ? (
+        {collectionsToRender?.length === 0 ? (
           <div className="color-secondary-1 text-p3">No words (yet)</div>
         ) : (
-          collections?.map((collection) => {
-            const words = localCollections[collection.id] || new Set()
+          collectionsToRender?.map((collection) => {
+            const words = localCollections[collection.id]
             return (
               <div key={collection.id} className="space-y-[10px]">
                 <div className="color-secondary-4 font-semibold text-[16px]">{collection.name}</div>
-                {words.size > 0 ? (
-                  Array.from(words).map((word) => (
-                    <div key={word} className="color-secondary-2 flex items-center justify-between text-p3">
-                      <span>{word}</span>
-                      {onRemoveWord && (
-                        <Button
-                          variant="icon"
-                          className="h-[18px] w-[18px]"
-                          onClick={() => onRemoveWordClick(word, collection.id)}
-                        >
-                          <X size={18} />
-                        </Button>
-                      )}
-                    </div>
-                  ))
-                ) : null}
-                <div className="color-secondary-1 text-p3">Add word</div>
+                {words && words.size > 0 ? (
+                  <div className="space-y-[10px]">
+                    {Array.from(words).map((word) => (
+                      <div key={word} className="color-secondary-2 flex items-center justify-between text-p3">
+                        <span>{word}</span>
+                        {onRemoveWord && (
+                          <Button
+                            variant="icon"
+                            className="max-h-[18px] max-w-[18px]"
+                            onClick={() => onRemoveWordClick(word, collection.id)}
+                          >
+                            <X size={18} />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <div className="color-secondary-1 text-p3">Add word</div>
+                  </div>
+                ) : (
+                  <div className="color-secondary-1 text-p3">No words (yet)</div>
+                )}
               </div>
             )
           })

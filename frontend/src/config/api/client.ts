@@ -37,8 +37,6 @@ api.interceptors.request.use(
     // Log the full URL for debugging
     const baseUrl = config.baseURL || ''
     const url = config.url || ''
-    console.log('Making API request to:', baseUrl + url)
-
     return config
   },
   error => {
