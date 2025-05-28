@@ -133,7 +133,7 @@ export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarPr
         )}
         <div className="ml-auto">
           <Button onClick={onSearch} variant="outline">
-            Search
+            Go
           </Button>
         </div>
       </div>

@@ -1,10 +1,13 @@
 // Project hooks
 export { useAddWordToCollectionMutation } from './collections/useAddWordToCollectionMutation';
+export { useCollectionSearchCache } from './collections/useCollectionSearchCache';
 export { useCreateCollectionMutation } from './collections/useCreateCollectionMutation';
+export { useGetCollectionsQuery } from './collections/useGetCollectionsQuery';
+export { useRemoveWordFromCollectionMutation } from './collections/useRemoveWordFromCollectionMutation';
 export { useCreateProjectMutation } from './projects/useCreateProjectMutation';
 export { useDeleteProjectMutation } from './projects/useDeleteProjectMutation';
-export { useGetCollectionsQuery } from './collections/useGetCollectionsQuery';
 export { useGetProjectQuery } from './projects/useGetProjectQuery';
 export { useGetProjectsQuery } from './projects/useGetProjectsQuery';
-export { useRemoveWordFromCollectionMutation } from './collections/useRemoveWordFromCollectionMutation';
+export { useUpdateProjectMutation } from './projects/useUpdateProjectMutation';
 export { useSearchQuery } from './search/useSearchQuery';
+export { useSearchResultsCache } from './search/useSearchResultsCache';

@@ -14,6 +14,7 @@ interface CollectionsSidebarProps {
   onAddWord?: (word: string, collectionId: string) => Promise<void>
   onRemoveWord?: (word: string, collectionId: string) => Promise<void>
   localCollections: Record<string, Set<string>>
+  isLoading?: boolean
 }
 
 export const CollectionsSidebar = ({
@@ -24,7 +25,8 @@ export const CollectionsSidebar = ({
   onCollectionSelect,
   onAddWord,
   onRemoveWord,
-  localCollections
+  localCollections,
+  isLoading = false
 }: CollectionsSidebarProps) => {
   const onRemoveWordClick = useCallback(async (word: string, collectionId: string) => {
     if (!onRemoveWord) return
@@ -38,6 +40,18 @@ export const CollectionsSidebar = ({
 
   // Use collections prop, fallback to project collections if not provided
   const collectionsToRender = collections || project?.collections || []
+
+  if (isLoading) {
+    return (
+      <div className="p-4 w-[300px]">
+        <div className="flex flex-col gap-[16px] h-full">
+          <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
+          <div className="bg-secondary-1/30 h-[1px] w-full" />
+          <div className="color-secondary-1 text-p3">Loading...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 w-[300px]">

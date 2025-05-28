@@ -312,6 +312,72 @@ Key directories and their purposes:
 4. Consider extracting complex conditions to variables
 5. Document complex conditional logic
 
+## Loading and Error State Handling
+1. **Use Early Returns**: Handle loading and error states with early returns instead of ternary operators
+2. **Keep UI Structure Consistent**: Maintain the same container structure in loading states when possible
+3. **Clear State Hierarchy**: Handle states in order of priority: error → loading → empty → content
+
+### Examples
+
+#### Loading State (Preferred)
+```jsx
+export const MyComponent = ({ isLoading, error, data }) => {
+  if (error) {
+    return (
+      <div className="container">
+        <div className="error-message">Failed to load data</div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container">
+        <div className="loading-message">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!data?.length) {
+    return (
+      <div className="container">
+        <div className="empty-message">No data available</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container">
+      {data.map(item => <Item key={item.id} {...item} />)}
+    </div>
+  )
+}
+```
+
+#### Avoid Nested Ternaries (Bad)
+```jsx
+// Bad - hard to read and maintain
+return (
+  <div className="container">
+    {error ? (
+      <div>Error occurred</div>
+    ) : isLoading ? (
+      <div>Loading...</div>
+    ) : data?.length ? (
+      data.map(item => <Item key={item.id} {...item} />)
+    ) : (
+      <div>No data</div>
+    )}
+  </div>
+)
+```
+
+### Benefits
+- **Improved Readability**: Each state is clearly separated and easy to understand
+- **Better Maintainability**: Easy to modify individual states without affecting others
+- **Consistent Structure**: Maintains UI layout consistency across different states
+- **Easier Testing**: Each state can be tested independently
+
 ## Export Patterns and Tree-Shaking
 
 ### Avoid Barrel Files

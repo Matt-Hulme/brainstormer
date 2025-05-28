@@ -7,7 +7,7 @@ import { CollectionsSidebar } from './CollectionsSidebar'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
 import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
-import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation } from '@/hooks'
+import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { toast } from 'react-toastify'
 
@@ -28,6 +28,7 @@ export const Search = () => {
   const { addWordToCollection } = useAddWordToCollectionMutation()
   const { removeWordFromCollection } = useRemoveWordFromCollectionMutation()
   const { createCollection } = useCreateCollectionMutation()
+  const { setLastSearch } = useCollectionSearchCache()
 
   // Local state for optimistic updates
   const [localCollections, setLocalCollections] = useState<Record<string, Set<string>>>({})
@@ -48,6 +49,13 @@ export const Search = () => {
       })
     }
   }, [collections])
+
+  // Cache search query when a collection is selected and search value changes
+  useEffect(() => {
+    if (selectedCollectionId && searchValue) {
+      setLastSearch(selectedCollectionId, searchValue)
+    }
+  }, [selectedCollectionId, searchValue, setLastSearch])
 
   // Memoize active words for the selected collection
   const localActiveWords = useMemo(() => {
@@ -109,6 +117,9 @@ export const Search = () => {
         }))
 
         setSelectedCollectionId(collection.id)
+
+        // Cache the search query for the new collection
+        setLastSearch(collection.id, searchValue)
       } catch (error: any) {
         console.error('Error creating collection:', error)
         const errorMessage = error?.response?.data?.detail ?? error?.message ?? 'Failed to create collection'
@@ -120,7 +131,7 @@ export const Search = () => {
     }
 
     createSearchCollection()
-  }, [searchValue, projectId, project, collections, createCollection])
+  }, [searchValue, projectId, project, collections, createCollection, setLastSearch])
 
   const handleAddWord = async (word: string, collectionId: string) => {
     // Optimistically update local state
@@ -213,20 +224,29 @@ export const Search = () => {
           </Button>
           <Button
             variant="icon"
-            className={`w-[35px] h-[35px] rounded-md ${activeView === 'focus' ? 'bg-secondary-0' : 'bg-transparent'
+            className={`w-[35px] h-[35px] rounded-md ${activeView === 'mindmap' ? 'bg-secondary-0' : 'bg-transparent'
               } hover:bg-secondary-0/50`}
             onClick={showUndevelopedFeatureToast}
           >
-            <Target
-              className={`${activeView === 'focus' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
+            <GitBranch
+              className={`${activeView === 'mindmap' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
+            />
+          </Button>
+          <Button
+            variant="icon"
+            className={`w-[35px] h-[35px] rounded-md ${activeView === 'layers' ? 'bg-secondary-0' : 'bg-transparent'
+              } hover:bg-secondary-0/50`}
+            onClick={showUndevelopedFeatureToast}
+          >
+            <Layers
+              className={`${activeView === 'layers' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
             />
           </Button>
         </div>
-
         {hasMultiplePhrases && (
-          <div className="mt-5 pt-5 border-t border-secondary-1/20">
-            <p className="text-xs text-secondary-2 mb-2">Search Mode</p>
-            <div className="space-y-[10px]">
+          <div className="mt-[20px] space-y-[10px]">
+            <div className="text-xs color-secondary-3 mb-2">Search Mode:</div>
+            <div className="space-y-[5px]">
               <Button
                 variant="icon"
                 title="OR mode - Include results matching any phrase"
@@ -234,18 +254,18 @@ export const Search = () => {
                   } hover:bg-secondary-0/50`}
                 onClick={() => setSearchMode('or')}
               >
-                <GitBranch
+                <Target
                   className={`${searchMode === 'or' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
                 />
               </Button>
               <Button
                 variant="icon"
-                title="AND mode - Only include results matching all phrases"
+                title="AND mode - Include only results matching all phrases"
                 className={`w-[35px] h-[35px] rounded-md ${searchMode === 'and' ? 'bg-secondary-0' : 'bg-transparent'
                   } hover:bg-secondary-0/50`}
                 onClick={() => setSearchMode('and')}
               >
-                <Layers
+                <GitBranch
                   className={`${searchMode === 'and' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
                 />
               </Button>
@@ -309,6 +329,7 @@ export const Search = () => {
               onAddWord={handleAddWord}
               onRemoveWord={handleRemoveWord}
               localCollections={localCollections}
+              isLoading={collectionsLoading}
             />
           </aside>
         </div>

@@ -45,6 +45,8 @@ class AddWordRequest(BaseModel):
 class RemoveWordRequest(BaseModel):
     word: str
 
+
+
 @router.post("", response_model=Collection)
 async def create_collection(
     collection: CollectionCreate,
@@ -327,6 +329,8 @@ async def add_word_to_collection(
         .execute()
     
     return result.data
+
+
 
 @router.delete("/{collection_id}/word", response_model=Collection)
 async def remove_word_from_collection(

@@ -1,15 +1,26 @@
 import { Fragment } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/design-system/Button'
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
+import { useCollectionSearchCache, useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 
 export const ProjectDetails = () => {
+  const navigate = useNavigate()
   const { projectId } = useParams<{ projectId: string }>()
   const { error: projectError, isLoading: projectLoading, project } = useGetProjectQuery(projectId ?? '')
   const { collections, error: collectionsError, loading: collectionsLoading } = useGetCollectionsQuery(project?.id ?? '')
+  const { getLastSearch } = useCollectionSearchCache()
+
+  const onCollectionClick = (collection: any) => {
+    if (!projectId) return
+
+    // Get the last search query from cache, fallback to collection name
+    const lastSearch = getLastSearch(collection.id)
+    const searchQuery = lastSearch || collection.name
+    navigate(`/projects/${projectId}/search?q=${encodeURIComponent(searchQuery)}`)
+  }
 
   if (projectLoading || collectionsLoading) {
     return (
@@ -19,7 +30,7 @@ export const ProjectDetails = () => {
 
   if (projectError || collectionsError) {
     return (
-      <div className="flex items-center justify-center h-full text-red-500">
+      <div className="flex items-center justify-center h-full color-red">
         Failed to load project details
       </div>
     )
@@ -38,10 +49,15 @@ export const ProjectDetails = () => {
               {idx !== 0 && <div className="col-span-2 w-full h-[1px] bg-secondary-2/20" />}
               <div className="pt-[30px]">
                 <div className="flex flex-row items-center gap-[4px]">
-                  <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
-                  <Button className="color-secondary-3" variant="icon">
-                    <ArrowRight className="" size={24} />
-                  </Button>
+                  <button
+                    className="flex flex-row items-center gap-[4px] hover:opacity-80 transition-opacity"
+                    onClick={() => onCollectionClick(collection)}
+                  >
+                    <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
+                    <Button className="color-secondary-3" variant="icon">
+                      <ArrowRight className="" size={24} />
+                    </Button>
+                  </button>
                 </div>
               </div>
               <div className="pt-[33px] pb-[30px]">
