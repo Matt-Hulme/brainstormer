@@ -17,8 +17,9 @@ export const Search = () => {
   const navigate = useNavigate()
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
-  const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+  const searchMode = searchParams.get('mode') as 'or' | 'and' ?? 'or'
   const collectionParam = searchParams.get('collection')
+  const focusParam = searchParams.get('focus')
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
@@ -72,6 +73,21 @@ export const Search = () => {
   useEffect(() => {
     lastAttemptedSearch.current = null
   }, [searchValue])
+
+  // Handle focus parameter from ProjectDetails navigation
+  useEffect(() => {
+    if (focusParam === 'true') {
+      // Clear and focus the search bar
+      searchBarRef.current?.clear()
+      searchBarRef.current?.focus()
+
+      // Clean up the focus parameter from URL
+      const newParams = new URLSearchParams(searchParams)
+      newParams.delete('focus')
+      const newUrl = newParams.toString() ? `?${newParams.toString()}` : ''
+      navigate(`/projects/${projectId}/search${newUrl}`, { replace: true })
+    }
+  }, [focusParam, navigate, projectId, searchParams])
 
   // Create or select a collection when search is performed
   useEffect(() => {
@@ -217,7 +233,7 @@ export const Search = () => {
     }
   }
 
-  const setSearchMode = useCallback((mode: 'or' | 'and' | 'both') => {
+  const setSearchMode = useCallback((mode: 'or' | 'and') => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('mode', mode)
     navigate(`/projects/${projectId}/search?${newParams.toString()}`)
@@ -236,106 +252,9 @@ export const Search = () => {
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
-      <HamburgerSidebar>
-        <div className="space-y-[10px]">
-          <Button
-            variant="icon"
-            className={`w-[35px] h-[35px] rounded-md ${activeView === 'list' ? 'bg-secondary-0' : 'bg-transparent'
-              } hover:bg-secondary-0/50`}
-            onClick={showUndevelopedFeatureToast}
-          >
-            <AlignLeft
-              className={`${activeView === 'list' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-            />
-          </Button>
-          <Button
-            variant="icon"
-            className={`w-[35px] h-[35px] rounded-md ${activeView === 'connections' ? 'bg-secondary-0' : 'bg-transparent'
-              } hover:bg-secondary-0/50`}
-            onClick={showUndevelopedFeatureToast}
-          >
-            <VennDiagramIcon
-              className={`${activeView === 'connections' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-            />
-          </Button>
-          <Button
-            variant="icon"
-            className={`w-[35px] h-[35px] rounded-md ${activeView === 'mindmap' ? 'bg-secondary-0' : 'bg-transparent'
-              } hover:bg-secondary-0/50`}
-            onClick={showUndevelopedFeatureToast}
-          >
-            <GitBranch
-              className={`${activeView === 'mindmap' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-            />
-          </Button>
-          <Button
-            variant="icon"
-            className={`w-[35px] h-[35px] rounded-md ${activeView === 'layers' ? 'bg-secondary-0' : 'bg-transparent'
-              } hover:bg-secondary-0/50`}
-            onClick={showUndevelopedFeatureToast}
-          >
-            <Layers
-              className={`${activeView === 'layers' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-            />
-          </Button>
-        </div>
-        {hasMultiplePhrases && (
-          <div className="mt-[20px] space-y-[10px]">
-            <div className="text-xs color-secondary-3 mb-2">Search Mode:</div>
-            <div className="space-y-[5px]">
-              <Button
-                variant="icon"
-                title="OR mode - Include results matching any phrase"
-                className={`w-[35px] h-[35px] rounded-md ${searchMode === 'or' ? 'bg-secondary-0' : 'bg-transparent'
-                  } hover:bg-secondary-0/50`}
-                onClick={() => setSearchMode('or')}
-              >
-                <Target
-                  className={`${searchMode === 'or' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-                />
-              </Button>
-              <Button
-                variant="icon"
-                title="AND mode - Include only results matching all phrases"
-                className={`w-[35px] h-[35px] rounded-md ${searchMode === 'and' ? 'bg-secondary-0' : 'bg-transparent'
-                  } hover:bg-secondary-0/50`}
-                onClick={() => setSearchMode('and')}
-              >
-                <GitBranch
-                  className={`${searchMode === 'and' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-                />
-              </Button>
-              <Button
-                variant="icon"
-                title="BOTH mode - Include results from both OR and AND modes"
-                className={`w-[35px] h-[35px] rounded-md ${searchMode === 'both' ? 'bg-secondary-0' : 'bg-transparent'
-                  } hover:bg-secondary-0/50`}
-                onClick={() => setSearchMode('both')}
-              >
-                <VennDiagramIcon
-                  className={`${searchMode === 'both' ? 'color-secondary-2' : 'color-secondary-1'} transition-colors group-hover:color-secondary-2`}
-                />
-              </Button>
-            </div>
-          </div>
-        )}
-      </HamburgerSidebar>
+      <HamburgerSidebar />
       <div className="flex flex-col w-full h-screen">
         <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
-
-        {hasMultiplePhrases && !isLoading && (data?.suggestions?.length ?? 0) > 0 && (
-          <div className="px-4 py-2 bg-secondary-0/50 text-xs text-secondary-3">
-            {searchMode === 'both' && hasAndMatches && hasOrMatches && (
-              <p>Showing results matching any phrase (OR) and all phrases (AND)</p>
-            )}
-            {searchMode === 'or' && (
-              <p>Showing results matching any phrase (OR)</p>
-            )}
-            {searchMode === 'and' && (
-              <p>Showing results matching all phrases (AND)</p>
-            )}
-          </div>
-        )}
 
         <div className="flex flex-row pt-[25px]">
           <main className="flex-1 h-full">
@@ -352,6 +271,9 @@ export const Search = () => {
                 onAddWord={handleAddWord}
                 onRemoveWord={handleRemoveWord}
                 localActiveWords={localActiveWords}
+                searchMode={searchMode}
+                onSearchModeChange={setSearchMode}
+                hasMultiplePhrases={hasMultiplePhrases}
               />
             )}
           </main>

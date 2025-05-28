@@ -68,13 +68,14 @@ async def create_collection(
     
     # Check if collection with same name already exists in project
     existing_collection = supabase.table("collections")\
-        .select("id")\
+        .select("*, saved_words(*)")\
         .eq("project_id", collection.project_id)\
         .eq("name", collection.name)\
         .execute()
     
     if existing_collection.data and len(existing_collection.data) > 0:
-        raise HTTPException(status_code=400, detail="A collection with this name already exists in the project")
+        # Return the existing collection instead of throwing an error
+        return existing_collection.data[0]
     
     data = {
         "name": collection.name,

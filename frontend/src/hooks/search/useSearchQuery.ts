@@ -6,7 +6,7 @@ import { useSearchResultsCache } from './useSearchResultsCache'
 export const useSearchQuery = (
     projectId: string,
     query: string,
-    searchMode: 'or' | 'and' | 'both' = 'both'
+    searchMode: 'or' | 'and' = 'or'
 ) => {
     const { getCachedResult, setCachedResult } = useSearchResultsCache()
 

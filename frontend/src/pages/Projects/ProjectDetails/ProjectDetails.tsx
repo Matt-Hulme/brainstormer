@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { AddCollectionChip } from '@/components'
 import { Button } from '@/components/design-system/Button'
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery, useRemoveWordFromCollectionMutation } from '@/hooks'
@@ -36,6 +37,11 @@ export const ProjectDetails = () => {
     removeWordFromCollection(word, collectionId)
   }
 
+  const onAddCollection = () => {
+    // Navigate to a blank search page within this project with focus parameter
+    navigate(`/projects/${projectId}/search?focus=true`)
+  }
+
   if (projectLoading || collectionsLoading) {
     return (
       <div className="flex items-center justify-center h-full text-secondary-2">Loading...</div>
@@ -55,7 +61,7 @@ export const ProjectDetails = () => {
       <HamburgerSidebar />
       <div className="flex flex-col w-full gap-[30px]">
         <ProjectDetailsHeader project={project ?? null} />
-        <main className="grid [grid-template-columns:minmax(220px,auto)_1fr] gap-x-[120px]">
+        <main className="grid [grid-template-columns:minmax(220px,auto)_1fr] gap-x-[120px] gap-y-[30px]">
           <div className="text-p3 color-secondary-4">COLLECTIONS</div>
           <div className="text-p3 color-secondary-4">SAVED WORDS</div>
           {collections?.map((collection, idx) => (
@@ -100,6 +106,9 @@ export const ProjectDetails = () => {
               </div>
             </Fragment>
           ))}
+          <div>
+            <AddCollectionChip onClick={onAddCollection} />
+          </div>
         </main>
       </div>
     </div >

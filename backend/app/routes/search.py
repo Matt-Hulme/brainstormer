@@ -10,7 +10,7 @@ router = APIRouter(prefix="/search", tags=["search"])
 class SearchRequest(BaseModel):
     query: str
     project_id: str
-    search_mode: Optional[str] = "or"  # "or" or "and" or "both"
+    search_mode: Optional[str] = "or"  # "or" or "and"
 
 class KeywordSuggestion(BaseModel):
     word: str
@@ -84,7 +84,7 @@ async def search_keywords(
                 temperature=0.7,
             )
             
-            # Process suggestions
+            # Process suggestions - always set match_type to "or" for consistency
             suggestions_text = response.choices[0].message.content.strip()
             # Split by newlines and clean each item
             or_suggestions = [
@@ -94,8 +94,8 @@ async def search_keywords(
             ]
             suggestions.extend(or_suggestions)
         
-        if len(phrases) > 1 and (search.search_mode == "and" or search.search_mode == "both"):
-            # For AND mode or BOTH mode, we need to find words that relate to all phrases
+        if len(phrases) > 1 and (search.search_mode == "and"):
+            # For AND mode, we need to find words that relate to all phrases
             all_phrases = " AND ".join([f'"{phrase}"' for phrase in phrases])
             
             system_message = f"""You are a Focused Brainstormer. Your job is to generate keywords that MUST be strongly related to ALL of the following concepts simultaneously: {all_phrases}.

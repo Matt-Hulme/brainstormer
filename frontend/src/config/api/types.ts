@@ -29,7 +29,7 @@ export interface SaveWordRequest {
 export interface SearchRequest {
   projectId: string
   query: string
-  searchMode?: 'and' | 'both' | 'or'
+  searchMode?: 'and' | 'or'
 }
 
 export interface KeywordSuggestion {

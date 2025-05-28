@@ -19,7 +19,7 @@ const getApiBaseUrl = () => {
 // Create API instance
 const api: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 10000,
+  timeout: 120000, // 2 minutes to handle OpenAI API calls
   headers: {
     'Content-Type': 'application/json',
   },
