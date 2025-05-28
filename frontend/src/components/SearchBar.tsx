@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useState } from 'react'
+import { KeyboardEvent, useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
@@ -11,14 +11,30 @@ interface SearchBarProps {
   searchValue: string
 }
 
-export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarProps) => {
+export interface SearchBarRef {
+  clear: () => void
+  focus: () => void
+}
+
+export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', onChange, searchValue }, ref) => {
   const navigate = useNavigate()
   const { projectId } = useParams<{ projectId?: string }>()
   const createProjectMutation = useCreateProjectMutation()
   const { projects } = useGetProjectsQuery()
+  const firstInputRef = useRef<HTMLInputElement>(null)
 
   const initialPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
   const [phrases, setPhrases] = useState<string[]>(initialPhrases)
+
+  // Expose clear and focus methods via ref
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      setPhrases([''])
+    },
+    focus: () => {
+      firstInputRef.current?.focus()
+    }
+  }), [])
 
   useEffect(() => {
     const newPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
@@ -99,6 +115,7 @@ export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarPr
         {phrases.map((phrase, index) => (
           <div key={index} className="flex items-center gap-2 w-full">
             <Input
+              ref={index === 0 ? firstInputRef : undefined}
               className={className}
               maxLength={20}
               onChange={(e) => onPhraseChange(index, e.target.value)}
@@ -139,4 +156,6 @@ export const SearchBar = ({ className = '', onChange, searchValue }: SearchBarPr
       </div>
     </div>
   )
-}
+})
+
+SearchBar.displayName = 'SearchBar'

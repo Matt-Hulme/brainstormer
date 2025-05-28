@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
 import { Button } from '@/components/design-system/Button'
+import { useDeleteCollectionMutation } from '@/hooks'
 import { Project, SavedWord, Collection } from '@/types'
 
 interface CollectionsSidebarProps {
@@ -15,6 +16,7 @@ interface CollectionsSidebarProps {
   onRemoveWord?: (word: string, collectionId: string) => Promise<void>
   localCollections: Record<string, Set<string>>
   isLoading?: boolean
+  onAddCollection?: () => void
 }
 
 export const CollectionsSidebar = ({
@@ -26,8 +28,22 @@ export const CollectionsSidebar = ({
   onAddWord,
   onRemoveWord,
   localCollections,
-  isLoading = false
+  isLoading = false,
+  onAddCollection
 }: CollectionsSidebarProps) => {
+  const deleteCollectionMutation = useDeleteCollectionMutation()
+
+  const onDeleteCollection = useCallback(async (collectionId: string, collectionName: string) => {
+    if (confirm(`Are you sure you want to delete the collection "${collectionName}"?`)) {
+      try {
+        deleteCollectionMutation.mutate(collectionId)
+      } catch (error) {
+        console.error('Error deleting collection:', error)
+        toast.error('Failed to delete collection')
+      }
+    }
+  }, [deleteCollectionMutation])
+
   const onRemoveWordClick = useCallback(async (word: string, collectionId: string) => {
     if (!onRemoveWord) return
     try {
@@ -66,19 +82,28 @@ export const CollectionsSidebar = ({
             const words = localCollections[collection.id]
             return (
               <div key={collection.id} className="space-y-[10px]">
-                <div className="color-secondary-4 font-semibold text-[16px]">{collection.name}</div>
+                <div className="color-secondary-4 font-semibold text-[16px] flex items-center justify-between group">
+                  <span>{collection.name}</span>
+                  <Button
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-4 w-4 max-h-[18px] max-w-[18px]"
+                    onClick={() => onDeleteCollection(collection.id, collection.name)}
+                    variant="icon"
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
                 {words && words.size > 0 ? (
                   <div className="space-y-[10px]">
                     {Array.from(words).map((word) => (
-                      <div key={word} className="color-secondary-2 flex items-center justify-between text-p3">
+                      <div key={word} className="color-secondary-2 flex items-center justify-between text-p3 group">
                         <span>{word}</span>
                         {onRemoveWord && (
                           <Button
                             variant="icon"
-                            className="max-h-[18px] max-w-[18px]"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-4 w-4 max-h-[18px] max-w-[18px]"
                             onClick={() => onRemoveWordClick(word, collection.id)}
                           >
-                            <X size={18} />
+                            <X size={14} />
                           </Button>
                         )}
                       </div>
@@ -93,7 +118,7 @@ export const CollectionsSidebar = ({
           })
         )}
         <div>
-          <AddCollectionChip />
+          <AddCollectionChip onClick={onAddCollection} />
         </div>
       </div>
     </div>

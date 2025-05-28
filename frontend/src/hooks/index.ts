@@ -2,6 +2,7 @@
 export { useAddWordToCollectionMutation } from './collections/useAddWordToCollectionMutation';
 export { useCollectionSearchCache } from './collections/useCollectionSearchCache';
 export { useCreateCollectionMutation } from './collections/useCreateCollectionMutation';
+export { useDeleteCollectionMutation } from './collections/useDeleteCollectionMutation';
 export { useGetCollectionsQuery } from './collections/useGetCollectionsQuery';
 export { useRemoveWordFromCollectionMutation } from './collections/useRemoveWordFromCollectionMutation';
 export { useCreateProjectMutation } from './projects/useCreateProjectMutation';

@@ -1,5 +1,5 @@
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { SearchBar } from '@/components/SearchBar'
+import { SearchBar, SearchBarRef } from '@/components/SearchBar'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { SearchContentEmpty } from './SearchContentEmpty'
@@ -18,9 +18,11 @@ export const Search = () => {
   const searchValue = searchParams.get('q') ?? ''
   const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' | 'both' ?? 'both'
+  const collectionParam = searchParams.get('collection')
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
+  const searchBarRef = useRef<SearchBarRef>(null)
 
   const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
@@ -75,6 +77,30 @@ export const Search = () => {
   useEffect(() => {
     const handleSearchCollection = async () => {
       if (!searchValue || !projectId || !project || !collections) return
+
+      // If we have a collection parameter, select that collection directly
+      if (collectionParam) {
+        const targetCollection = collections.find(c => c.id === collectionParam)
+        if (targetCollection) {
+          setLocalCollections(prev => {
+            if (!prev[targetCollection.id]) {
+              return {
+                ...prev,
+                [targetCollection.id]: new Set(targetCollection.savedWords?.map(sw => sw.word) || [])
+              }
+            }
+            return prev
+          })
+
+          setSelectedCollectionId(targetCollection.id)
+
+          // Remove the collection parameter from URL to clean it up
+          const newParams = new URLSearchParams(searchParams)
+          newParams.delete('collection')
+          navigate(`/projects/${projectId}/search?${newParams.toString()}`, { replace: true })
+          return
+        }
+      }
 
       // First try to find an existing collection with this name
       const existingCollection = collections.find(
@@ -135,7 +161,7 @@ export const Search = () => {
     }
 
     handleSearchCollection()
-  }, [searchValue, projectId, project, collections, createCollection, setLastSearch])
+  }, [searchValue, projectId, project, collections, createCollection, setLastSearch, collectionParam, searchParams, navigate])
 
   const handleAddWord = async (word: string, collectionId: string) => {
     // Optimistically update local state
@@ -196,6 +222,12 @@ export const Search = () => {
     newParams.set('mode', mode)
     navigate(`/projects/${projectId}/search?${newParams.toString()}`)
   }, [navigate, projectId, searchParams])
+
+  const onAddCollection = useCallback(() => {
+    // Clear the search bar and focus it
+    searchBarRef.current?.clear()
+    searchBarRef.current?.focus()
+  }, [])
 
   // Display information about match types
   const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
@@ -289,7 +321,7 @@ export const Search = () => {
         )}
       </HamburgerSidebar>
       <div className="flex flex-col w-full h-screen">
-        <SearchBar searchValue={searchValue} className="text-h3 text-secondary-4" />
+        <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
 
         {hasMultiplePhrases && !isLoading && (data?.suggestions?.length ?? 0) > 0 && (
           <div className="px-4 py-2 bg-secondary-0/50 text-xs text-secondary-3">
@@ -334,6 +366,7 @@ export const Search = () => {
               onRemoveWord={handleRemoveWord}
               localCollections={localCollections}
               isLoading={collectionsLoading}
+              onAddCollection={onAddCollection}
             />
           </aside>
         </div>

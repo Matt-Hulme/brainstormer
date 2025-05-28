@@ -1,9 +1,9 @@
 import { Fragment } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/design-system/Button'
 import { HamburgerSidebar } from '@/components/HamburgerSidebar'
-import { useCollectionSearchCache, useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
+import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 
 export const ProjectDetails = () => {
@@ -12,6 +12,7 @@ export const ProjectDetails = () => {
   const { error: projectError, isLoading: projectLoading, project } = useGetProjectQuery(projectId ?? '')
   const { collections, error: collectionsError, loading: collectionsLoading } = useGetCollectionsQuery(project?.id ?? '')
   const { getLastSearch } = useCollectionSearchCache()
+  const deleteCollectionMutation = useDeleteCollectionMutation()
 
   const onCollectionClick = (collection: any) => {
     if (!projectId) return
@@ -19,7 +20,14 @@ export const ProjectDetails = () => {
     // Get the last search query from cache, fallback to collection name
     const lastSearch = getLastSearch(collection.id)
     const searchQuery = lastSearch || collection.name
-    navigate(`/projects/${projectId}/search?q=${encodeURIComponent(searchQuery)}`)
+    navigate(`/projects/${projectId}/search?q=${encodeURIComponent(searchQuery)}&collection=${collection.id}`)
+  }
+
+  const onDeleteCollection = (e: React.MouseEvent, collectionId: string, collectionName: string) => {
+    e.stopPropagation()
+    if (confirm(`Are you sure you want to delete the collection "${collectionName}"?`)) {
+      deleteCollectionMutation.mutate(collectionId)
+    }
   }
 
   if (projectLoading || collectionsLoading) {
@@ -48,16 +56,20 @@ export const ProjectDetails = () => {
             <Fragment key={collection.id}>
               {idx !== 0 && <div className="col-span-2 w-full h-[1px] bg-secondary-2/20" />}
               <div className="pt-[30px]">
-                <div className="flex flex-row items-center gap-[4px]">
+                <div className="flex flex-row items-center gap-[4px] group">
                   <button
                     className="flex flex-row items-center gap-[4px] hover:opacity-80 transition-opacity"
                     onClick={() => onCollectionClick(collection)}
                   >
                     <h3 className="text-h3 color-secondary-4">{collection.name}</h3>
-                    <Button className="color-secondary-3" variant="icon">
-                      <ArrowRight className="" size={24} />
-                    </Button>
                   </button>
+                  <Button
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-6 w-6"
+                    onClick={(e) => onDeleteCollection(e, collection.id, collection.name)}
+                    variant="icon"
+                  >
+                    <X size={16} />
+                  </Button>
                 </div>
               </div>
               <div className="pt-[33px] pb-[30px]">
