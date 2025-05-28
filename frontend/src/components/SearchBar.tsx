@@ -23,7 +23,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   const { projects } = useGetProjectsQuery()
   const firstInputRef = useRef<HTMLInputElement>(null)
 
-  const initialPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
+  const initialPhrases = searchValue ? searchValue.split('+').map(p => p.trim()).filter(Boolean) : ['']
   const [phrases, setPhrases] = useState<string[]>(initialPhrases)
 
   // Expose clear and focus methods via ref
@@ -37,7 +37,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   }), [])
 
   useEffect(() => {
-    const newPhrases = searchValue ? searchValue.split('||').map(p => p.trim()).filter(Boolean) : ['']
+    const newPhrases = searchValue ? searchValue.split('+').map(p => p.trim()).filter(Boolean) : ['']
     setPhrases(newPhrases)
   }, [searchValue])
 
@@ -75,7 +75,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
     newPhrases[index] = value
     setPhrases(newPhrases)
 
-    const joinedValue = newPhrases.filter(Boolean).join(' || ')
+    const joinedValue = newPhrases.filter(Boolean).join(' + ')
     onChange?.(joinedValue)
   }
 
@@ -84,7 +84,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
       const newPhrases = phrases.filter((_, i) => i !== index)
       setPhrases(newPhrases)
 
-      const joinedValue = newPhrases.filter(Boolean).join(' || ')
+      const joinedValue = newPhrases.filter(Boolean).join(' + ')
       onChange?.(joinedValue)
     }
   }
@@ -93,7 +93,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
     const validPhrases = phrases.filter(p => p.trim())
     if (validPhrases.length === 0) return
 
-    const searchQuery = validPhrases.join(' || ')
+    const searchQuery = validPhrases.join(' + ')
 
     if (projectId) {
       navigate(`/projects/${projectId}/search?q=${encodeURIComponent(searchQuery)}`)

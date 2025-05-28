@@ -5,8 +5,6 @@ import { SearchContent } from './SearchContent'
 import { SearchContentEmpty } from './SearchContentEmpty'
 import { CollectionsSidebar } from './CollectionsSidebar'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
-import { AlignLeft, Target, GitBranch, Layers } from 'lucide-react'
-import { Button, showUndevelopedFeatureToast, VennDiagramIcon } from '@/components'
 import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { toast } from 'react-toastify'
@@ -16,7 +14,6 @@ export const Search = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const searchValue = searchParams.get('q') ?? ''
-  const activeView = searchParams.get('view') ?? 'list'
   const searchMode = searchParams.get('mode') as 'or' | 'and' ?? 'or'
   const collectionParam = searchParams.get('collection')
   const focusParam = searchParams.get('focus')
@@ -246,9 +243,7 @@ export const Search = () => {
   }, [])
 
   // Display information about match types
-  const hasAndMatches = data?.suggestions?.some(s => s?.matchType === 'and') ?? false
-  const hasOrMatches = data?.suggestions?.some(s => s?.matchType === 'or') ?? false
-  const hasMultiplePhrases = searchValue.includes('||')
+  const hasMultiplePhrases = searchValue.includes('+')
 
   return (
     <div className="flex flex-row items-start gap-[10px]">
@@ -262,10 +257,7 @@ export const Search = () => {
             {searchError && <SearchContentEmpty />}
             {!isLoading && !searchError && (
               <SearchContent
-                projectId={projectId ?? ''}
                 results={data?.suggestions ?? []}
-                project={project}
-                collections={collections}
                 selectedCollectionId={selectedCollectionId}
                 isCreatingCollection={isCreatingCollection}
                 onAddWord={handleAddWord}

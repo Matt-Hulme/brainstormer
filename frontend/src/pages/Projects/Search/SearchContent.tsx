@@ -1,15 +1,11 @@
 import { useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
-import { Project, Collection } from '@/types'
 import { Toggle } from '@/components'
 import { toast } from 'react-toastify'
 
 interface SearchContentProps {
-  projectId: string
   results: KeywordSuggestion[]
-  project?: Project
-  collections?: Collection[]
   selectedCollectionId: string | null
   isCreatingCollection: boolean
   onAddWord: (word: string, collectionId: string) => Promise<void>
@@ -21,10 +17,7 @@ interface SearchContentProps {
 }
 
 export const SearchContent = ({
-  projectId,
   results = [],
-  project,
-  collections = [],
   selectedCollectionId,
   isCreatingCollection,
   onAddWord,
@@ -73,15 +66,16 @@ export const SearchContent = ({
   }
 
   return (
-    <div className="pb-[35px]">
+    <div className="pb-[35px] space-y-6">
       {/* Search Mode Toggle - only show for multiple phrases */}
       {hasMultiplePhrases && (
-        <div className="mb-6 flex items-center gap-4">
+        <div className="space-y-6">
+          <span className="text-p2 color-secondary-4">Search Mode</span>
           <Toggle
             checked={searchMode === 'and'}
             onChange={(checked) => onSearchModeChange(checked ? 'and' : 'or')}
-            leftLabel="Broad"
-            rightLabel="Focused"
+            leftLabel="Or"
+            rightLabel="And"
             variant="default"
             size="md"
           />

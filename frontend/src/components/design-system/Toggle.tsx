@@ -52,11 +52,11 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
                         size === 'md' && 'h-6 w-11',
                         // Color variants
                         variant === 'default' && [
-                            checked ? 'bg-primary-1' : 'bg-secondary-1',
+                            checked ? 'bg-secondary-2' : 'bg-secondary-1',
                             'focus:ring-primary-1'
                         ],
                         variant === 'primary' && [
-                            checked ? 'bg-primary-1' : 'bg-secondary-1',
+                            checked ? 'bg-secondary-2' : 'bg-secondary-1',
                             'focus:ring-primary-1'
                         ],
                         // Disabled state

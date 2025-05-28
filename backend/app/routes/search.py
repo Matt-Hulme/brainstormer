@@ -40,7 +40,7 @@ async def search_keywords(
         raise HTTPException(status_code=404, detail="Project not found")
     
     # Parse multiple phrases
-    phrases = [phrase.strip() for phrase in search.query.split("||") if phrase.strip()]
+    phrases = [phrase.strip() for phrase in search.query.split("+") if phrase.strip()]
     
     # Get keyword suggestions from OpenAI
     openai = get_openai_client()
