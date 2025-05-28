@@ -66,41 +66,45 @@ export const Search = () => {
   // Determine overall loading state
   const isLoading = searchLoading || projectLoading || collectionsLoading
 
-  // Create a collection when search is performed
+  // Reset last attempted search when search value changes
   useEffect(() => {
-    const createSearchCollection = async () => {
-      if (!searchValue || !projectId || !project) return
+    lastAttemptedSearch.current = null
+  }, [searchValue])
 
-      // Skip if we've already attempted to create a collection for this search value
+  // Create or select a collection when search is performed
+  useEffect(() => {
+    const handleSearchCollection = async () => {
+      if (!searchValue || !projectId || !project || !collections) return
+
+      // First try to find an existing collection with this name
+      const existingCollection = collections.find(
+        c => c?.name?.toLowerCase() === searchValue.toLowerCase()
+      )
+
+      if (existingCollection) {
+        // If collection exists, just select it
+        setLocalCollections(prev => {
+          if (!prev[existingCollection.id]) {
+            return {
+              ...prev,
+              [existingCollection.id]: new Set(existingCollection.savedWords?.map(sw => sw.word) || [])
+            }
+          }
+          return prev
+        })
+
+        setSelectedCollectionId(existingCollection.id)
+        return
+      }
+
+      // Only create a new collection if one doesn't exist and we haven't already tried
       if (lastAttemptedSearch.current === searchValue) return
 
       lastAttemptedSearch.current = searchValue
       setIsCreatingCollection(true)
 
       try {
-        // First try to find an existing collection with this name
-        const existingCollection = collections?.find(
-          c => c?.name?.toLowerCase() === searchValue.toLowerCase()
-        )
-
-        if (existingCollection) {
-          // Ensure the existing collection is in localCollections
-          setLocalCollections(prev => {
-            if (!prev[existingCollection.id]) {
-              return {
-                ...prev,
-                [existingCollection.id]: new Set(existingCollection.savedWords?.map(sw => sw.word) || [])
-              }
-            }
-            return prev
-          })
-
-          setSelectedCollectionId(existingCollection.id)
-          setIsCreatingCollection(false)
-          return
-        }
-
-        // If no existing collection found, create a new one
+        // Create a new collection
         const collection = await createCollection({
           name: searchValue,
           projectId
@@ -130,7 +134,7 @@ export const Search = () => {
       }
     }
 
-    createSearchCollection()
+    handleSearchCollection()
   }, [searchValue, projectId, project, collections, createCollection, setLastSearch])
 
   const handleAddWord = async (word: string, collectionId: string) => {

@@ -10,16 +10,13 @@ export const useSearchQuery = (
 ) => {
     const { getCachedResult, setCachedResult } = useSearchResultsCache()
 
+    // Get cached result to use as initial data
+    const cachedResult = getCachedResult(projectId, query, searchMode)
+
     return useQuery<SearchResponse, Error>({
         queryKey: ['search', projectId, query, searchMode],
         queryFn: async () => {
-            // Check cache first
-            const cachedResult = getCachedResult(projectId, query, searchMode)
-            if (cachedResult) {
-                return cachedResult
-            }
-
-            // If not in cache, fetch from API
+            // Fetch from API
             const result = await searchApi.search({ projectId, query, searchMode })
 
             // Cache the result
@@ -28,7 +25,8 @@ export const useSearchQuery = (
             return result
         },
         enabled: !!projectId && !!query,
-        staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+        initialData: cachedResult || undefined,
+        staleTime: cachedResult ? 0 : 5 * 60 * 1000, // If we have cached data, consider it stale immediately to allow background refresh
         gcTime: 10 * 60 * 1000, // Keep in React Query cache for 10 minutes
     })
 } 
