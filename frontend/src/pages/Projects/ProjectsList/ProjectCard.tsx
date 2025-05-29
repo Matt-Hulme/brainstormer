@@ -30,42 +30,44 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
 
   return (
     <ResultsCard onClick={onCardClick}>
-      <div className="space-y-[4px]">
-        <h3 className="line-clamp-1 text-h3 text-secondary-4">{name ? name : 'New Project'}</h3>
-        <div className="flex flex-row gap-[10px] items-center">
-          {lastEdited && (
-            <>
-              <span className="line-clamp-1 text-p3 text-secondary-2">
-                Last edited {lastEdited}
-              </span>
-              <div className="bg-secondary-1 h-[15px] w-[1px]" />
-            </>
-          )}
-          {collections.length > 0 && (
-            <>
-              <span className="line-clamp-1 text-p3 text-secondary-2">
-                Collections: {collections.join(', ')}
-              </span>
-              <div className="bg-secondary-1 h-[15px] w-[1px]" />
-            </>
-          )}
-          <span className="line-clamp-1 text-p3 text-secondary-2">
-            {savedWords.length > 0 ? `Saved words: ${savedWords.join(', ')}` : 'Nothing yet'}
-          </span>
+      <div className="flex flex-row items-center justify-between w-full">
+        <div className="space-y-[4px]">
+          <h3 className="line-clamp-1 text-h3 text-secondary-4">{name ? name : 'New Project'}</h3>
+          <div className="flex flex-row gap-[10px] items-center">
+            {lastEdited && (
+              <>
+                <span className="line-clamp-1 text-p3 text-secondary-2">
+                  Last edited {lastEdited}
+                </span>
+                <div className="bg-secondary-1 h-[15px] w-[1px]" />
+              </>
+            )}
+            {collections.length > 0 && (
+              <>
+                <span className="line-clamp-1 text-p3 text-secondary-2">
+                  Collections: {collections.join(', ')}
+                </span>
+                <div className="bg-secondary-1 h-[15px] w-[1px]" />
+              </>
+            )}
+            <span className="line-clamp-1 text-p3 text-secondary-2">
+              {savedWords.length > 0 ? `Saved words: ${savedWords.join(', ')}` : 'Nothing yet'}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="flex gap-2 items-center relative">
-        <Button
-          aria-label="Delete project"
-          className="mr-[4px]"
-          onClick={onDelete}
-          variant="icon"
-        >
-          <Trash className="h-5 text-gray-500 w-5" />
-        </Button>
-        <Button className="rounded-full" variant="icon">
-          <ArrowRight className="h-7 text-gray-500 w-7" />
-        </Button>
+        <div className="flex gap-2 items-center relative">
+          <Button
+            aria-label="Delete project"
+            className="mr-[4px]"
+            onClick={onDelete}
+            variant="icon"
+          >
+            <Trash className="h-5 text-gray-500 w-5" />
+          </Button>
+          <Button className="rounded-full" variant="icon">
+            <ArrowRight className="h-7 text-gray-500 w-7" />
+          </Button>
+        </div>
       </div>
     </ResultsCard>
   )
