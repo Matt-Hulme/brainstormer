@@ -99,7 +99,7 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
       <div className="flex flex-row items-center justify-between w-full">
         <div className="space-y-[4px]">
           {isEditing ? (
-            <div className="flex items-center gap-[8px]" onClick={onInputClick}>
+            <div className="flex items-center gap-[8px] relative" onClick={onInputClick}>
               <Input
                 ref={inputRef}
                 className="text-h3 text-secondary-4"
@@ -108,14 +108,14 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
                 value={editValue}
               />
               <Button
-                className="color-green-500"
+                className="color-green-500 relative"
                 onClick={onSaveEdit}
                 variant="icon"
               >
                 <Check size={16} />
               </Button>
               <Button
-                className="color-secondary-3"
+                className="color-secondary-3 relative"
                 onClick={onCancelEdit}
                 variant="icon"
               >
@@ -123,15 +123,18 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-[8px] group">
+            <div className="flex items-center gap-[8px] relative">
               <h3 className="line-clamp-1 text-h3 text-secondary-4">{name ? name : 'New Project'}</h3>
-              <Button
-                className="opacity-0 group-hover:opacity-100 transition-opacity color-secondary-3"
-                onClick={onEditClick}
-                variant="icon"
-              >
-                <Edit2 size={16} />
-              </Button>
+              <div className="group">
+                <div className="absolute left-0 top-0 w-[400px] h-full" />
+                <Button
+                  className="opacity-0 group-hover:opacity-100 transition-opacity color-secondary-3 relative z-10"
+                  onClick={onEditClick}
+                  variant="icon"
+                >
+                  <Edit2 size={16} />
+                </Button>
+              </div>
             </div>
           )}
           <div className="flex flex-row gap-[10px] items-center">

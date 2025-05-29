@@ -12,18 +12,18 @@ export const HamburgerSidebar = ({ children }: HamburgerSidebarProps) => {
   const navigate = useNavigate()
 
   return (
-    <aside className="flex flex-col min-h-screen w-[110px] p-[40px] pt-[35px] justify-between">
+    <aside className="bg-background fixed flex flex-col h-screen justify-between left-0 p-[40px] pt-[35px] top-0 w-[110px] z-10">
       <div className="flex flex-col gap-y-[65px]">
         <Button
-          className="rounded-md color-secondary-3"
-          onClick={() => navigate('/')}
+          className="color-secondary-3 rounded-md"
+          onClick={() => navigate('/projects')}
           variant="icon"
         >
           <Menu size={24} />
         </Button>
         {children}
       </div>
-      <ProfilePicture onClick={() => navigate('/')} />
+      <ProfilePicture onClick={() => navigate('/projects')} />
     </aside>
   )
 }

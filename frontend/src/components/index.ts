@@ -1,6 +1,7 @@
 export { AddCollectionChip } from './AddCollectionChip'
 export { Button, type ButtonProps } from './design-system/Button'
 export { HamburgerSidebar } from './HamburgerSidebar'
+export { Layout } from './Layout'
 export { ProfilePicture } from './ProfilePicture'
 export { ProtectedRoute } from './ProtectedRoute'
 export { SearchBar } from './SearchBar'

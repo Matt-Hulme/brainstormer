@@ -6,27 +6,35 @@ import { useSearchResultsCache } from './useSearchResultsCache'
 export const useSearchQuery = (
     projectId: string,
     query: string,
-    searchMode: 'or' | 'and' = 'or'
+    searchMode: 'or' | 'and' = 'or',
+    excludeWords: string[] = []
 ) => {
     const { getCachedResult, setCachedResult } = useSearchResultsCache()
 
-    // Get cached result to use as initial data
-    const cachedResult = getCachedResult(projectId, query, searchMode)
+    // Create a unique cache key that includes excludeWords
+    const cacheKey = excludeWords.length > 0
+        ? `${projectId}-${query}-${searchMode}-exclude-${excludeWords.length}`
+        : `${projectId}-${query}-${searchMode}`
+
+    // Get cached result to use as initial data (only for initial searches, not load more)
+    const cachedResult = excludeWords.length === 0 ? getCachedResult(projectId, query, searchMode) : null
 
     return useQuery<SearchResponse, Error>({
-        queryKey: ['search', projectId, query, searchMode],
+        queryKey: ['search', projectId, query, searchMode, excludeWords],
         queryFn: async () => {
             // Fetch from API
-            const result = await searchApi.search({ projectId, query, searchMode })
+            const result = await searchApi.search({ projectId, query, searchMode, excludeWords })
 
-            // Cache the result
-            setCachedResult(projectId, query, searchMode, result)
+            // Cache the result only for initial searches (not load more)
+            if (excludeWords.length === 0) {
+                setCachedResult(projectId, query, searchMode, result)
+            }
 
             return result
         },
         enabled: !!projectId && !!query,
         initialData: cachedResult || undefined,
-        staleTime: 5 * 60 * 1000, // Keep data fresh for 5 minutes regardless of cache status
-        gcTime: 10 * 60 * 1000, // Keep in React Query cache for 10 minutes
+        staleTime: excludeWords.length > 0 ? 0 : 5 * 60 * 1000, // Don't cache load more results
+        gcTime: excludeWords.length > 0 ? 0 : 10 * 60 * 1000, // Don't keep load more in cache
     })
 } 

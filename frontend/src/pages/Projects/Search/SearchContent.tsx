@@ -2,6 +2,9 @@ import { useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 import { toast } from 'react-toastify'
+import { Button } from '@/components/design-system/Button'
+import { Plus } from 'lucide-react'
+import { Spinner } from '@/components/design-system/Spinner'
 
 interface SearchContentProps {
   results: KeywordSuggestion[]
@@ -13,6 +16,9 @@ interface SearchContentProps {
   searchMode: 'or' | 'and'
   hasMultiplePhrases: boolean
   error?: boolean
+  onLoadMore?: (excludeWords: string[]) => Promise<void>
+  isLoadingMore?: boolean
+  canLoadMore?: boolean
 }
 
 export const SearchContent = ({
@@ -24,7 +30,10 @@ export const SearchContent = ({
   localActiveWords,
   searchMode,
   hasMultiplePhrases,
-  error = false
+  error = false,
+  onLoadMore,
+  isLoadingMore = false,
+  canLoadMore = false
 }: SearchContentProps) => {
   const onSelectWord = useCallback(async (termId: string) => {
     // Get the full word/phrase by removing the match type and index
@@ -57,6 +66,30 @@ export const SearchContent = ({
     return localActiveWords?.has(word)
   }
 
+  // Filter out error messages that might be returned as suggestions
+  const validResults = results.filter(result => {
+    if (!result?.word) return false
+    // Filter out any suggestions that look like error messages
+    const word = result.word.toLowerCase()
+    return !word.includes('sorry') &&
+      !word.includes('need the specific concepts') &&
+      !word.includes('please provide') &&
+      !word.startsWith('i ') &&
+      word.length <= 100 // Reasonable length for keywords
+  })
+
+  const handleLoadMore = async () => {
+    if (!onLoadMore || !canLoadMore) return
+
+    const excludeWords = validResults.map(result => result.word)
+
+    try {
+      await onLoadMore(excludeWords)
+    } catch (error) {
+      // Error handling is done in the hook
+    }
+  }
+
   // Error state
   if (error) {
     return (
@@ -70,8 +103,7 @@ export const SearchContent = ({
     <div className="pb-[35px] space-y-6">
       {/* Results */}
       <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
-        {results.map((result, index) => {
-          if (!result?.word) return null
+        {validResults.map((result, index) => {
           const termId = `${result.word}-${searchMode}-${index}`
           return (
             <SearchTerm
@@ -86,11 +118,36 @@ export const SearchContent = ({
       </div>
 
       {/* No results state */}
-      {results.length === 0 && (
+      {validResults.length === 0 && !isLoadingMore && (
         <div className="text-center py-8 color-secondary-3">
-          <p>No {searchMode === 'and' ? 'AND' : 'OR'} matches found.</p>
+          <p>No results found.</p>
           {searchMode === 'and' && hasMultiplePhrases && (
             <p className="text-sm mt-2">Try switching to "OR" mode for more results.</p>
+          )}
+        </div>
+      )}
+
+      {/* Load More button */}
+      {validResults.length > 0 && (canLoadMore || isLoadingMore) && (
+        <div className="flex items-center justify-center mt-6">
+          {isLoadingMore ? (
+            <Button
+              variant="outline"
+              className="flex items-center gap-1"
+              disabled
+            >
+              <Spinner size="sm" />
+              Loading More...
+            </Button>
+          ) : (
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              className="flex items-center gap-1"
+            >
+              <Plus size={16} />
+              Load More
+            </Button>
           )}
         </div>
       )}

@@ -30,6 +30,7 @@ export interface SearchRequest {
   projectId: string
   query: string
   searchMode?: 'and' | 'or'
+  excludeWords?: string[]
 }
 
 export interface KeywordSuggestion {

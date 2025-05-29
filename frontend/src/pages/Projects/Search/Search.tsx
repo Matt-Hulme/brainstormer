@@ -1,11 +1,11 @@
-import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { SearchBar, SearchBarRef } from '@/components/SearchBar'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { CollectionsSidebar } from './CollectionsSidebar'
 import { Toggle } from '@/components'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
-import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
+import { useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
+import { useSearchWithLoadMore } from '@/hooks/search/useSearchWithLoadMore'
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { toast } from 'react-toastify'
 
@@ -21,8 +21,7 @@ export const Search = () => {
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
   const searchBarRef = useRef<SearchBarRef>(null)
-
-  const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectId ?? '', searchValue, searchMode)
+  const { results, isLoading: searchLoading, isLoadingMore, error: searchError, loadMore, canLoadMore } = useSearchWithLoadMore(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
   const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
   const { addWordToCollection } = useAddWordToCollectionMutation()
@@ -244,58 +243,63 @@ export const Search = () => {
     searchBarRef.current?.focus()
   }, [])
 
+  const onLoadMore = useCallback(async (excludeWords: string[]) => {
+    if (!canLoadMore) return
+    await loadMore(excludeWords)
+  }, [loadMore, canLoadMore])
+
   // Display information about match types
   const hasMultiplePhrases = searchValue.includes('+')
 
   return (
-    <div className="flex flex-row items-start gap-[10px]">
-      <HamburgerSidebar />
-      <div className="flex flex-col w-full h-screen">
-        <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
+    <div className="flex flex-col w-full h-screen">
+      <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
 
-        <div className="flex flex-row pt-[25px] gap-5">
-          <main className="flex-1 h-full">
-            {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
-            {hasMultiplePhrases && searchValue && (
-              <div className="space-y-2 mb-6">
-                <span className="text-p2 color-secondary-4">Search Mode</span>
-                <Toggle
-                  checked={searchMode === 'and'}
-                  onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
-                  leftLabel="OR"
-                  rightLabel="AND"
-                  variant="default"
-                  size="md"
-                />
-              </div>
-            )}
-
-            {isLoading && <SearchContentLoading />}
-            {!isLoading && searchValue && (
-              <SearchContent
-                results={data?.suggestions ?? []}
-                selectedCollectionId={selectedCollectionId}
-                isCreatingCollection={isCreatingCollection}
-                onAddWord={handleAddWord}
-                onRemoveWord={handleRemoveWord}
-                localActiveWords={localActiveWords}
-                searchMode={searchMode}
-                hasMultiplePhrases={hasMultiplePhrases}
-                error={!!searchError}
+      <div className="flex flex-row pt-[25px] gap-5">
+        <main className="flex-1 h-full">
+          {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
+          {hasMultiplePhrases && searchValue && (
+            <div className="space-y-2 mb-6">
+              <span className="text-p2 color-secondary-4">Search Mode</span>
+              <Toggle
+                checked={searchMode === 'and'}
+                onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
+                leftLabel="OR"
+                rightLabel="AND"
+                variant="default"
+                size="md"
               />
-            )}
-          </main>
-          <aside>
-            <CollectionsSidebar
-              project={project}
-              collections={collections}
+            </div>
+          )}
+
+          {isLoading && <SearchContentLoading />}
+          {!isLoading && searchValue && (
+            <SearchContent
+              results={results}
+              selectedCollectionId={selectedCollectionId}
+              isCreatingCollection={isCreatingCollection}
+              onAddWord={handleAddWord}
               onRemoveWord={handleRemoveWord}
-              localCollections={localCollections}
-              isLoading={collectionsLoading}
-              onAddCollection={onAddCollection}
+              localActiveWords={localActiveWords}
+              searchMode={searchMode}
+              hasMultiplePhrases={hasMultiplePhrases}
+              error={!!searchError}
+              onLoadMore={onLoadMore}
+              isLoadingMore={isLoadingMore}
+              canLoadMore={canLoadMore}
             />
-          </aside>
-        </div>
+          )}
+        </main>
+        <aside className="w-[300px] flex-shrink-0">
+          <CollectionsSidebar
+            project={project}
+            collections={collections}
+            onRemoveWord={handleRemoveWord}
+            localCollections={localCollections}
+            isLoading={collectionsLoading}
+            onAddCollection={onAddCollection}
+          />
+        </aside>
       </div>
     </div>
   )
