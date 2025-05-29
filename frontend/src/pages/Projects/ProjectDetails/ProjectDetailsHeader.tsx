@@ -7,6 +7,8 @@ import { Input } from '@/components/design-system/Input'
 import { useUpdateProjectMutation } from '@/hooks'
 import { Project } from '@/types'
 import { toast } from 'react-toastify'
+import { ProfilePicture } from '@/components/ProfilePicture'
+import { showUndevelopedFeatureToast } from '@/utils/toast'
 
 interface ProjectDetailsHeaderProps {
   project: Project | null
@@ -123,11 +125,7 @@ export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => 
           )}
         </div>
         <div className="flex flex-row items-center gap-[10px]">
-          <img
-            alt="Profile"
-            className="rounded-full border-1 border-secondary-4 h-[20px] w-[20px]"
-            src={profilePicture}
-          />
+          <ProfilePicture />
           <p className="text-p3 color-secondary-2">
             Last edited {formatDate(project?.updatedAt ?? '')}
           </p>

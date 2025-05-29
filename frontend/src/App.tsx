@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import { Home, Login, ProjectDetails, ProjectsList, Search } from './pages'
-import { ProtectedRoute } from './components'
+import { Layout, ProtectedRoute } from './components'
 import { Toast } from './components/design-system/Toast'
 
 export const App = () => {
@@ -8,32 +8,24 @@ export const App = () => {
     <Router>
       <div className="bg-background">
         <Routes>
+          {/* Public routes without sidebar */}
           <Route element={<Home />} path="/" />
           <Route element={<Login />} path="/login" />
+
+          {/* Protected routes with Layout wrapper */}
           <Route
             element={
               <ProtectedRoute>
-                <ProjectsList />
+                <Layout />
               </ProtectedRoute>
             }
             path="/projects"
-          />
-          <Route
-            element={
-              <ProtectedRoute>
-                <ProjectDetails />
-              </ProtectedRoute>
-            }
-            path="/projects/:projectId"
-          />
-          <Route
-            element={
-              <ProtectedRoute>
-                <Search />
-              </ProtectedRoute>
-            }
-            path="/projects/:projectId/search"
-          />
+          >
+            <Route element={<ProjectsList />} index />
+            <Route element={<ProjectDetails />} path=":projectId" />
+            <Route element={<Search />} path=":projectId/search" />
+          </Route>
+
           <Route element={<Navigate replace to="/" />} path="*" />
         </Routes>
         <Toast />

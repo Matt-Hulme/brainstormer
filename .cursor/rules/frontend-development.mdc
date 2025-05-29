@@ -61,7 +61,7 @@ Key directories and their purposes:
      // State variables (alphabetized)
      const activeView = searchParams.get('view') ?? 'list'
      const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
-     const hasMultiplePhrases = searchValue.includes('||')
+     const hasMultiplePhrases = searchValue.includes('+')
      const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
      const isLoading = searchLoading || projectLoading
 
@@ -98,7 +98,7 @@ Key directories and their purposes:
    
    // Related variables grouped together
    const { data, isLoading: searchLoading, error: searchError } = useSearchQuery(projectName ?? '', searchValue, searchMode)
-   const hasMultiplePhrases = searchValue.includes('||')
+   const hasMultiplePhrases = searchValue.includes('+')
    const hasAndMatches = data?.suggestions?.some(s => s.matchType === 'and') ?? false
    const hasOrMatches = data?.suggestions?.some(s => s.matchType === 'or') ?? false
    ```
@@ -225,6 +225,37 @@ Key directories and their purposes:
    - Use `border-{name}` for border colors
    - DO NOT change existing class names without explicit direction
    - DO NOT assume Tailwind conventions (like `text-{color}`) unless explicitly specified
+7. Spacing Preferences:
+   - **Prefer containers with `space-y-*` or `gap-y-*`** over individual `margin` classes for vertical spacing
+   - **Prefer containers with `space-x-*` or `gap-x-*`** over individual `margin` classes for horizontal spacing
+   - **Prefer `padding` over `margin`** in general for component spacing
+   - Use `gap-*` for flexbox and grid layouts
+   - Use `space-*` for flow layouts with multiple children
+   - Examples:
+     ```tsx
+     // Good - container controls spacing
+     <div className="space-y-4">
+       <div>Item 1</div>
+       <div>Item 2</div>
+       <div>Item 3</div>
+     </div>
+     
+     // Good - flexbox with gap
+     <div className="flex flex-col gap-4">
+       <div>Item 1</div>
+       <div>Item 2</div>
+     </div>
+     
+     // Good - padding for component spacing
+     <div className="p-4 bg-white">Content</div>
+     
+     // Avoid - individual margins
+     <div>
+       <div className="mb-4">Item 1</div>
+       <div className="mb-4">Item 2</div>
+       <div>Item 3</div>
+     </div>
+     ```
 
 ## API Integration
 1. All API configuration in config directory

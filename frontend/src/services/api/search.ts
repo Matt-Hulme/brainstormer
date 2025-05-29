@@ -10,6 +10,7 @@ export const searchApi = {
       query: data.query,
       project_id: data.projectId,
       search_mode: data.searchMode || 'or',
+      exclude_words: data.excludeWords || [],
     })
 
     return {
