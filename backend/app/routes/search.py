@@ -47,8 +47,9 @@ async def search_keywords(
     try:
         suggestions = []
         
-        # Always generate OR results
+        # Generate results based on search mode
         if len(phrases) == 1:
+            # Single phrase - always generate broad results (search_mode doesn't matter for single phrases)
             or_query = search.query
             system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to "{or_query}".
                 Instructions:
@@ -61,8 +62,25 @@ async def search_keywords(
                 - Separate items using ONLY line breaks
 
                 The goal is to provide a wide range of potential connections to "{or_query}" across different domains and contexts."""
-        else:
-            # For multiple phrases, create a more specific prompt
+            
+            response = await openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": system_message}],
+                temperature=1.0,
+            )
+            
+            # Process suggestions - set match_type to "or" for single phrases
+            suggestions_text = response.choices[0].message.content.strip()
+            # Split by newlines and clean each item
+            or_suggestions = [
+                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
+                for word in suggestions_text.split('\n')
+                if word.strip()
+            ]
+            suggestions.extend(or_suggestions)
+            
+        elif len(phrases) > 1 and search.search_mode == "or":
+            # Multiple phrases in OR mode - generate OR results
             phrases_list = ", ".join([f'"{phrase}"' for phrase in phrases])
             system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to ANY of these phrases: {phrases_list}.
                 Instructions:
@@ -76,26 +94,25 @@ async def search_keywords(
                 - Separate items using ONLY line breaks
 
                 The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
+            
+            response = await openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": system_message}],
+                temperature=1.0,
+            )
+            
+            # Process suggestions - set match_type to "or"
+            suggestions_text = response.choices[0].message.content.strip()
+            # Split by newlines and clean each item
+            or_suggestions = [
+                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
+                for word in suggestions_text.split('\n')
+                if word.strip()
+            ]
+            suggestions.extend(or_suggestions)
         
-        response = await openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "system", "content": system_message}],
-            temperature=1.0,
-        )
-        
-        # Process suggestions - always set match_type to "or" for consistency
-        suggestions_text = response.choices[0].message.content.strip()
-        # Split by newlines and clean each item
-        or_suggestions = [
-            KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
-            for word in suggestions_text.split('\n')
-            if word.strip()
-        ]
-        suggestions.extend(or_suggestions)
-        
-        # For multiple phrases, always generate AND results regardless of search mode
-        # This ensures users can switch between OR and AND modes and see results for both
-        if len(phrases) > 1:
+        elif len(phrases) > 1 and search.search_mode == "and":
+            # Multiple phrases in AND mode - generate AND results
             all_phrases = " AND ".join([f'"{phrase}"' for phrase in phrases])
             
             system_message = f"""You are a Focused Brainstormer. Your job is to generate keywords that MUST be strongly related to ALL of the following concepts simultaneously: {all_phrases}.
@@ -118,7 +135,7 @@ async def search_keywords(
                 temperature=1.0,
             )
             
-            # Process suggestions
+            # Process suggestions - set match_type to "and"
             suggestions_text = response.choices[0].message.content.strip()
             # Split by newlines and clean each item
             and_suggestions = [

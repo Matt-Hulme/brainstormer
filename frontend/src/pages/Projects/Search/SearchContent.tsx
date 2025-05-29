@@ -50,13 +50,6 @@ export const SearchContent = ({
     }
   }, [selectedCollectionId, isCreatingCollection, onAddWord, onRemoveWord, localActiveWords])
 
-  // Filter results based on current search mode
-  // Handle cases where matchType might be null/undefined (treat as 'or')
-  const filteredResults = results.filter(result => {
-    const resultMatchType = result.matchType || 'or'
-    return resultMatchType === searchMode
-  })
-
   // Check if a word is in the selected collection (using local state)
   const isWordInCollection = (word: string) => {
     return localActiveWords?.has(word)
@@ -66,7 +59,7 @@ export const SearchContent = ({
     <div className="pb-[35px] space-y-6">
       {/* Results */}
       <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
-        {filteredResults.map((result, index) => {
+        {results.map((result, index) => {
           if (!result?.word) return null
           const termId = `${result.word}-${searchMode}-${index}`
           return (
@@ -74,7 +67,6 @@ export const SearchContent = ({
               key={termId}
               isActive={isWordInCollection(result.word)}
               onClick={() => onSelectWord(termId)}
-              matchType={searchMode}
             >
               {result.word}
             </SearchTerm>
@@ -83,7 +75,7 @@ export const SearchContent = ({
       </div>
 
       {/* Empty state */}
-      {filteredResults.length === 0 && (
+      {results.length === 0 && (
         <div className="text-center py-8 color-secondary-3">
           <p>No {searchMode === 'and' ? 'AND' : 'OR'} matches found.</p>
           {searchMode === 'and' && hasMultiplePhrases && (

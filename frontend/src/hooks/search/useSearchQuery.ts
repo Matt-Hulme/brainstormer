@@ -26,7 +26,7 @@ export const useSearchQuery = (
         },
         enabled: !!projectId && !!query,
         initialData: cachedResult || undefined,
-        staleTime: cachedResult ? 0 : 5 * 60 * 1000, // If we have cached data, consider it stale immediately to allow background refresh
+        staleTime: 5 * 60 * 1000, // Keep data fresh for 5 minutes regardless of cache status
         gcTime: 10 * 60 * 1000, // Keep in React Query cache for 10 minutes
     })
 } 
