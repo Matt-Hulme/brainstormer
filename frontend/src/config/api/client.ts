@@ -34,9 +34,6 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
 
-    // Log the full URL for debugging
-    const baseUrl = config.baseURL || ''
-    const url = config.url || ''
     return config
   },
   error => {

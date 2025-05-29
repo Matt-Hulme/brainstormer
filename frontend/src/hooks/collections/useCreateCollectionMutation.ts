@@ -15,7 +15,7 @@ export const useCreateCollectionMutation = () => {
             }
             return response
         },
-        onSuccess: (newCollection) => {
+        onSuccess: () => {
             // Invalidate collections list queries
             queryClient.invalidateQueries({ queryKey: ['collections'] })
         },

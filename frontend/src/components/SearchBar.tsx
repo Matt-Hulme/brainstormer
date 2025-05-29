@@ -64,7 +64,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
     }
   }
 
-  const onKeyDown = (e: KeyboardEvent, index: number) => {
+  const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       onSearch()
     }
@@ -119,7 +119,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
               className={className}
               maxLength={20}
               onChange={(e) => onPhraseChange(index, e.target.value)}
-              onKeyDown={(e) => onKeyDown(e, index)}
+              onKeyDown={onKeyDown}
               placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
               type="text"
               value={phrase}

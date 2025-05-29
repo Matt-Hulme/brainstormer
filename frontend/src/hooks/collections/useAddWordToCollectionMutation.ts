@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { collectionsApi } from '@/services/api/collections'
 import { toast } from 'react-toastify'
-import { Collection } from '@/types'
+import { Collection, Project } from '@/types'
 
 export const useAddWordToCollectionMutation = () => {
     const queryClient = useQueryClient()
@@ -41,7 +41,7 @@ export const useAddWordToCollectionMutation = () => {
             // Update the project cache to reflect the collection changes
             queryClient.setQueryData(
                 ['project', projectId],
-                (oldData: any) => {
+                (oldData: Project | undefined) => {
                     if (!oldData) return oldData
                     return {
                         ...oldData,

@@ -164,9 +164,11 @@ export const Search = () => {
 
         // Cache the search query for the new collection
         setLastSearch(collection.id, searchValue)
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error creating collection:', error)
-        const errorMessage = error?.response?.data?.detail ?? error?.message ?? 'Failed to create collection'
+        const errorMessage = error instanceof Error
+          ? error.message
+          : 'Failed to create collection'
         toast.error(errorMessage)
         setSelectedCollectionId(null)
       } finally {

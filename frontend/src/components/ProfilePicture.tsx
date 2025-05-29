@@ -1,4 +1,4 @@
-import { showUndevelopedFeatureToast } from '@/components'
+import { showUndevelopedFeatureToast } from '@/utils/toast'
 import profilePicture from '../assets/profile-picture.png'
 
 export const ProfilePicture = () => {
