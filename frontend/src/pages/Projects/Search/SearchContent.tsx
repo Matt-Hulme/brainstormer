@@ -12,6 +12,7 @@ interface SearchContentProps {
   localActiveWords: Set<string>
   searchMode: 'or' | 'and'
   hasMultiplePhrases: boolean
+  error?: boolean
 }
 
 export const SearchContent = ({
@@ -22,7 +23,8 @@ export const SearchContent = ({
   onRemoveWord,
   localActiveWords,
   searchMode,
-  hasMultiplePhrases
+  hasMultiplePhrases,
+  error = false
 }: SearchContentProps) => {
   const onSelectWord = useCallback(async (termId: string) => {
     // Get the full word/phrase by removing the match type and index
@@ -55,6 +57,15 @@ export const SearchContent = ({
     return localActiveWords?.has(word)
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full color-red">
+        Failed to load search results
+      </div>
+    )
+  }
+
   return (
     <div className="pb-[35px] space-y-6">
       {/* Results */}
@@ -74,7 +85,7 @@ export const SearchContent = ({
         })}
       </div>
 
-      {/* Empty state */}
+      {/* No results state */}
       {results.length === 0 && (
         <div className="text-center py-8 color-secondary-3">
           <p>No {searchMode === 'and' ? 'AND' : 'OR'} matches found.</p>

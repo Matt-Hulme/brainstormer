@@ -2,7 +2,6 @@ import { HamburgerSidebar } from '@/components/HamburgerSidebar'
 import { SearchBar, SearchBarRef } from '@/components/SearchBar'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
-import { SearchContentEmpty } from './SearchContentEmpty'
 import { CollectionsSidebar } from './CollectionsSidebar'
 import { Toggle } from '@/components'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
@@ -272,8 +271,7 @@ export const Search = () => {
             )}
 
             {isLoading && <SearchContentLoading />}
-            {searchError && <SearchContentEmpty />}
-            {!isLoading && !searchError && (
+            {!isLoading && searchValue && (
               <SearchContent
                 results={data?.suggestions ?? []}
                 selectedCollectionId={selectedCollectionId}
@@ -283,6 +281,7 @@ export const Search = () => {
                 localActiveWords={localActiveWords}
                 searchMode={searchMode}
                 hasMultiplePhrases={hasMultiplePhrases}
+                error={!!searchError}
               />
             )}
           </main>

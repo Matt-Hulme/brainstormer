@@ -23,7 +23,7 @@ export const HamburgerSidebar = ({ children }: HamburgerSidebarProps) => {
         </Button>
         {children}
       </div>
-      <ProfilePicture />
+      <ProfilePicture onClick={() => navigate('/')} />
     </aside>
   )
 }

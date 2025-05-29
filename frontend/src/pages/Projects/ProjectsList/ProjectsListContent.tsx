@@ -89,7 +89,7 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
             </span>
           </div>
           <div className="flex items-center justify-center h-32 text-secondary-2">
-            Loading collections...
+            Loading Projects...
           </div>
         </div>
       </div>
