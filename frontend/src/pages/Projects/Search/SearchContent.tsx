@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
-import { Toggle } from '@/components'
 import { toast } from 'react-toastify'
 
 interface SearchContentProps {
@@ -12,7 +11,6 @@ interface SearchContentProps {
   onRemoveWord: (word: string, collectionId: string) => Promise<void>
   localActiveWords: Set<string>
   searchMode: 'or' | 'and'
-  onSearchModeChange: (mode: 'or' | 'and') => void
   hasMultiplePhrases: boolean
 }
 
@@ -24,7 +22,6 @@ export const SearchContent = ({
   onRemoveWord,
   localActiveWords,
   searchMode,
-  onSearchModeChange,
   hasMultiplePhrases
 }: SearchContentProps) => {
   const onSelectWord = useCallback(async (termId: string) => {
@@ -67,21 +64,6 @@ export const SearchContent = ({
 
   return (
     <div className="pb-[35px] space-y-6">
-      {/* Search Mode Toggle - only show for multiple phrases */}
-      {hasMultiplePhrases && (
-        <div className="space-y-6">
-          <span className="text-p2 color-secondary-4">Search Mode</span>
-          <Toggle
-            checked={searchMode === 'and'}
-            onChange={(checked) => onSearchModeChange(checked ? 'and' : 'or')}
-            leftLabel="Or"
-            rightLabel="And"
-            variant="default"
-            size="md"
-          />
-        </div>
-      )}
-
       {/* Results */}
       <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
         {filteredResults.map((result, index) => {
@@ -103,9 +85,9 @@ export const SearchContent = ({
       {/* Empty state */}
       {filteredResults.length === 0 && (
         <div className="text-center py-8 color-secondary-3">
-          <p>No {searchMode === 'and' ? 'focused' : 'broad'} matches found.</p>
+          <p>No {searchMode === 'and' ? 'AND' : 'OR'} matches found.</p>
           {searchMode === 'and' && hasMultiplePhrases && (
-            <p className="text-sm mt-2">Try switching to "Broad" mode for more results.</p>
+            <p className="text-sm mt-2">Try switching to "OR" mode for more results.</p>
           )}
         </div>
       )}

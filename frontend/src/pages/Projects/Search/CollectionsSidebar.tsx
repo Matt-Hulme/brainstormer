@@ -51,7 +51,7 @@ export const CollectionsSidebar = ({
 
   if (isLoading) {
     return (
-      <div className="p-4 w-[300px]">
+      <div className="w-[300px]">
         <div className="flex flex-col gap-[16px] h-full">
           <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
           <div className="bg-secondary-1/30 h-[1px] w-full" />
@@ -62,7 +62,7 @@ export const CollectionsSidebar = ({
   }
 
   return (
-    <div className="p-4 w-[300px]">
+    <div className="w-[300px]">
       <div className="flex flex-col gap-[16px] h-full">
         <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
         <div className="bg-secondary-1/30 h-[1px] w-full" />

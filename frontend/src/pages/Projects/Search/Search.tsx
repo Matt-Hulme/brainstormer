@@ -4,6 +4,7 @@ import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { SearchContentEmpty } from './SearchContentEmpty'
 import { CollectionsSidebar } from './CollectionsSidebar'
+import { Toggle } from '@/components'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { useSearchQuery, useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
@@ -251,8 +252,23 @@ export const Search = () => {
       <div className="flex flex-col w-full h-screen">
         <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
 
-        <div className="flex flex-row pt-[25px]">
+        <div className="flex flex-row pt-[25px] gap-5">
           <main className="flex-1 h-full">
+            {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
+            {hasMultiplePhrases && searchValue && (
+              <div className="space-y-2 mb-6">
+                <span className="text-p2 color-secondary-4">Search Mode</span>
+                <Toggle
+                  checked={searchMode === 'and'}
+                  onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
+                  leftLabel="OR"
+                  rightLabel="AND"
+                  variant="default"
+                  size="md"
+                />
+              </div>
+            )}
+
             {isLoading && <SearchContentLoading />}
             {searchError && <SearchContentEmpty />}
             {!isLoading && !searchError && (
@@ -264,12 +280,11 @@ export const Search = () => {
                 onRemoveWord={handleRemoveWord}
                 localActiveWords={localActiveWords}
                 searchMode={searchMode}
-                onSearchModeChange={setSearchMode}
                 hasMultiplePhrases={hasMultiplePhrases}
               />
             )}
           </main>
-          <aside className="ml-5">
+          <aside>
             <CollectionsSidebar
               project={project}
               collections={collections}
