@@ -256,20 +256,17 @@ export const Search = () => {
       <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
 
       <div className="flex flex-row pt-[25px] gap-5">
-        <main className="flex-1 h-full">
+        <main className="flex-1 h-full space-y-6">
           {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
           {hasMultiplePhrases && searchValue && (
-            <div className="space-y-2 mb-6">
-              <span className="text-p2 color-secondary-4">Search Mode</span>
-              <Toggle
-                checked={searchMode === 'and'}
-                onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
-                leftLabel="OR"
-                rightLabel="AND"
-                variant="default"
-                size="md"
-              />
-            </div>
+            <Toggle
+              checked={searchMode === 'and'}
+              onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
+              leftLabel="OR"
+              rightLabel="AND"
+              variant="default"
+              size="md"
+            />
           )}
 
           {isLoading && <SearchContentLoading />}
