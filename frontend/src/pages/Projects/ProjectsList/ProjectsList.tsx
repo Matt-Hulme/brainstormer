@@ -14,7 +14,7 @@ export const ProjectsList = () => {
         <HamburgerSidebar />
         <div className="flex flex-col w-full">
           <SearchBar searchValue={''} />
-          <div className="flex items-center justify-center h-full text-secondary-2">Loading...</div>
+          <div className="text-secondary-2">Loading...</div>
         </div>
       </div>
     )
@@ -26,7 +26,7 @@ export const ProjectsList = () => {
         <HamburgerSidebar />
         <div className="flex flex-col w-full">
           <SearchBar searchValue={''} />
-          <div className="flex items-center justify-center h-full text-red-500">
+          <div className="text-red-500">
             Failed to load projects
           </div>
         </div>

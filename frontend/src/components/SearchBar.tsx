@@ -25,6 +25,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
 
   const initialPhrases = searchValue ? searchValue.split('+').map(p => p.trim()).filter(Boolean) : ['']
   const [phrases, setPhrases] = useState<string[]>(initialPhrases)
+  const hasPhrase = phrases.some(phrase => phrase.trim())
 
   // Expose clear and focus methods via ref
   useImperativeHandle(ref, () => ({
@@ -110,13 +111,13 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   }
 
   return (
-    <div className="border-b-[0.5px] flex flex-col items-start justify-between pb-[25px] pt-[30px] w-full pr-[30px]">
-      <div className="w-full flex flex-col gap-2">
+    <div className="border-b-[0.5px] flex flex-row items-center pb-[25px] pr-[30px] pt-[30px] w-full">
+      <div className="flex flex-row gap-2">
         {phrases.map((phrase, index) => (
-          <div key={index} className="flex items-center gap-2 w-full">
+          <div key={index} className="flex gap-2 items-center w-full">
             <Input
               ref={index === 0 ? firstInputRef : undefined}
-              className={className}
+              className={className + 'w-fit'}
               maxLength={20}
               onChange={(e) => onPhraseChange(index, e.target.value)}
               onKeyDown={onKeyDown}
@@ -126,7 +127,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
             />
             {phrases.length > 1 && (
               <Button
-                className="h-10 w-10 rounded-full"
+                className="color-secondary-3 h-10 rounded-full w-10"
                 onClick={() => onRemovePhrase(index)}
                 variant="icon"
               >
@@ -136,24 +137,21 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
           </div>
         ))}
       </div>
-
-      <div className="flex justify-between w-full mt-4">
-        {phrases.length < 3 && (
-          <Button
-            className="flex items-center gap-1"
-            disabled={phrases.length >= 3}
-            onClick={onAddPhrase}
-            variant="outline"
-          >
-            <Plus size={16} /> Add Phrase
-          </Button>
-        )}
-        <div className="ml-auto">
-          <Button onClick={onSearch} variant="outline">
-            Go
-          </Button>
-        </div>
-      </div>
+      {phrases.length < 3 && (
+        <Button
+          className="flex gap-1 items-center"
+          disabled={phrases.length >= 3}
+          onClick={onAddPhrase}
+          variant="icon"
+        >
+          <Plus size={16} />
+        </Button>
+      )}
+      {hasPhrase && <div>
+        <Button onClick={onSearch} variant="outline">
+          Go
+        </Button>
+      </div>}
     </div>
   )
 })
