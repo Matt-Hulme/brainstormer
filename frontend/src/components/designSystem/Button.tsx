@@ -5,6 +5,7 @@ import classNames from 'classnames'
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   textClass?: string
   variant?: 'primary' | 'default' | 'outline' | 'link' | 'text' | 'icon'
+  className?: string
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

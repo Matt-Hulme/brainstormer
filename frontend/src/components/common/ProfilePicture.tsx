@@ -1,4 +1,4 @@
-import profilePicture from '../assets/profile-picture.png'
+import profilePicture from '@/assets/profile-picture.png'
 
 interface ProfilePictureProps {
     onClick?: () => void

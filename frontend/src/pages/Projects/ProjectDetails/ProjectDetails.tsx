@@ -1,8 +1,8 @@
-import { Fragment } from 'react'
-import { X } from 'lucide-react'
+import { Fragment, } from 'react'
+import { X, } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AddCollectionChip } from '@/components'
-import { Button } from '@/components/design-system/Button'
+import { Button } from '@/components'
 import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery, useRemoveWordFromCollectionMutation } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
 

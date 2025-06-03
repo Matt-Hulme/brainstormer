@@ -1,10 +1,9 @@
 import { useCallback } from 'react'
+import { Button, Spinner } from '@/components'
 import { SearchTerm } from './SearchTerm'
 import { KeywordSuggestion } from '@/config/api/types'
 import { toast } from 'react-toastify'
-import { Button } from '@/components/design-system/Button'
 import { Plus } from 'lucide-react'
-import { Spinner } from '@/components/design-system/Spinner'
 
 interface SearchContentProps {
   results: KeywordSuggestion[]

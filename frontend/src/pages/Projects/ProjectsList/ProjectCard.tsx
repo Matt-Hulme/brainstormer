@@ -2,9 +2,7 @@ import { ArrowRight, Check, Edit2, Trash, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { Button } from '@/components/design-system/Button'
-import { Input } from '@/components/design-system/Input'
-import { ResultsCard } from '@/components/design-system/ResultsCard'
+import { Button, Input, ResultsCard } from '@/components'
 import { useDeleteProjectMutation, useUpdateProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {

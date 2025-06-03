@@ -1,5 +1,4 @@
-import { SearchBar } from '@/components/SearchBar'
-import { HamburgerSidebar } from '../../../components/HamburgerSidebar'
+import { SearchBar, HamburgerSidebar } from '@/components'
 import { ProjectsListContent } from './ProjectsListContent'
 import { ProjectsListContentEmpty } from './ProjectsListContentEmpty'
 import { useGetProjectsQuery } from '@/hooks'

@@ -2,12 +2,10 @@ import { KeyboardEvent, useEffect, useState, forwardRef, useImperativeHandle, us
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
-import { Button } from './design-system/Button'
-import { Input } from './design-system/Input'
+import { Button, Input } from '../../designSystem'
 
 interface SearchBarProps {
   className?: string
-  onChange?: (value: string) => void
   searchValue: string
 }
 
@@ -16,7 +14,7 @@ export interface SearchBarRef {
   focus: () => void
 }
 
-export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', onChange, searchValue }, ref) => {
+export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', searchValue }, ref) => {
   const navigate = useNavigate()
   const { projectId } = useParams<{ projectId?: string }>()
   const createProjectMutation = useCreateProjectMutation()
@@ -73,20 +71,16 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
 
   const onPhraseChange = (index: number, value: string) => {
     const newPhrases = [...phrases]
-    newPhrases[index] = value
+    // Replace multiple consecutive spaces with single spaces
+    const sanitizedValue = value.replace(/\s{2,}/g, ' ')
+    newPhrases[index] = sanitizedValue
     setPhrases(newPhrases)
-
-    const joinedValue = newPhrases.filter(Boolean).join(' + ')
-    onChange?.(joinedValue)
   }
 
   const onRemovePhrase = (index: number) => {
     if (phrases.length > 1) {
       const newPhrases = phrases.filter((_, i) => i !== index)
       setPhrases(newPhrases)
-
-      const joinedValue = newPhrases.filter(Boolean).join(' + ')
-      onChange?.(joinedValue)
     }
   }
 
@@ -111,49 +105,53 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   }
 
   return (
-    <div className="border-b-[0.5px] flex flex-row items-center pb-[25px] pr-[30px] pt-[30px] w-full">
-      <div className="flex flex-row gap-2">
-        {phrases.map((phrase, index) => (
-          <div key={index} className="flex gap-2 items-center w-full">
-            <Input
-              ref={index === 0 ? firstInputRef : undefined}
-              className={className + 'w-fit'}
-              maxLength={20}
-              onChange={(e) => onPhraseChange(index, e.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
-              type="text"
-              value={phrase}
-            />
-            {phrases.length > 1 && (
-              <Button
-                className="color-secondary-3 h-10 rounded-full w-10"
-                onClick={() => onRemovePhrase(index)}
-                variant="icon"
-              >
-                <X size={16} />
-              </Button>
-            )}
-          </div>
-        ))}
+    <div className="border-b-[0.5px] flex items-center pb-[25px] pr-[30px] pt-[30px]">
+      <div className="flex flex-row gap-2 items-center">
+        {phrases.map((phrase, index) => {
+          const placeholder = index === 0 ? "Start a new search" : "Add another phrase"
+          return (
+            <div key={index} className="flex gap-[10px] items-center">
+              <Input
+                ref={index === 0 ? firstInputRef : undefined}
+                className={`${className}`}
+                maxLength={30}
+                onChange={(e) => onPhraseChange(index, e.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder={placeholder}
+                size={phrase ? phrase.length + 2 : placeholder.length}
+                type="text"
+                value={phrase}
+              />
+              {phrases.length > 1 && (
+                <Button
+                  className="color-secondary-3 h-10 rounded-full w-10"
+                  onClick={() => onRemovePhrase(index)}
+                  variant="icon"
+                >
+                  <X size={16} />
+                </Button>
+              )}
+            </div>
+          )
+        })}
+        {phrases.length < 3 && hasPhrase && (
+          <Button
+            className="flex gap-1 items-center"
+            disabled={phrases.length >= 3}
+            onClick={onAddPhrase}
+            variant="icon"
+          >
+            <Plus size={16} />
+          </Button>
+        )}
       </div>
-      {phrases.length < 3 && (
-        <Button
-          className="flex gap-1 items-center"
-          disabled={phrases.length >= 3}
-          onClick={onAddPhrase}
-          variant="icon"
-        >
-          <Plus size={16} />
-        </Button>
-      )}
-      {hasPhrase && <div>
-        <Button onClick={onSearch} variant="outline">
+      {hasPhrase && (
+        <Button className="ml-auto" onClick={onSearch} variant="outline">
           Go
         </Button>
-      </div>}
+      )}
     </div>
   )
 })
 
-SearchBar.displayName = 'SearchBar'
+SearchBar.displayName = 'SearchBar' 

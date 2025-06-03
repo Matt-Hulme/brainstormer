@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react'
-import { Chip } from './design-system/Chip'
+import { Chip } from '../designSystem'
 
 interface AddCollectionChipProps {
   className?: string
