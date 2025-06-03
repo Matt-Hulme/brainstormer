@@ -1,14 +1,10 @@
 import { format } from 'date-fns'
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, Edit2, X } from 'lucide-react'
-import profilePicture from '@/assets/profile-picture.png'
-import { Button } from '@/components/design-system/Button'
-import { Input } from '@/components/design-system/Input'
+import { Button, Input, ProfilePicture } from '@/components'
 import { useUpdateProjectMutation } from '@/hooks'
 import { Project } from '@/types'
 import { toast } from 'react-toastify'
-import { ProfilePicture } from '@/components/ProfilePicture'
-import { showUndevelopedFeatureToast } from '@/utils/toast'
 
 interface ProjectDetailsHeaderProps {
   project: Project | null

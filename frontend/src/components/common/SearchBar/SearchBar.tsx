@@ -2,12 +2,10 @@ import { KeyboardEvent, useEffect, useState, forwardRef, useImperativeHandle, us
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
-import { Button } from './design-system/Button'
-import { Input } from './design-system/Input'
+import { Button, Input } from '../../designSystem'
 
 interface SearchBarProps {
   className?: string
-  onChange?: (value: string) => void
   searchValue: string
 }
 
@@ -16,7 +14,7 @@ export interface SearchBarRef {
   focus: () => void
 }
 
-export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', onChange, searchValue }, ref) => {
+export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', searchValue }, ref) => {
   const navigate = useNavigate()
   const { projectId } = useParams<{ projectId?: string }>()
   const createProjectMutation = useCreateProjectMutation()
@@ -25,6 +23,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
 
   const initialPhrases = searchValue ? searchValue.split('+').map(p => p.trim()).filter(Boolean) : ['']
   const [phrases, setPhrases] = useState<string[]>(initialPhrases)
+  const hasPhrase = phrases.some(phrase => phrase.trim())
 
   // Expose clear and focus methods via ref
   useImperativeHandle(ref, () => ({
@@ -72,20 +71,16 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
 
   const onPhraseChange = (index: number, value: string) => {
     const newPhrases = [...phrases]
-    newPhrases[index] = value
+    // Replace multiple consecutive spaces with single spaces
+    const sanitizedValue = value.replace(/\s{2,}/g, ' ')
+    newPhrases[index] = sanitizedValue
     setPhrases(newPhrases)
-
-    const joinedValue = newPhrases.filter(Boolean).join(' + ')
-    onChange?.(joinedValue)
   }
 
   const onRemovePhrase = (index: number) => {
     if (phrases.length > 1) {
       const newPhrases = phrases.filter((_, i) => i !== index)
       setPhrases(newPhrases)
-
-      const joinedValue = newPhrases.filter(Boolean).join(' + ')
-      onChange?.(joinedValue)
     }
   }
 
@@ -110,52 +105,53 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   }
 
   return (
-    <div className="border-b-[0.5px] flex flex-col items-start justify-between pb-[25px] pt-[30px] w-full pr-[30px]">
-      <div className="w-full flex flex-col gap-2">
-        {phrases.map((phrase, index) => (
-          <div key={index} className="flex items-center gap-2 w-full">
-            <Input
-              ref={index === 0 ? firstInputRef : undefined}
-              className={className}
-              maxLength={20}
-              onChange={(e) => onPhraseChange(index, e.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder={index === 0 ? "Start a new search" : "Add another phrase"}
-              type="text"
-              value={phrase}
-            />
-            {phrases.length > 1 && (
-              <Button
-                className="h-10 w-10 rounded-full"
-                onClick={() => onRemovePhrase(index)}
-                variant="icon"
-              >
-                <X size={16} />
-              </Button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-between w-full mt-4">
-        {phrases.length < 3 && (
+    <div className="border-b-[0.5px] flex items-center pb-[25px] pr-[30px] pt-[30px]">
+      <div className="flex flex-row gap-2 items-center">
+        {phrases.map((phrase, index) => {
+          const placeholder = index === 0 ? "Start a new search" : "Add another phrase"
+          return (
+            <div key={index} className="flex gap-[10px] items-center">
+              <Input
+                ref={index === 0 ? firstInputRef : undefined}
+                className={`${className}`}
+                maxLength={30}
+                onChange={(e) => onPhraseChange(index, e.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder={placeholder}
+                size={phrase ? phrase.length + 2 : placeholder.length}
+                type="text"
+                value={phrase}
+              />
+              {phrases.length > 1 && (
+                <Button
+                  className="color-secondary-3 h-10 rounded-full w-10"
+                  onClick={() => onRemovePhrase(index)}
+                  variant="icon"
+                >
+                  <X size={16} />
+                </Button>
+              )}
+            </div>
+          )
+        })}
+        {phrases.length < 3 && hasPhrase && (
           <Button
-            className="flex items-center gap-1"
+            className="flex gap-1 items-center"
             disabled={phrases.length >= 3}
             onClick={onAddPhrase}
-            variant="outline"
+            variant="icon"
           >
-            <Plus size={16} /> Add Phrase
+            <Plus size={16} />
           </Button>
         )}
-        <div className="ml-auto">
-          <Button onClick={onSearch} variant="outline">
-            Go
-          </Button>
-        </div>
       </div>
+      {hasPhrase && (
+        <Button className="ml-auto" onClick={onSearch} variant="outline">
+          Go
+        </Button>
+      )}
     </div>
   )
 })
 
-SearchBar.displayName = 'SearchBar'
+SearchBar.displayName = 'SearchBar' 

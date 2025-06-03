@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import { Home, Login, ProjectDetails, ProjectsList, Search } from './pages'
 import { Layout, ProtectedRoute } from './components'
-import { Toast } from './components/design-system/Toast'
+import { Toast } from '@/components'
 
 export const App = () => {
   return (

@@ -1,7 +1,7 @@
 import { Menu } from 'lucide-react'
 import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from './design-system/Button'
+import { Button } from '../designSystem'
 import { ProfilePicture } from './ProfilePicture'
 
 interface HamburgerSidebarProps {

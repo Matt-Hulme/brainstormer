@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
-import { Button } from '@/components/design-system/Button'
+import { Button } from '@/components'
 import { useDeleteCollectionMutation } from '@/hooks'
 import { Project, Collection } from '@/types'
 

@@ -1,4 +1,4 @@
-import { SearchBar, SearchBarRef } from '@/components/SearchBar'
+import { SearchBar, SearchBarRef } from '@/components'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { CollectionsSidebar } from './CollectionsSidebar'
