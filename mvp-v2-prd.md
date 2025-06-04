@@ -106,7 +106,7 @@ Based on cofounder feedback from initial walkthrough, the following improvements
 - [x] **Project navigation**: Project details page (when clicking into a project card) needs to navigate to the correct/most recent search, not just the last search performed
 
 ### Loading & UX Improvements
-- [ ] **Better loading treatment**: Improve loading states on the Search.tsx page (spinner should work)
+- [x] **Better loading treatment**: Improve loading states on the Search.tsx page (spinner should work)
 
 These updates focus on polish and user experience improvements ixdentified during the walkthrough process.
 
