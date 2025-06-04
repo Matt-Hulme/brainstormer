@@ -2,7 +2,7 @@ import { KeyboardEvent, useEffect, useState, forwardRef, useImperativeHandle, us
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
-import { Button } from '../designSystem'
+import { AutoSizeInput, Button } from '../designSystem'
 
 interface SearchBarProps {
   className?: string
@@ -13,42 +13,6 @@ export interface SearchBarRef {
   clear: () => void
   focus: () => void
 }
-
-const AutoSizeInput = forwardRef<HTMLInputElement, {
-  className?: string
-  maxLength?: number
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onKeyDown: (e: KeyboardEvent) => void
-  placeholder: string
-  value: string
-}>(({ className = '', maxLength, onChange, onKeyDown, placeholder, value }, ref) => {
-  // If there's actual content, measure that. Otherwise use placeholder with minimum fallback
-  const measureText = value.length > 0 ? value : placeholder || 'Type here'
-
-  return (
-    <div className="relative" style={{ width: 'fit-content', display: 'inline-block' }}>
-      <div
-        className={`${className} invisible whitespace-pre pointer-events-none select-none`}
-        aria-hidden="true"
-      >
-        {measureText}
-      </div>
-      <input
-        ref={ref}
-        className={`${className} bg-transparent border-0 outline-0 absolute top-0 left-0 w-full h-full`}
-        maxLength={maxLength}
-        onChange={onChange}
-        onFocus={(e) => e.target.select()}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        type="text"
-        value={value}
-      />
-    </div>
-  )
-})
-
-AutoSizeInput.displayName = 'AutoSizeInput'
 
 export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className = '', searchValue }, ref) => {
   const navigate = useNavigate()
@@ -149,7 +113,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
             <div key={index} className="flex gap-[10px] items-center flex-shrink-0">
               <AutoSizeInput
                 ref={index === 0 ? firstInputRef : undefined}
-                className={`${className}`}
+                className={className}
                 maxLength={40}
                 onChange={(e) => onPhraseChange(index, e.target.value)}
                 onKeyDown={onKeyDown}

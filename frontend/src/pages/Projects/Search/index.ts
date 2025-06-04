@@ -1,4 +1,5 @@
 export { Search } from './Search'
 export { SearchContent } from './SearchContent'
+export { SearchContentEmpty } from './SearchContentEmpty'
 export { SearchContentLoading } from './SearchContentLoading'
 export { CollectionsSidebar } from './CollectionsSidebar'
