@@ -38,6 +38,7 @@ const AutoSizeInput = forwardRef<HTMLInputElement, {
         className={`${className} bg-transparent border-0 outline-0 absolute top-0 left-0 w-full h-full`}
         maxLength={maxLength}
         onChange={onChange}
+        onFocus={(e) => e.target.select()}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         type="text"
