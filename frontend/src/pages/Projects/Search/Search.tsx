@@ -1,4 +1,3 @@
-import { SearchBar, SearchBarRef } from '@/components'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
 import { CollectionsSidebar } from './CollectionsSidebar'
@@ -20,7 +19,6 @@ export const Search = () => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
-  const searchBarRef = useRef<SearchBarRef>(null)
   const { results, isLoading: searchLoading, isLoadingMore, error: searchError, loadMore, canLoadMore } = useSearchWithLoadMore(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
   const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
@@ -74,16 +72,9 @@ export const Search = () => {
   useEffect(() => {
     if (focusParam === 'true') {
       // Clear and focus the search bar
-      searchBarRef.current?.clear()
-      searchBarRef.current?.focus()
-
-      // Clean up the focus parameter from URL
-      const newParams = new URLSearchParams(searchParams)
-      newParams.delete('focus')
-      const newUrl = newParams.toString() ? `?${newParams.toString()}` : ''
-      navigate(`/projects/${projectId}/search${newUrl}`, { replace: true })
+      navigate(`/projects/${projectId}/search`, { replace: true })
     }
-  }, [focusParam, navigate, projectId, searchParams])
+  }, [focusParam, navigate, projectId])
 
   // Create or select a collection when search is performed
   useEffect(() => {
@@ -238,10 +229,8 @@ export const Search = () => {
   }, [navigate, projectId, searchParams])
 
   const onAddCollection = useCallback(() => {
-    // Clear the search bar and focus it
-    searchBarRef.current?.clear()
-    searchBarRef.current?.focus()
-  }, [])
+    navigate(`/projects/${projectId}/search`, { replace: true })
+  }, [navigate, projectId])
 
   const onLoadMore = useCallback(async (excludeWords: string[]) => {
     if (!canLoadMore) return
@@ -253,9 +242,7 @@ export const Search = () => {
 
   return (
     <div className="flex flex-col w-full h-screen">
-      <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
-
-      <div className="flex flex-row pt-[25px] gap-5">
+      <div className="flex flex-row pt-[25px] gap-5 px-[30px]">
         <main className="flex-1 h-full space-y-6">
           {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
           {hasMultiplePhrases && searchValue && (

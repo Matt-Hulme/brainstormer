@@ -56,7 +56,7 @@ export const ProjectDetails = () => {
   }
 
   return (
-    <div className="flex flex-col w-full gap-[30px]">
+    <div className="flex flex-col w-full gap-[30px] p-[30px]">
       <ProjectDetailsHeader project={project ?? null} />
       <main className="grid [grid-template-columns:minmax(220px,auto)_1fr] gap-x-[120px] gap-y-[30px]">
         <div className="text-p3 color-secondary-4">COLLECTIONS</div>
