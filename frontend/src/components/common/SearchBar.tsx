@@ -2,7 +2,7 @@ import { KeyboardEvent, useEffect, useState, forwardRef, useImperativeHandle, us
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { useCreateProjectMutation, useGetProjectsQuery } from '@/hooks'
-import { Button, Input } from '../../designSystem'
+import { AutoSizeInput, Button } from '../designSystem'
 
 interface SearchBarProps {
   className?: string
@@ -106,25 +106,23 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
 
   return (
     <div className="border-b-[0.5px] flex items-center pb-[25px] pr-[30px] pt-[30px]">
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row gap-[10px] items-center flex-wrap">
         {phrases.map((phrase, index) => {
           const placeholder = index === 0 ? "Start a new search" : "Add another phrase"
           return (
-            <div key={index} className="flex gap-[10px] items-center">
-              <Input
+            <div key={index} className="flex gap-[10px] items-center flex-shrink-0">
+              <AutoSizeInput
                 ref={index === 0 ? firstInputRef : undefined}
-                className={`${className}`}
-                maxLength={30}
+                className={className}
+                maxLength={40}
                 onChange={(e) => onPhraseChange(index, e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder={placeholder}
-                size={phrase ? phrase.length + 2 : placeholder.length}
-                type="text"
                 value={phrase}
               />
               {phrases.length > 1 && (
                 <Button
-                  className="color-secondary-3 h-10 rounded-full w-10"
+                  className="color-secondary-3 h-10 rounded-full w-10 flex-shrink-0"
                   onClick={() => onRemovePhrase(index)}
                   variant="icon"
                 >
@@ -136,7 +134,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
         })}
         {phrases.length < 3 && hasPhrase && (
           <Button
-            className="flex gap-1 items-center"
+            className="flex gap-1 items-center flex-shrink-0"
             disabled={phrases.length >= 3}
             onClick={onAddPhrase}
             variant="icon"
@@ -146,7 +144,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
         )}
       </div>
       {hasPhrase && (
-        <Button className="ml-auto" onClick={onSearch} variant="outline">
+        <Button className="ml-auto flex-shrink-0" onClick={onSearch} variant="outline">
           Go
         </Button>
       )}
@@ -154,4 +152,4 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({ className =
   )
 })
 
-SearchBar.displayName = 'SearchBar' 
+SearchBar.displayName = 'SearchBar'

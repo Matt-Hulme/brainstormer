@@ -1,8 +1,9 @@
-import { SearchBar, SearchBarRef } from '@/components'
 import { SearchContentLoading } from './SearchContentLoading'
 import { SearchContent } from './SearchContent'
+import { SearchContentEmpty } from './SearchContentEmpty'
 import { CollectionsSidebar } from './CollectionsSidebar'
 import { Toggle } from '@/components'
+import { useSearchBarContext } from '@/components'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
 import { useSearchWithLoadMore } from '@/hooks/search/useSearchWithLoadMore'
@@ -13,6 +14,7 @@ export const Search = () => {
   const { projectId } = useParams<{ projectId: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { clearAndFocusSearchBar } = useSearchBarContext()
   const searchValue = searchParams.get('q') ?? ''
   const searchMode = searchParams.get('mode') as 'or' | 'and' ?? 'or'
   const collectionParam = searchParams.get('collection')
@@ -20,7 +22,6 @@ export const Search = () => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
-  const searchBarRef = useRef<SearchBarRef>(null)
   const { results, isLoading: searchLoading, isLoadingMore, error: searchError, loadMore, canLoadMore } = useSearchWithLoadMore(projectId ?? '', searchValue, searchMode)
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
   const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
@@ -74,16 +75,10 @@ export const Search = () => {
   useEffect(() => {
     if (focusParam === 'true') {
       // Clear and focus the search bar
-      searchBarRef.current?.clear()
-      searchBarRef.current?.focus()
-
-      // Clean up the focus parameter from URL
-      const newParams = new URLSearchParams(searchParams)
-      newParams.delete('focus')
-      const newUrl = newParams.toString() ? `?${newParams.toString()}` : ''
-      navigate(`/projects/${projectId}/search${newUrl}`, { replace: true })
+      clearAndFocusSearchBar()
+      navigate(`/projects/${projectId}/search`, { replace: true })
     }
-  }, [focusParam, navigate, projectId, searchParams])
+  }, [focusParam, navigate, projectId, clearAndFocusSearchBar])
 
   // Create or select a collection when search is performed
   useEffect(() => {
@@ -238,10 +233,9 @@ export const Search = () => {
   }, [navigate, projectId, searchParams])
 
   const onAddCollection = useCallback(() => {
-    // Clear the search bar and focus it
-    searchBarRef.current?.clear()
-    searchBarRef.current?.focus()
-  }, [])
+    // Clear the search and navigate to a fresh search state to start new collection creation
+    navigate(`/projects/${projectId}/search?focus=true`, { replace: true })
+  }, [navigate, projectId])
 
   const onLoadMore = useCallback(async (excludeWords: string[]) => {
     if (!canLoadMore) return
@@ -253,9 +247,7 @@ export const Search = () => {
 
   return (
     <div className="flex flex-col w-full h-screen">
-      <SearchBar ref={searchBarRef} searchValue={searchValue} className="text-h3 text-secondary-4" />
-
-      <div className="flex flex-row pt-[25px] gap-5">
+      <div className="flex flex-row pt-[25px] gap-5 px-[30px]">
         <main className="flex-1 h-full space-y-6">
           {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
           {hasMultiplePhrases && searchValue && (
@@ -270,6 +262,7 @@ export const Search = () => {
           )}
 
           {isLoading && <SearchContentLoading />}
+          {!isLoading && !searchValue && <SearchContentEmpty />}
           {!isLoading && searchValue && (
             <SearchContent
               results={results}

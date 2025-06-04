@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import { useEffect, useRef, useState } from 'react'
 import { Check, Edit2, X } from 'lucide-react'
-import { Button, Input, ProfilePicture } from '@/components'
+import { AutoSizeInput, Button, ProfilePicture } from '@/components'
 import { useUpdateProjectMutation } from '@/hooks'
 import { Project } from '@/types'
 import { toast } from 'react-toastify'
@@ -85,7 +85,7 @@ export const ProjectDetailsHeader = ({ project }: ProjectDetailsHeaderProps) => 
         <div className="flex items-center gap-[8px]">
           {isEditing ? (
             <div className="flex items-center gap-[8px]">
-              <Input
+              <AutoSizeInput
                 ref={inputRef}
                 className="text-h3 text-secondary-4"
                 onChange={(e) => setEditValue(e.target.value)}

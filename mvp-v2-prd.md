@@ -95,18 +95,18 @@ It helps users generate and organize keyword ideas.
 Based on cofounder feedback from initial walkthrough, the following improvements are needed:
 
 ### Search Bar Improvements
-- [ ] **Button alignment**: Fix visual alignment of search button with input field
-- [ ] **Extra phrase cleanup**: Change these to be inline
-- [ ] **Text contrast**: Make actual search text darker than placeholder text for better readability
-- [ ] **Term highlighting**: Clicking on a search term in the Search Bar should focus AND highlight that specific term
+- [x] **Button alignment**: Fix visual alignment of search button with input field
+- [x] **Extra phrase cleanup**: Change these to be inline
+- [x] **Text contrast**: Make actual search text darker than placeholder text for better readability
+- [x] **Term highlighting**: Clicking on a search term in the Search Bar should focus AND highlight that specific term
 
 ### Navigation & Sidebar Updates
-- [ ] **Dynamic left sidebar**: Left sidebar should sometimes show a back arrow usually, but when on the ProjectDetails page, show the hamburger menu that triggers the 'undeveloped toast'
-- [ ] **Add collection functionality**: "Add a collection" button in right sidebar needs to trigger a new search flow instead of just focusing the search bar
-- [ ] **Project navigation**: Project details page (when clicking into a project card) needs to navigate to the correct/most recent search, not just the last search performed
+- [x] **Dynamic left sidebar**: Left sidebar should sometimes show a back arrow usually, but when on the ProjectDetails page, show the hamburger menu that triggers the 'undeveloped toast'
+- [x] **Add collection functionality**: "Add a collection" button in right sidebar needs to trigger a new search flow instead of just focusing the search bar
+- [x] **Project navigation**: Project details page (when clicking into a project card) needs to navigate to the correct/most recent search, not just the last search performed
 
 ### Loading & UX Improvements
-- [ ] **Better loading treatment**: Improve loading states on the Search.tsx page (spinner should work)
+- [x] **Better loading treatment**: Improve loading states on the Search.tsx page (spinner should work)
 
 These updates focus on polish and user experience improvements ixdentified during the walkthrough process.
 

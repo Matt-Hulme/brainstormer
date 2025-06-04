@@ -1,7 +1,7 @@
 export { Alert } from './Alert'
+export { AutoSizeInput } from './AutoSizeInput'
 export { Button } from './Button'
 export { Chip } from './Chip'
-export { Input } from './Input'
 export { ResultsCard } from './ResultsCard'
 export { Spinner } from './Spinner'
 export { Toast } from './Toast'

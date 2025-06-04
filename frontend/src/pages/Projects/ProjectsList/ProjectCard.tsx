@@ -2,7 +2,7 @@ import { ArrowRight, Check, Edit2, Trash, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { Button, Input, ResultsCard } from '@/components'
+import { AutoSizeInput, Button, ResultsCard } from '@/components'
 import { useDeleteProjectMutation, useUpdateProjectMutation } from '@/hooks'
 
 interface ProjectCardProps {
@@ -98,7 +98,7 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
         <div className="space-y-[4px]">
           {isEditing ? (
             <div className="flex items-center gap-[8px] relative" onClick={onInputClick}>
-              <Input
+              <AutoSizeInput
                 ref={inputRef}
                 className="text-h3 text-secondary-4"
                 onChange={(e) => setEditValue(e.target.value)}

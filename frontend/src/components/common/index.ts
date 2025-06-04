@@ -1,6 +1,6 @@
 export { AddCollectionChip } from './AddCollectionChip'
 export { HamburgerSidebar } from './HamburgerSidebar'
-export { Layout } from './Layout'
+export { Layout, useSearchBarContext } from './Layout'
 export { ProfilePicture } from './ProfilePicture'
 export { ProtectedRoute } from './ProtectedRoute'
 export { SearchBar } from './SearchBar'
