@@ -105,4 +105,16 @@ async def delete_project(project_id: str, request: Request):
     if not result.data:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    return {"message": "Project deleted successfully"} 
+    return {"message": "Project deleted successfully"}
+
+@router.delete("/bulk/all")
+async def delete_all_projects(request: Request):
+    """Delete all projects for the authenticated user."""
+    supabase = get_supabase_client()
+    
+    result = supabase.table("projects")\
+        .delete()\
+        .eq("user_id", request.state.user_id)\
+        .execute()
+    
+    return {"message": "All projects deleted successfully"} 

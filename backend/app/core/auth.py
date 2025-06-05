@@ -35,35 +35,28 @@ class User(BaseModel):
 # Get guest credentials from environment
 GUEST_USERNAME = settings.GUEST_USERNAME
 GUEST_PASSWORD = settings.GUEST_PASSWORD
-GUEST_USER_ID = str(uuid.uuid4())  # Generate a unique UUID for guest at startup
 
 def get_user(username: str):
     """Get user by username"""
-    logger.info(f"Attempting to get user with username: {username}")
     if username == GUEST_USERNAME:
-        logger.info("Username matches GUEST_USERNAME")
+        # Generate a unique anonymous ID for each login session
+        unique_anonymous_id = str(uuid.uuid4())
         return {
             "username": GUEST_USERNAME,
-            "anonymous_id": GUEST_USER_ID,  # Use UUID for guest
+            "anonymous_id": unique_anonymous_id,  # Use unique UUID for each session
             "disabled": False
         }
-    logger.info("Username does not match GUEST_USERNAME")
     return None
 
 def authenticate_user(username: str, password: str):
     """Authenticate a user"""
-    logger.info(f"Attempting to authenticate user: {username}")
-    
     user = get_user(username)
     if not user:
-        logger.info(f"User not found: {username}")
         return False
     
     if password != GUEST_PASSWORD:
-        logger.info(f"Password verification failed for user: {username}")
         return False
     
-    logger.info(f"Authentication successful for user: {username}")
     return user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -111,6 +104,13 @@ async def verify_user_auth(request: Request) -> str:
         if not anonymous_id:
             raise HTTPException(status_code=401, detail="Invalid authentication")
         return anonymous_id
+    except JWTError as e:
+        if "Signature has expired" in str(e):
+            logger.error(f"Token expired for request: {request.url.path}")
+            raise HTTPException(status_code=401, detail="Token expired. Please log in again.")
+        else:
+            logger.error(f"JWT error: {str(e)}")
+            raise HTTPException(status_code=401, detail="Invalid token. Please log in again.")
     except Exception as e:
         logger.error(f"Authentication error: {str(e)}")
-        raise HTTPException(status_code=401, detail="Invalid authentication") 
+        raise HTTPException(status_code=401, detail="Authentication failed. Please log in again.") 
