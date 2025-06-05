@@ -97,7 +97,7 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
       <div className="flex flex-row items-center justify-between w-full">
         <div className="space-y-[4px]">
           {isEditing ? (
-            <div className="flex items-center gap-[8px] relative" onClick={onInputClick}>
+            <div className="inline-flex items-center gap-[8px] relative" onClick={onInputClick}>
               <AutoSizeInput
                 ref={inputRef}
                 className="text-h3 text-secondary-4"
@@ -121,18 +121,15 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-[8px] relative">
+            <div className="inline-flex items-center gap-[8px] relative group">
               <h3 className="line-clamp-1 text-h3 text-secondary-4">{name ? name : 'New Project'}</h3>
-              <div className="group">
-                <div className="absolute left-0 top-0 w-[400px] h-full" />
-                <Button
-                  className="opacity-0 group-hover:opacity-100 transition-opacity color-secondary-3 relative z-10"
-                  onClick={onEditClick}
-                  variant="icon"
-                >
-                  <Edit2 size={16} />
-                </Button>
-              </div>
+              <Button
+                className="opacity-0 group-hover:opacity-100 transition-opacity color-secondary-3 relative"
+                onClick={onEditClick}
+                variant="icon"
+              >
+                <Edit2 size={16} />
+              </Button>
             </div>
           )}
           <div className="flex flex-row gap-[10px] items-center">
