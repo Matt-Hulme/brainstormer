@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from typing import List, Optional
 from pydantic import BaseModel
+from datetime import datetime
 from ..core.database import get_supabase_client
 from ..core.openai_client import get_openai_client
 import re
@@ -50,10 +51,9 @@ async def search_keywords(
         # Generate results based on search mode
         if len(phrases) == 1:
             # Single phrase - always generate broad results (search_mode doesn't matter for single phrases)
-            or_query = search.query
-            system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to "{or_query}".
+            system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to "{search.query}".
                 Instructions:
-                - Generate at least 100 words or phrases related to "{or_query}"
+                - Generate at least 100 words or phrases related to "{search.query}"
                 - Include both single words and multi-word phrases, evenly mixed
                 - The words should not be organized in any particular order
                 - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
@@ -61,23 +61,8 @@ async def search_keywords(
                 - Do not number your list
                 - Separate items using ONLY line breaks
 
-                The goal is to provide a wide range of potential connections to "{or_query}" across different domains and contexts."""
-            
-            response = await openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": system_message}],
-                temperature=1.0,
-            )
-            
-            # Process suggestions - set match_type to "or" for single phrases
-            suggestions_text = response.choices[0].message.content.strip()
-            # Split by newlines and clean each item
-            or_suggestions = [
-                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
-                for word in suggestions_text.split('\n')
-                if word.strip()
-            ]
-            suggestions.extend(or_suggestions)
+                The goal is to provide a wide range of potential connections to "{search.query}" across different domains and contexts."""
+            match_type = "or"
             
         elif len(phrases) > 1 and search.search_mode == "or":
             # Multiple phrases in OR mode - generate OR results
@@ -94,27 +79,11 @@ async def search_keywords(
                 - Separate items using ONLY line breaks
 
                 The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
+            match_type = "or"
             
-            response = await openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": system_message}],
-                temperature=1.0,
-            )
-            
-            # Process suggestions - set match_type to "or"
-            suggestions_text = response.choices[0].message.content.strip()
-            # Split by newlines and clean each item
-            or_suggestions = [
-                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="or") 
-                for word in suggestions_text.split('\n')
-                if word.strip()
-            ]
-            suggestions.extend(or_suggestions)
-        
         elif len(phrases) > 1 and search.search_mode == "and":
             # Multiple phrases in AND mode - generate AND results
             all_phrases = " AND ".join([f'"{phrase}"' for phrase in phrases])
-            
             system_message = f"""You are a Focused Brainstormer. Your job is to generate keywords that MUST be strongly related to ALL of the following concepts simultaneously: {all_phrases}.
                 Instructions:
                 - Generate words or phrases that have a DIRECT and MEANINGFUL connection to EACH of these concepts: {all_phrases}
@@ -128,22 +97,41 @@ async def search_keywords(
                 - Separate items using ONLY line breaks
                 
                 The goal is to find the TRUE intersection of these different concepts - words that genuinely relate to ALL of them simultaneously."""
+            match_type = "and"
             
-            response = await openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": system_message}],
-                temperature=1.0,
-            )
-            
-            # Process suggestions - set match_type to "and"
-            suggestions_text = response.choices[0].message.content.strip()
-            # Split by newlines and clean each item
-            and_suggestions = [
-                KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type="and") 
-                for word in suggestions_text.split('\n')
-                if word.strip()
-            ]
-            suggestions.extend(and_suggestions)
+        else:
+            # Fallback case - default to OR mode for multiple phrases
+            phrases_list = ", ".join([f'"{phrase}"' for phrase in phrases])
+            system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to ANY of these phrases: {phrases_list}.
+                Instructions:
+                - Generate at least 100 words or phrases related to ONE OR MORE of these phrases: {phrases_list}
+                - Each suggestion should clearly relate to at least one of the phrases
+                - Include both single words and multi-word phrases, evenly mixed
+                - The words should not be organized in any particular order
+                - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
+                - Each item should be on its own line with NO prefix characters (no bullet points, no dashes)
+                - Do not number your list
+                - Separate items using ONLY line breaks
+
+                The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
+            match_type = "or"
+
+        # Make the OpenAI API call
+        response = await openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_message}],
+            temperature=1.0,
+        )
+        
+        # Process suggestions with the determined match_type
+        suggestions_text = response.choices[0].message.content.strip()
+        # Split by newlines and clean each item
+        processed_suggestions = [
+            KeywordSuggestion(word=word.strip().lstrip('-•*').strip(), match_type=match_type) 
+            for word in suggestions_text.split('\n')
+            if word.strip()
+        ]
+        suggestions.extend(processed_suggestions)
         
         return SearchResponse(suggestions=suggestions)
         

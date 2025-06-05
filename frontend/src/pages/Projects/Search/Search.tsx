@@ -6,7 +6,7 @@ import { Toggle } from '@/components'
 import { useSearchBarContext } from '@/components'
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom'
 import { useGetProjectQuery, useGetCollectionsQuery, useAddWordToCollectionMutation, useRemoveWordFromCollectionMutation, useCreateCollectionMutation, useCollectionSearchCache } from '@/hooks'
-import { useSearchWithLoadMore } from '@/hooks/search/useSearchWithLoadMore'
+import { useStreamingSearch } from '@/hooks/search/useStreamingSearch'
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import { toast } from 'react-toastify'
 
@@ -22,7 +22,7 @@ export const Search = () => {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
-  const { results, isLoading: searchLoading, isLoadingMore, error: searchError, loadMore, canLoadMore } = useSearchWithLoadMore(projectId ?? '', searchValue, searchMode)
+  const { suggestions: results, isLoading: searchLoading, isLoadingMore, isComplete, isStreaming, wasStreaming, error: searchError, startSearch, loadMore, canLoadMore } = useStreamingSearch()
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
   const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
   const { addWordToCollection } = useAddWordToCollectionMutation()
@@ -70,6 +70,15 @@ export const Search = () => {
   useEffect(() => {
     lastAttemptedSearch.current = null
   }, [searchValue])
+
+  // Start streaming search when parameters change
+  useEffect(() => {
+    if (projectId && searchValue && searchValue !== lastAttemptedSearch.current) {
+      lastAttemptedSearch.current = searchValue
+      startSearch(projectId, searchValue, searchMode)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, searchValue, searchMode])
 
   // Handle focus parameter from ProjectDetails navigation
   useEffect(() => {
@@ -130,9 +139,11 @@ export const Search = () => {
         return
       }
 
-      // Only create a new collection if one doesn't exist and we haven't already tried
-      if (lastAttemptedSearch.current === searchValue) return
-
+      // Only create a new collection if one doesn't exist and we haven't already tried successfully
+      // If we're already creating a collection or already have one selected, don't create another
+      if (isCreatingCollection || selectedCollectionId) {
+        return
+      }
       lastAttemptedSearch.current = searchValue
       setIsCreatingCollection(true)
 
@@ -237,10 +248,11 @@ export const Search = () => {
     navigate(`/projects/${projectId}/search?focus=true`, { replace: true })
   }, [navigate, projectId])
 
-  const onLoadMore = useCallback(async (excludeWords: string[]) => {
-    if (!canLoadMore) return
-    await loadMore(excludeWords)
-  }, [loadMore, canLoadMore])
+  const onLoadMore = useCallback(async () => {
+    if (projectId && searchValue) {
+      await loadMore(projectId, searchValue, searchMode)
+    }
+  }, [projectId, searchValue, searchMode, loadMore])
 
   // Display information about match types
   const hasMultiplePhrases = searchValue.includes('+')
@@ -277,6 +289,8 @@ export const Search = () => {
               onLoadMore={onLoadMore}
               isLoadingMore={isLoadingMore}
               canLoadMore={canLoadMore}
+              isComplete={isComplete}
+              wasStreaming={wasStreaming}
             />
           )}
         </main>

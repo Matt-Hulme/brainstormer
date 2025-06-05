@@ -13,7 +13,7 @@ from .core.auth import (
     get_current_active_user
 )
 # from .core.rate_limit import rate_limit_middleware, RATE_LIMITS # Commented out
-from .routes import projects, collections, saved_words, search
+from .routes import projects, collections, saved_words, search, search_streaming
 
 settings = get_settings()
 
@@ -72,8 +72,8 @@ async def auth_and_rate_limit_middleware(request: Request, call_next):
     """
     Middleware to handle authentication and rate limiting for all requests.
     """
-    # Skip auth for login endpoint and OPTIONS requests
-    if request.url.path == "/token" or request.method == "OPTIONS":
+    # Skip auth for login endpoint, health check, and OPTIONS requests
+    if request.url.path in ["/token", "/health", "/", "/auth/verify"] or request.method == "OPTIONS":
         return await call_next(request)
         
     # Verify auth and get anonymous ID
@@ -103,10 +103,24 @@ app.include_router(projects.router, prefix=settings.API_V1_STR)
 app.include_router(collections.router, prefix=settings.API_V1_STR)
 app.include_router(saved_words.router, prefix=settings.API_V1_STR)
 app.include_router(search.router, prefix=settings.API_V1_STR)
+app.include_router(search_streaming.router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Brainstormer API"} 
+    return {"message": "Welcome to Brainstormer API"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+@app.get("/auth/verify")
+async def verify_auth(request: Request):
+    """Verify if the current token is valid."""
+    try:
+        user_id = await verify_user_auth(request)
+        return {"valid": True, "user_id": user_id}
+    except HTTPException:
+        return {"valid": False}
 
 for route in app.routes:
     print(route.path, route.methods)

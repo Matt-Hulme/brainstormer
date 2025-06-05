@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+import { Trash } from 'lucide-react'
 import { Collection, Project, SavedWord } from '@/types'
 import { collectionsApi } from '@/services/api/collections'
+import { useDeleteAllProjectsMutation } from '@/hooks'
 import { ProjectCard } from './ProjectCard'
+import { Spinner } from '@/components'
 
 interface ProjectsListContentProps {
   projects: Project[]
@@ -15,6 +18,7 @@ interface EnrichedProject extends Project {
 export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
   const [enrichedProjects, setEnrichedProjects] = useState<EnrichedProject[]>([])
   const [loadingCollections, setLoadingCollections] = useState(true)
+  const deleteAllProjectsMutation = useDeleteAllProjectsMutation()
 
   // Fetch collections for all projects
   useEffect(() => {
@@ -72,6 +76,12 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
     fetchAllCollections()
   }, [projects])
 
+  const onDeleteAllProjects = () => {
+    if (window.confirm('Are you sure you want to delete ALL projects? This action cannot be undone.')) {
+      deleteAllProjectsMutation.mutate()
+    }
+  }
+
   if (loadingCollections) {
     return (
       <div className="flex flex-col gap-[72px] justify-center pt-[70px]">
@@ -88,8 +98,8 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
               Use the search bar above to start a new project
             </span>
           </div>
-          <div className="flex items-center justify-center h-32 text-secondary-2">
-            Loading Projects...
+          <div className="flex items-center justify-center h-32">
+            <Spinner size="lg" />
           </div>
         </div>
       </div>
@@ -123,6 +133,16 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
                 savedWords={project?.savedWords?.map((w: SavedWord) => w.word) ?? []}
               />
             ))}
+          </div>
+          <div className="flex justify-end pr-[30px]">
+            <button
+              onClick={onDeleteAllProjects}
+              className="flex items-center gap-2 px-3 py-1 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+              title="Delete ALL Projects"
+            >
+              <Trash size={16} />
+              <span className="text-p3">Delete all Projects</span>
+            </button>
           </div>
         </div>
       </div>

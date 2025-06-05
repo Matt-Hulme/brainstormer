@@ -45,4 +45,10 @@ export const projectsApi = {
     const response = await api.delete(`${BASE_PATH}/${projectId}`)
     return camelcaseKeys(response.data, { deep: true }) as Project
   },
+
+  // Delete all projects for the current user
+  deleteAll: async () => {
+    const response = await api.delete(`${BASE_PATH}/bulk/all`)
+    return camelcaseKeys(response.data, { deep: true })
+  },
 }

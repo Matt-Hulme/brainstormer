@@ -257,6 +257,32 @@ Key directories and their purposes:
      </div>
      ```
 
+8. **Component-Local CSS Organization**:
+   - Create component-specific CSS files alongside components when needed
+   - Organize components with custom CSS in folders with both the component and CSS file
+   - Use an index.ts file to export both the component and import the CSS
+   - Structure example:
+     ```
+     components/
+       |- SearchResult/
+          |- SearchResult.tsx      // Component implementation
+          |- SearchResult.css      // Component-specific styles and animations
+          |- index.ts              // Exports component and imports CSS
+       |- SimpleComponent.tsx      // Simple components without custom CSS
+     ```
+   - Index file pattern:
+     ```typescript
+     import './SearchResult.css'
+     export { SearchResult } from './SearchResult'
+     ```
+   - Keep keyframes, custom animations, and component-specific styles in local CSS files
+   - Only use global CSS (index.css) for design system utilities and base styles
+   - Benefits:
+     - Better organization and maintainability
+     - Easier to find and modify component-specific styles
+     - Clear separation between global and component styles
+     - Better tree-shaking and code splitting opportunities
+
 ## API Integration
 1. All API configuration in config directory
 2. Use typed API responses

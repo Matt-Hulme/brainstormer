@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { Button, Spinner } from '@/components'
-import { SearchTerm } from './SearchTerm'
+import { SearchResult } from './SearchResult'
 import { KeywordSuggestion } from '@/config/api/types'
 import { toast } from 'react-toastify'
 import { Plus } from 'lucide-react'
@@ -15,9 +15,11 @@ interface SearchContentProps {
   searchMode: 'or' | 'and'
   hasMultiplePhrases: boolean
   error?: boolean
-  onLoadMore?: (excludeWords: string[]) => Promise<void>
+  onLoadMore?: () => Promise<void>
   isLoadingMore?: boolean
   canLoadMore?: boolean
+  isComplete?: boolean
+  wasStreaming?: boolean
 }
 
 export const SearchContent = ({
@@ -32,17 +34,48 @@ export const SearchContent = ({
   error = false,
   onLoadMore,
   isLoadingMore = false,
-  canLoadMore = false
+  canLoadMore = false,
+  isComplete = false,
+  wasStreaming = true
 }: SearchContentProps) => {
-  const onSelectWord = useCallback(async (termId: string) => {
-    // Get the full word/phrase by removing the match type and index
-    const word = termId.split('-').slice(0, -2).join('-')
+  const [initialResultsLength, setInitialResultsLength] = useState(0)
+  const [animationsCompleted, setAnimationsCompleted] = useState(0)
+
+  // Track initial results length when first results arrive
+  useEffect(() => {
+    if (results.length > 0 && initialResultsLength === 0) {
+      setInitialResultsLength(results.length)
+    }
+  }, [results.length, initialResultsLength])
+
+  // Reset counters when search changes
+
+  useEffect(() => {
+    if (results.length === 0) {
+      setInitialResultsLength(0)
+      setAnimationsCompleted(0)
+    }
+  }, [results.length])
+
+  // For cached data, mark all animations as complete immediately
+  useEffect(() => {
+    if (!wasStreaming) {
+      setAnimationsCompleted(results.length)
+    }
+  }, [wasStreaming, results.length])
+
+  const onAnimationComplete = useCallback(() => {
+    setAnimationsCompleted(prev => prev + 1)
+  }, [])
+
+  const onSelectWord = useCallback(async (word: string) => {
     try {
       if (!selectedCollectionId && isCreatingCollection) {
         toast.error('Please wait for collection to be created')
         return
       }
       if (!selectedCollectionId) {
+        toast.error('No collection selected. Create a collection by searching for a topic.')
         return
       }
 
@@ -77,13 +110,29 @@ export const SearchContent = ({
       word.length <= 100 // Reasonable length for keywords
   })
 
-  const handleLoadMore = async () => {
-    if (!onLoadMore || !canLoadMore) return
+  // Show LoadMore button when we have results and can load more
+  const shouldShowLoadMore = validResults.length > 0 && canLoadMore
 
-    const excludeWords = validResults.map(result => result.word)
+  // Button should be enabled when:
+  // 1. Not currently loading more
+  // 2. Initial search is complete 
+  // 3. All current animations are done (for streaming data)
+  const shouldEnableLoadMore = !isLoadingMore && isComplete &&
+    (wasStreaming ? animationsCompleted >= validResults.length : true)
+
+  // Show loading state when:
+  // 1. Currently loading more, OR
+  // 2. New results arrived but animations aren't complete yet
+  const shouldShowLoadingState = isLoadingMore ||
+    (wasStreaming && animationsCompleted < validResults.length && validResults.length > initialResultsLength)
+
+
+
+  const handleLoadMore = async () => {
+    if (!onLoadMore || !canLoadMore || !shouldEnableLoadMore) return
 
     try {
-      await onLoadMore(excludeWords)
+      await onLoadMore()
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -104,14 +153,23 @@ export const SearchContent = ({
       <div className="flex flex-row flex-wrap gap-x-[20px] gap-y-[10px]">
         {validResults.map((result, index) => {
           const termId = `${result.word}-${searchMode}-${index}`
+
+          // For LoadMore results, calculate stagger index relative to when they were added
+          // This prevents huge delays for results loaded later
+          const isLoadMoreResult = index >= initialResultsLength
+          const relativeStaggerIndex = isLoadMoreResult ? (index - initialResultsLength) : index
+
           return (
-            <SearchTerm
+            <SearchResult
               key={termId}
               isActive={isWordInCollection(result.word)}
-              onClick={() => onSelectWord(termId)}
+              onClick={() => onSelectWord(result.word)}
+              onAnimationComplete={onAnimationComplete}
+              skipAnimation={!wasStreaming}
+              staggerIndex={relativeStaggerIndex}
             >
               {result.word}
-            </SearchTerm>
+            </SearchResult>
           )
         })}
       </div>
@@ -127,27 +185,26 @@ export const SearchContent = ({
       )}
 
       {/* Load More button */}
-      {validResults.length > 0 && (canLoadMore || isLoadingMore) && (
+      {shouldShowLoadMore && (
         <div className="flex items-center justify-center mt-6">
-          {isLoadingMore ? (
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-              disabled
-            >
-              <Spinner size="sm" />
-              Loading More...
-            </Button>
-          ) : (
-            <Button
-              onClick={handleLoadMore}
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              <Plus size={16} />
-              Load More
-            </Button>
-          )}
+          <Button
+            onClick={handleLoadMore}
+            variant="outline"
+            className="flex items-center gap-1"
+            disabled={!shouldEnableLoadMore}
+          >
+            {shouldShowLoadingState ? (
+              <>
+                <Spinner size="sm" />
+                Loading More...
+              </>
+            ) : (
+              <>
+                <Plus size={16} />
+                Load More
+              </>
+            )}
+          </Button>
         </div>
       )}
     </div>

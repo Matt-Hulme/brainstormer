@@ -13,16 +13,19 @@ export const HamburgerSidebar = ({ children }: HamburgerSidebarProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Only show hamburger menu on the projects list page, back arrow everywhere else
   const isProjectsListPage = location.pathname === '/projects'
 
   const handleMainButtonClick = () => {
     if (isProjectsListPage) {
-      // Show undeveloped toast for hamburger menu
       showUndevelopedFeatureToast()
     } else {
-      // Always go back in history
-      navigate(-1)
+      const isSearchPage = location.pathname.includes('/search')
+
+      if (isSearchPage) {
+        navigate('/projects')
+      } else {
+        navigate(-1)
+      }
     }
   }
 
