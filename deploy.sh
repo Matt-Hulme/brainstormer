@@ -31,9 +31,9 @@ else
 fi
 
 # Check required environment variables
-if [ -z "$OPENAI_API_KEY" ] || [ -z "$JWT_SECRET" ] || [ -z "$GUEST_PASSWORD" ] || [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+if [ -z "$OPENAI_API_KEY" ] || [ -z "$JWT_SECRET" ] || [ -z "$GUEST_USERNAME" ] || [ -z "$GUEST_PASSWORD" ] || [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
     log "Error: Required environment variables not set"
-    log "Required variables: OPENAI_API_KEY, JWT_SECRET, GUEST_PASSWORD, SUPABASE_URL, SUPABASE_KEY"
+    log "Required variables: OPENAI_API_KEY, JWT_SECRET, GUEST_USERNAME, GUEST_PASSWORD, SUPABASE_URL, SUPABASE_KEY"
     log "Either set them as environment variables or include them in a .env file"
     exit 1
 fi
@@ -128,7 +128,7 @@ SUPABASE_URL=${SUPABASE_URL}
 SUPABASE_KEY=${SUPABASE_KEY}
 OPENAI_API_KEY=${OPENAI_API_KEY}
 JWT_SECRET=${JWT_SECRET}
-GUEST_USERNAME=guest
+GUEST_USERNAME=${GUEST_USERNAME}
 GUEST_PASSWORD=${GUEST_PASSWORD}
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 DEBUG=False
@@ -136,11 +136,19 @@ DEBUG=False
 # Frontend Configuration
 VITE_SUPABASE_URL=${SUPABASE_URL}
 VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY}
-VITE_API_BASE_URL=https://matt-hulme.com/api
+VITE_API_URL=https://matt-hulme.com
 
 # Redis Configuration
 REDIS_HOST=redis
 REDIS_PORT=6379
+EOL
+
+# Create frontend-specific .env file for Docker build
+log "Creating frontend environment file..."
+sudo -u brainstormer cat > frontend/.env << EOL
+VITE_SUPABASE_URL=${SUPABASE_URL}
+VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY}
+VITE_API_URL=https://matt-hulme.com
 EOL
 
 # Secure the .env file
@@ -150,7 +158,7 @@ chown brainstormer:brainstormer .env
 # Create .htpasswd file for basic auth with secure permissions
 log "Setting up basic authentication..."
 mkdir -p docker
-echo -n "guest:" > docker/.htpasswd
+echo -n "${GUEST_USERNAME}:" > docker/.htpasswd
 echo "${GUEST_PASSWORD}" | openssl passwd -apr1 -stdin >> docker/.htpasswd
 chmod 600 docker/.htpasswd
 chown brainstormer:brainstormer docker/.htpasswd
@@ -214,7 +222,7 @@ log "✅ Secure file permissions applied"
 log "✅ SSL certificates configured"
 log ""
 log "🌐 Access your app at: https://matt-hulme.com"
-log "👤 Username: guest"
+log "👤 Username: ${GUEST_USERNAME}"
 log "🔑 Password: (your GUEST_PASSWORD)"
 log ""
 log "📊 Monitor with:"

@@ -76,15 +76,16 @@ SUPABASE_KEY=your-anon-key-here
 
 ## 🔧 Secure Deployment Steps
 
-### Step 1: Upload Files
+### Step 1: Upload Files (from your local machine)
 ```bash
-# Upload your project (including .env) to server
-rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'venv' ./ your-server:/opt/brainstormer/
+# Run this from your LOCAL machine in the brainstormer directory
+# Replace 'your-server' with your actual server (user@ip or hostname)
+rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'venv' ./ [username]vnp-ip:/opt/brainstormer/
 ```
 
-### Step 2: Run Deployment
+### Step 2: SSH and Deploy
 ```bash
-# SSH to your server
+# Now SSH into your server
 ssh your-server
 
 # Navigate to project directory
