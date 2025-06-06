@@ -8,10 +8,11 @@ interface AutoSizeInputProps {
     onKeyDown?: (e: KeyboardEvent) => void
     placeholder?: string
     value: string
+    [key: string]: any // Allow additional props like data attributes
 }
 
 export const AutoSizeInput = forwardRef<HTMLInputElement, AutoSizeInputProps>(
-    ({ className = '', maxLength, onChange, onFocus, onKeyDown, placeholder = '', value }, ref) => {
+    ({ className = '', maxLength, onChange, onFocus, onKeyDown, placeholder = '', value, ...restProps }, ref) => {
         // If there's actual content, measure that. Otherwise use placeholder with minimum fallback
         const measureText = value.length > 0 ? value : placeholder || 'Type here'
 
@@ -35,6 +36,7 @@ export const AutoSizeInput = forwardRef<HTMLInputElement, AutoSizeInputProps>(
                     placeholder={placeholder}
                     type="text"
                     value={value}
+                    {...restProps}
                 />
             </div>
         )

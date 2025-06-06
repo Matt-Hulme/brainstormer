@@ -18,10 +18,11 @@ export const Search = () => {
   const searchValue = searchParams.get('q') ?? ''
   const searchMode = searchParams.get('mode') as 'or' | 'and' ?? 'or'
   const collectionParam = searchParams.get('collection')
-  const focusParam = searchParams.get('focus')
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const lastAttemptedSearch = useRef<string | null>(null)
+  const lastAttemptedSearchMode = useRef<'or' | 'and' | null>(null)
+  const lastSuccessfullyCreatedCollection = useRef<string | null>(null)
   const { suggestions: results, isLoading: searchLoading, isLoadingMore, isComplete, isStreaming, wasStreaming, error: searchError, startSearch, loadMore, canLoadMore } = useStreamingSearch()
   const { project, isLoading: projectLoading } = useGetProjectQuery(projectId ?? '')
   const { collections, loading: collectionsLoading } = useGetCollectionsQuery(projectId ?? '')
@@ -69,30 +70,31 @@ export const Search = () => {
   // Reset last attempted search when search value changes
   useEffect(() => {
     lastAttemptedSearch.current = null
+    lastAttemptedSearchMode.current = null
+    // Reset selected collection when starting a completely new search
+    if (!searchValue) {
+      setSelectedCollectionId(null)
+      lastSuccessfullyCreatedCollection.current = null
+    }
   }, [searchValue])
 
   // Start streaming search when parameters change
   useEffect(() => {
-    if (projectId && searchValue && searchValue !== lastAttemptedSearch.current) {
+    if (projectId && searchValue &&
+      (searchValue !== lastAttemptedSearch.current || searchMode !== lastAttemptedSearchMode.current)) {
       lastAttemptedSearch.current = searchValue
+      lastAttemptedSearchMode.current = searchMode
       startSearch(projectId, searchValue, searchMode)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, searchValue, searchMode])
 
-  // Handle focus parameter from ProjectDetails navigation
-  useEffect(() => {
-    if (focusParam === 'true') {
-      // Clear and focus the search bar
-      clearAndFocusSearchBar()
-      navigate(`/projects/${projectId}/search`, { replace: true })
-    }
-  }, [focusParam, navigate, projectId, clearAndFocusSearchBar])
-
   // Create or select a collection when search is performed
   useEffect(() => {
     const handleSearchCollection = async () => {
       if (!searchValue || !projectId || !project || !collections) return
+
+
 
       // If we have a collection parameter, select that collection directly
       if (collectionParam) {
@@ -140,10 +142,16 @@ export const Search = () => {
       }
 
       // Only create a new collection if one doesn't exist and we haven't already tried successfully
-      // If we're already creating a collection or already have one selected, don't create another
-      if (isCreatingCollection || selectedCollectionId) {
+      // Always allow creation of new collections when searching with different terms
+      if (isCreatingCollection) {
         return
       }
+
+      // Don't create duplicate collections for the same search term
+      if (lastSuccessfullyCreatedCollection.current === searchValue) {
+        return
+      }
+
       lastAttemptedSearch.current = searchValue
       setIsCreatingCollection(true)
 
@@ -165,6 +173,7 @@ export const Search = () => {
         }))
 
         setSelectedCollectionId(collection.id)
+        lastSuccessfullyCreatedCollection.current = searchValue
 
         // Cache the search query for the new collection
         setLastSearch(collection.id, searchValue)
@@ -243,26 +252,32 @@ export const Search = () => {
     navigate(`/projects/${projectId}/search?${newParams.toString()}`)
   }, [navigate, projectId, searchParams])
 
-  const onAddCollection = useCallback(() => {
-    // Clear the search and navigate to a fresh search state to start new collection creation
-    navigate(`/projects/${projectId}/search?focus=true`, { replace: true })
-  }, [navigate, projectId])
-
   const onLoadMore = useCallback(async () => {
     if (projectId && searchValue) {
       await loadMore(projectId, searchValue, searchMode)
     }
   }, [projectId, searchValue, searchMode, loadMore])
 
-  // Display information about match types
-  const hasMultiplePhrases = searchValue.includes('+')
+  const onAddCollection = useCallback(() => {
+    // Reset state to allow new collection creation
+    setSelectedCollectionId(null)
+    lastAttemptedSearch.current = null
+    lastAttemptedSearchMode.current = null
+    lastSuccessfullyCreatedCollection.current = null
+
+    // Clear search bar and focus it for new collection creation
+    clearAndFocusSearchBar()
+  }, [clearAndFocusSearchBar])
+
+  // Display information about match types - check for multiple words
+  const hasMultipleWords = searchValue.includes('+')
 
   return (
     <div className="flex flex-col w-full h-screen">
       <div className="flex flex-row pt-[25px] gap-5 px-[30px]">
         <main className="flex-1 h-full space-y-6">
-          {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
-          {hasMultiplePhrases && searchValue && (
+          {/* Search Mode Toggle - only show for multiple words and when we have search value */}
+          {hasMultipleWords && searchValue && (
             <Toggle
               checked={searchMode === 'and'}
               onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
@@ -284,7 +299,7 @@ export const Search = () => {
               onRemoveWord={handleRemoveWord}
               localActiveWords={localActiveWords}
               searchMode={searchMode}
-              hasMultiplePhrases={hasMultiplePhrases}
+              hasMultiplePhrases={hasMultipleWords}
               error={!!searchError}
               onLoadMore={onLoadMore}
               isLoadingMore={isLoadingMore}

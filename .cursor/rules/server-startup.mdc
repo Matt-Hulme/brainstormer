@@ -1,0 +1,39 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Server Startup Policy
+
+## Core Rule
+**DO NOT start an instance of the frontend or backend servers unless explicitly requested by the user.**
+
+## Guidelines
+1. Never run development servers automatically as part of code analysis, debugging, or general assistance
+2. Do not execute commands like:
+   - `npm run dev` (frontend)
+   - `npm start` (frontend)
+   - `yarn dev` (frontend)
+   - `python -m uvicorn` (backend)
+   - `fastapi dev` (backend)
+   - Any other server startup commands
+
+3. Only start servers when the user specifically asks to:
+   - Run the development server
+   - Start the frontend/backend
+   - Test the application locally
+   - Debug server-related issues
+
+4. When the user does request server startup:
+   - Confirm which server(s) they want started
+   - Use the appropriate command for their environment
+   - Provide clear instructions about how to stop the server
+
+## Rationale
+- Prevents unexpected resource usage
+- Avoids port conflicts
+- Maintains user control over their development environment
+- Ensures servers are only running when actually needed
+
+## Exception
+This rule can be overridden only when the user explicitly requests server startup or when troubleshooting server-specific issues that require the server to be running.

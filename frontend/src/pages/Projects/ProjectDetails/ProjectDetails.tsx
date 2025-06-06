@@ -1,10 +1,11 @@
-import { Fragment, } from 'react'
+import { Fragment, useCallback } from 'react'
 import { X, } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AddCollectionChip } from '@/components'
 import { Button } from '@/components'
 import { useCollectionSearchCache, useDeleteCollectionMutation, useGetCollectionsQuery, useGetProjectQuery, useRemoveWordFromCollectionMutation } from '@/hooks'
 import { ProjectDetailsHeader } from './ProjectDetailsHeader'
+import { toast } from 'react-toastify'
 
 export const ProjectDetails = () => {
   const navigate = useNavigate()
@@ -36,10 +37,15 @@ export const ProjectDetails = () => {
     removeWordFromCollection(word, collectionId)
   }
 
-  const onAddCollection = () => {
-    // Navigate to a blank search page within this project with focus parameter
-    navigate(`/projects/${projectId}/search?focus=true`)
-  }
+  const onAddCollection = useCallback(() => {
+    if (!projectId) {
+      toast.error('No project selected')
+      return
+    }
+
+    // Navigate to search page with empty search to start new collection flow
+    navigate(`/projects/${projectId}/search`)
+  }, [projectId, navigate])
 
   if (projectLoading || collectionsLoading) {
     return (
@@ -104,7 +110,9 @@ export const ProjectDetails = () => {
           </Fragment>
         ))}
         <div>
-          <AddCollectionChip onClick={onAddCollection} />
+          <AddCollectionChip
+            onClick={onAddCollection}
+          />
         </div>
       </main>
     </div>

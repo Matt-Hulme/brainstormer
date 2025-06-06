@@ -3,7 +3,7 @@ import { Check, Edit2, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
 import { AutoSizeInput, Button } from '@/components'
-import { useDeleteCollectionMutation, useUpdateProjectMutation } from '@/hooks'
+import { useDeleteCollectionMutation, useUpdateProjectMutation, useCreateCollectionMutation } from '@/hooks'
 import { Project, Collection } from '@/types'
 
 interface CollectionsSidebarProps {
@@ -25,6 +25,7 @@ export const CollectionsSidebar = ({
 }: CollectionsSidebarProps) => {
   const deleteCollectionMutation = useDeleteCollectionMutation()
   const updateProjectMutation = useUpdateProjectMutation()
+  const { createCollection } = useCreateCollectionMutation()
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
@@ -103,6 +104,13 @@ export const CollectionsSidebar = ({
     }
   }
 
+  const onAddCollectionClick = useCallback(() => {
+    // Clear search bar and focus it for new collection creation
+    if (onAddCollection) {
+      onAddCollection()
+    }
+  }, [onAddCollection])
+
   // Use collections prop, fallback to project collections if not provided
   const collectionsToRender = collections || project?.collections || []
 
@@ -129,7 +137,7 @@ export const CollectionsSidebar = ({
                 <AutoSizeInput
                   ref={inputRef}
                   className="text-h3 text-secondary-4 flex-1 min-w-0 max-w-[212px]"
-                  onChange={(e) => setEditValue(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                   onKeyDown={onKeyDown}
                   value={editValue}
                 />
@@ -208,7 +216,9 @@ export const CollectionsSidebar = ({
           })
         )}
         <div>
-          <AddCollectionChip onClick={onAddCollection} />
+          <AddCollectionChip
+            onClick={onAddCollectionClick}
+          />
         </div>
       </div>
     </div>

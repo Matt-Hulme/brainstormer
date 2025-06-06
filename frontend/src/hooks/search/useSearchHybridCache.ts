@@ -111,22 +111,22 @@ export const useSearchHybridCache = () => {
         searchMode: string
     ): SearchResponse | null => {
         const queryKey = getQueryKey(projectId, query, searchMode)
+        const cacheKey = getSessionCacheKey(projectId, query, searchMode)
 
         // First check React Query cache (in-memory, fastest)
         const reactQueryData = queryClient.getQueryData<SearchResponse>(queryKey)
         if (reactQueryData) {
-            console.log('🚀 Cache HIT: React Query (in-memory)')
+            console.log(`🚀 Cache HIT: React Query (in-memory) - Mode: ${searchMode}, Key: ${cacheKey}`)
             return reactQueryData
         }
 
         // Fall back to sessionStorage
         try {
             const sessionCache = getSessionCache()
-            const cacheKey = getSessionCacheKey(projectId, query, searchMode)
             const sessionEntry = sessionCache[cacheKey]
 
             if (sessionEntry && !isExpired(sessionEntry.timestamp)) {
-                console.log('💾 Cache HIT: SessionStorage')
+                console.log(`💾 Cache HIT: SessionStorage - Mode: ${searchMode}, Key: ${cacheKey}`)
 
                 // Restore to React Query cache for faster future access
                 queryClient.setQueryData(queryKey, sessionEntry.data, {
@@ -139,7 +139,7 @@ export const useSearchHybridCache = () => {
             console.error('Error reading session cache:', error)
         }
 
-        console.log('❌ Cache MISS: No cached data found')
+        console.log(`❌ Cache MISS: No cached data found - Mode: ${searchMode}, Key: ${cacheKey}`)
         return null
     }, [queryClient, getQueryKey, getSessionCacheKey, getSessionCache, isExpired])
 
@@ -150,6 +150,7 @@ export const useSearchHybridCache = () => {
         data: SearchResponse
     ): void => {
         const queryKey = getQueryKey(projectId, query, searchMode)
+        const cacheKey = getSessionCacheKey(projectId, query, searchMode)
         const timestamp = Date.now()
 
         // Set in React Query cache (in-memory)
@@ -160,7 +161,6 @@ export const useSearchHybridCache = () => {
         // Also save to sessionStorage for persistence across page reloads within session
         try {
             const sessionCache = getSessionCache()
-            const cacheKey = getSessionCacheKey(projectId, query, searchMode)
 
             sessionCache[cacheKey] = {
                 data,
@@ -171,11 +171,11 @@ export const useSearchHybridCache = () => {
             // No automatic cleanup - cache indefinitely
 
             setSessionCache(sessionCache)
-            console.log('✅ Cached in both React Query and SessionStorage')
+            console.log(`✅ Cached in both React Query and SessionStorage - Mode: ${searchMode}, Key: ${cacheKey}, Results: ${data.suggestions?.length}`)
         } catch (error) {
             console.error('Error saving to session cache:', error)
         }
-    }, [queryClient, getQueryKey, getSessionCacheKey, getSessionCache, setSessionCache, isExpired])
+    }, [queryClient, getQueryKey, getSessionCacheKey, getSessionCache, setSessionCache])
 
     const clearCache = useCallback((): void => {
         // Clear React Query cache for search queries

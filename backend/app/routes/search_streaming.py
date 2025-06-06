@@ -86,7 +86,7 @@ async def stream_search_results(
                 The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
             match_type = "or"
             
-        else:
+        elif len(phrases) > 1 and search.search_mode == "and":
             # Multiple phrases in AND mode
             all_phrases = " AND ".join([f'"{phrase}"' for phrase in phrases])
             system_message = f"""You are a Focused Brainstormer. Your job is to generate keywords that MUST be strongly related to ALL of the following concepts simultaneously: {all_phrases}.
@@ -103,6 +103,23 @@ async def stream_search_results(
                 
                 The goal is to find the TRUE intersection of these different concepts - words that genuinely relate to ALL of them simultaneously."""
             match_type = "and"
+            
+        else:
+            # Fallback case - default to OR mode for multiple phrases
+            phrases_list = ", ".join([f'"{phrase}"' for phrase in phrases])
+            system_message = f"""You are a Scattershot Brainstormer. Your job is to generate a diverse list of at least 100 keywords related to ANY of these phrases: {phrases_list}.
+                Instructions:
+                - Generate at least 100 words or phrases related to ONE OR MORE of these phrases: {phrases_list}
+                - Each suggestion should clearly relate to at least one of the phrases
+                - Include both single words and multi-word phrases, evenly mixed
+                - The words should not be organized in any particular order
+                - Ensure diversity across different fields: science, medicine, gaming, design, history, etc.
+                - Each item should be on its own line with NO prefix characters (no bullet points, no dashes)
+                - Do not number your list
+                - Separate items using ONLY line breaks
+
+                The goal is to provide a wide range of potential connections to any of these phrases: {phrases_list}."""
+            match_type = "or"
 
         # Get or create session ID
         session_id = search.session_id or str(uuid.uuid4())
