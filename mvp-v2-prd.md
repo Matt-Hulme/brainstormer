@@ -69,7 +69,7 @@ It helps users generate and organize keyword ideas.
 - Create/View Projects
 - View Collections within Projects
 - View Saved Words within Collections
-- Search and keyword suggestions (single-phrase for MVP)
+- Search and keyword suggestions (single-word only, maximum 5 words per search)
 - Painted door features for future ideas
 
 ## Security & Performance
@@ -89,6 +89,10 @@ It helps users generate and organize keyword ideas.
 - [x] Create/rename/delete collections
 - [x] Delete saved words
 - [x] Project page shows all collections grouped
+- [ ] Collection creation works from all 4 entry points
+- [x] Single-word search validation (max 5 words, no spaces)
+- [x] AND search functionality working
+- [x] Project name displayed in Collections Sidebar
 
 ## Walkthrough Updates
 
@@ -112,6 +116,36 @@ Based on cofounder feedback from initial walkthrough, the following improvements
 - [x] **Unique user sessions**: Each admin login now generates a unique anonymous ID, ensuring users on different computers have separate project sets
 
 These updates focus on polish and user experience improvements identified during the walkthrough process.
+
+## Finishing Touches
+
+Critical issues and improvements needed for MVP completion:
+
+### Collection Creation Flow
+- [x] **Fix collection creation logic**: There are 4 ways to create a new collection that now work correctly:
+  1. **From ProjectsList page**: ✅ Initiating a new search creates both a new project and a new collection
+  2. **From Search page**: ✅ Initiating a new search creates a new collection (if search term exists, select that existing collection instead)
+  3. **From Collections Sidebar**: ✅ Clicking 'Add to Collection' now directly creates a new collection with auto-generated name
+  4. **From ProjectDetails page**: ✅ Clicking 'Add to Collection' now directly creates a new collection with auto-generated name
+- [x] **Word association**: All subsequent words selected after any of these 4 methods are associated with the newly created collection
+- [x] **User Experience**: Collections are created immediately with success feedback, and auto-generated names avoid conflicts
+
+### UI/UX Improvements
+- [x] **Project name in Collections Sidebar**: Add project name copy to Collections Sidebar using the same font size as ProjectDetails page, replacing the current 'SAVED WORDS' copy
+
+### Search Functionality
+- [x] **Fix AND functionality**: Fixed toggle visibility to show for multiple words (2+ words) instead of multiple phrases
+- [x] **Single-word search constraints**: Implement single-word only search with the following rules:
+  - Maximum 5 words per search query (increased from current limit)
+  - Only single words allowed (no spaces within words)
+  - Block searches containing spaces within individual words
+  - Allow up to 5 separate single words in one search
+
+### Search Input Validation
+- [x] **Single-word validation**: Reject terms containing spaces with clear error messages
+- [x] **Maximum word limit**: Enforce maximum 5 words per search query
+- [x] **User feedback**: Clear error messages for invalid input with toast notifications and inline validation
+- [x] **Space-to-jump navigation**: Automatically move to next input field when user types a space
 
 ---
 
@@ -138,6 +172,11 @@ These updates focus on polish and user experience improvements identified during
      - Falls back to SessionStorage if not in memory
      - Automatically promotes SessionStorage hits back to React Query for future speed
      - Only hits streaming API when no cache is available
+   - **Search Mode Separation**: ✅ **Cache properly separates AND vs OR search results**
+     - **Independent Caching**: AND and OR search modes are cached separately for the same query
+     - **Mode-Specific Keys**: Cache keys include search mode (`project-query-or` vs `project-query-and`)
+     - **Toggle Behavior**: Switching between AND/OR modes triggers proper cache lookup or new search
+     - **No Animation on Cache**: Cached results appear instantly without animation, fresh results animate in
    - **Privacy-Friendly**: SessionStorage automatically clears when user closes tab (no persistent cross-session storage)
    - **User Experience**:
      - **Cached Results**: Appear instantly without animation delays
