@@ -111,7 +111,7 @@ export const ProjectsListContent = ({ projects }: ProjectsListContentProps) => {
       <header>
         <h1 className="max-w-[724px] text-h1 color-red">
           Welcome back. <br />
-          Time to brainstorm.
+          Time to Explore.
         </h1>
       </header>
       <div className="space-y-[20px]">

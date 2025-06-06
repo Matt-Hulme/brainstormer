@@ -1,9 +1,9 @@
-import { useCallback } from 'react'
-import { X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Check, Edit2, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AddCollectionChip } from '@/components'
-import { Button } from '@/components'
-import { useDeleteCollectionMutation } from '@/hooks'
+import { AutoSizeInput, Button } from '@/components'
+import { useDeleteCollectionMutation, useUpdateProjectMutation } from '@/hooks'
 import { Project, Collection } from '@/types'
 
 interface CollectionsSidebarProps {
@@ -24,6 +24,18 @@ export const CollectionsSidebar = ({
   onAddCollection
 }: CollectionsSidebarProps) => {
   const deleteCollectionMutation = useDeleteCollectionMutation()
+  const updateProjectMutation = useUpdateProjectMutation()
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [isEditing])
 
   const onDeleteCollection = useCallback(async (collectionId: string, collectionName: string) => {
     if (confirm(`Are you sure you want to delete the collection "${collectionName}"?`)) {
@@ -46,6 +58,51 @@ export const CollectionsSidebar = ({
     }
   }, [onRemoveWord])
 
+  const onEditClick = () => {
+    if (!project) return
+    setEditValue(project.name)
+    setIsEditing(true)
+  }
+
+  const onCancelEdit = () => {
+    setIsEditing(false)
+    setEditValue('')
+  }
+
+  const onSaveEdit = async () => {
+    if (!project) return
+
+    if (!editValue.trim()) {
+      toast.error('Project name cannot be empty')
+      return
+    }
+
+    if (editValue.trim() === project.name) {
+      setIsEditing(false)
+      return
+    }
+
+    try {
+      await updateProjectMutation.mutateAsync({
+        projectId: project.id,
+        data: { name: editValue.trim() }
+      })
+      setIsEditing(false)
+      toast.success('Project name updated')
+    } catch (error) {
+      console.error('Error updating project name:', error)
+      toast.error('Failed to update project name')
+    }
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onSaveEdit()
+    } else if (e.key === 'Escape') {
+      onCancelEdit()
+    }
+  }
+
   // Use collections prop, fallback to project collections if not provided
   const collectionsToRender = collections || project?.collections || []
 
@@ -53,7 +110,7 @@ export const CollectionsSidebar = ({
     return (
       <div className="w-[300px] pr-[10px]">
         <div className="flex flex-col gap-[16px] h-full">
-          <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
+          <div className="color-secondary-2 text-h3">Loading...</div>
           <div className="bg-secondary-1/30 h-[1px] w-full" />
           <div className="color-secondary-1 text-p3">Loading...</div>
         </div>
@@ -64,7 +121,48 @@ export const CollectionsSidebar = ({
   return (
     <div className="w-[300px] pr-[10px]">
       <div className="flex flex-col gap-[16px] h-full">
-        <h3 className="color-secondary-2 text-p2">SAVED WORDS</h3>
+        {/* Editable Project Name */}
+        {project && (
+          <div className="flex items-center gap-[8px]">
+            {isEditing ? (
+              <div className="flex items-center gap-[8px] w-full">
+                <AutoSizeInput
+                  ref={inputRef}
+                  className="text-h3 text-secondary-4 flex-1 min-w-0 max-w-[212px]"
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  value={editValue}
+                />
+                <Button
+                  className="color-green-500 flex-shrink-0"
+                  onClick={onSaveEdit}
+                  variant="icon"
+                >
+                  <Check size={16} />
+                </Button>
+                <Button
+                  className="color-secondary-3 flex-shrink-0"
+                  onClick={onCancelEdit}
+                  variant="icon"
+                >
+                  <X size={16} />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-[8px] group">
+                <h3 className="text-h3 color-secondary-4 truncate flex-1 min-w-0 max-w-[247px]">{project.name}</h3>
+                <Button
+                  className="opacity-0 group-hover:opacity-100 transition-opacity color-secondary-3 flex-shrink-0"
+                  onClick={onEditClick}
+                  variant="icon"
+                >
+                  <Edit2 size={16} />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="bg-secondary-1/30 h-[1px] w-full" />
 
         {collectionsToRender?.length === 0 ? (

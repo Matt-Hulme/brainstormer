@@ -69,7 +69,7 @@ It helps users generate and organize keyword ideas.
 - Create/View Projects
 - View Collections within Projects
 - View Saved Words within Collections
-- Search and keyword suggestions (single-phrase for MVP)
+- Search and keyword suggestions (single-word only, maximum 5 words per search)
 - Painted door features for future ideas
 
 ## Security & Performance
@@ -89,6 +89,10 @@ It helps users generate and organize keyword ideas.
 - [x] Create/rename/delete collections
 - [x] Delete saved words
 - [x] Project page shows all collections grouped
+- [ ] Collection creation works from all 4 entry points
+- [ ] Single-word search validation (max 5 words, no spaces)
+- [ ] AND search functionality working
+- [x] Project name displayed in Collections Sidebar
 
 ## Walkthrough Updates
 
@@ -112,6 +116,35 @@ Based on cofounder feedback from initial walkthrough, the following improvements
 - [x] **Unique user sessions**: Each admin login now generates a unique anonymous ID, ensuring users on different computers have separate project sets
 
 These updates focus on polish and user experience improvements identified during the walkthrough process.
+
+## Finishing Touches
+
+Critical issues and improvements needed for MVP completion:
+
+### Collection Creation Flow
+- [ ] **Fix collection creation logic**: There are 4 ways to create a new collection that need to work correctly:
+  1. **From ProjectsList page**: Initiating a new search creates both a new project and a new collection
+  2. **From Search page**: Initiating a new search creates a new collection (if search term exists, select that existing collection instead)
+  3. **From Collections Sidebar**: Clicking 'Add to Collection' triggers new collection creation
+  4. **From ProjectDetails page**: Clicking 'Add to Collection' triggers new collection creation
+- [ ] **Word association**: All subsequent words selected after any of these 4 methods should be associated with the newly created collection
+
+### UI/UX Improvements
+- [x] **Project name in Collections Sidebar**: Add project name copy to Collections Sidebar using the same font size as ProjectDetails page, replacing the current 'SAVED WORDS' copy
+
+### Search Functionality
+- [ ] **Fix AND functionality**: Investigate and resolve issues with AND search functionality
+- [ ] **Single-word search constraints**: Implement single-word only search with the following rules:
+  - Maximum 5 words per search query (increased from current limit)
+  - Only single words allowed (no spaces within words)
+  - Block searches containing spaces within individual words
+  - Allow up to 5 separate single words in one search
+
+### Search Input Validation
+Update search validation logic to enforce:
+- Single-word validation (reject terms containing spaces)
+- Maximum 5 words per search query
+- Clear error messages for invalid input
 
 ---
 

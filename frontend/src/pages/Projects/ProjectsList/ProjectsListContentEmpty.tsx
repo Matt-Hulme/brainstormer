@@ -1,4 +1,4 @@
-// import emptyShapesImage from '../../../assets/home-empty-shapes.png'
+import emptyShapesImage from '../../../assets/home-empty-shapes.png'
 
 export const ProjectsListContentEmpty = () => {
   return (
@@ -7,11 +7,11 @@ export const ProjectsListContentEmpty = () => {
       <p className="pl-[124px] color-secondary-3 text-h4">
         Use the search bar above to start a new project.
       </p>
-      {/* <img
+      <img
         src={emptyShapesImage}
         alt="Empty projects"
         className="absolute bottom-0 pl-[124px] max-h-[460px] w-auto object-contain opacity-75"
-      /> */}
+      />
     </div>
   )
 }
