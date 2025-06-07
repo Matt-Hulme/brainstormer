@@ -101,7 +101,7 @@ export const ProjectCard = ({ id, collections, lastEdited, name, savedWords }: P
               <AutoSizeInput
                 ref={inputRef}
                 className="text-h3 text-secondary-4"
-                onChange={(e) => setEditValue(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                 onKeyDown={onKeyDown}
                 value={editValue}
               />
