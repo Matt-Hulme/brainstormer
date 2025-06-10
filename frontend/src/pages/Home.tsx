@@ -42,7 +42,7 @@ export const Home = () => {
           </header>
           <div className='flex flex-row gap-[45px]'>
             <p className="text-h4 color-secondary-4 max-w-[582px]">
-              Instead of making art or writing for you, Creaitve helps you break out of your
+              Instead of making art or writing for you, this tool helps you break out of your
               creative block so you can create even better—because creativity breeds culture. When
               we lose the ability to be creative, we lose what it means to human.
             </p>

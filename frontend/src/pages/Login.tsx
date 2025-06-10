@@ -56,7 +56,7 @@ export const Login = () => {
         <div className="w-[400px] p-[40px] bg-white rounded-lg shadow-lg">
           <form onSubmit={onSubmit} className="space-y-6">
             <div>
-              <h2 className="text-h3 color-secondary-4 mb-6">Sign in to Brainstormer</h2>
+              <h2 className="text-h3 color-secondary-4 mb-6">Sign in</h2>
               {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               <div className="space-y-4">
                 <div>
