@@ -69,7 +69,7 @@ It helps users generate and organize keyword ideas.
 - Create/View Projects
 - View Collections within Projects
 - View Saved Words within Collections
-- Search and keyword suggestions (single-word only, maximum 5 words per search)
+- Search and keyword suggestions (phrase-based, maximum 3 phrases per search, 3 words per phrase)
 - Painted door features for future ideas
 
 ## Security & Performance
@@ -134,18 +134,18 @@ Critical issues and improvements needed for MVP completion:
 - [x] **Project name in Collections Sidebar**: Add project name copy to Collections Sidebar using the same font size as ProjectDetails page, replacing the current 'SAVED WORDS' copy
 
 ### Search Functionality
-- [x] **Fix AND functionality**: Fixed toggle visibility to show for multiple words (2+ words) instead of multiple phrases
-- [x] **Single-word search constraints**: Implement single-word only search with the following rules:
-  - Maximum 5 words per search query (increased from current limit)
-  - Only single words allowed (no spaces within words)
-  - Block searches containing spaces within individual words
-  - Allow up to 5 separate single words in one search
+- [x] **Fix AND functionality**: Fixed toggle visibility to show for multiple phrases (2+ phrases) instead of multiple words
+- [x] **Phrase-based search constraints**: Implement phrase-based search with the following rules:
+  - Maximum 3 phrases per search query
+  - Maximum 3 words per phrase (allowing 1 space between words within a phrase)
+  - Block phrases containing multiple consecutive spaces
+  - Allow up to 3 separate phrases in one search
 
 ### Search Input Validation
-- [x] **Single-word validation**: Reject terms containing spaces with clear error messages
-- [x] **Maximum word limit**: Enforce maximum 5 words per search query
-- [x] **User feedback**: Clear error messages for invalid input with toast notifications and inline validation
-- [x] **Space-to-jump navigation**: Automatically move to next input field when user types a space
+- [x] **Phrase validation**: Allow phrases with up to 3 words (2 spaces maximum per phrase) with silent input blocking for invalid input
+- [x] **Maximum phrase limit**: Enforce maximum 3 phrases per search query
+- [x] **User feedback**: Silent input blocking without error messages or toast notifications
+- [x] **Remove space-to-jump navigation**: Remove automatic focus movement when user types a space - spaces are now allowed within phrases
 
 ---
 

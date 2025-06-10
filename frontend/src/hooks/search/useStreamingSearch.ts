@@ -56,7 +56,7 @@ export const useStreamingSearch = () => {
                 isComplete: true,
                 error: null,
                 progress: cachedResult.suggestions.length,
-                canLoadMore: cachedResult.suggestions.length >= 80,
+                canLoadMore: true, // Always allow load more for cached results
                 loadMoreCount: 0,
                 sessionId: null,
                 isStreaming: false, // Not currently streaming
@@ -170,7 +170,7 @@ export const useStreamingSearch = () => {
                                             isComplete: true,
                                             isStreaming: false, // Streaming is complete
                                             progress: data.total,
-                                            canLoadMore: data.total >= 80 // Allow load more if we got a decent batch
+                                            canLoadMore: true // Always allow load more after initial search
                                         }
                                     })
                                     break
@@ -306,7 +306,7 @@ export const useStreamingSearch = () => {
                                             ...prev,
                                             isLoadingMore: false,
                                             loadMoreCount: prev.loadMoreCount + 1,
-                                            canLoadMore: data.total >= 50 && prev.loadMoreCount < 4 // Max 5 loads, need decent batch size
+                                            canLoadMore: prev.loadMoreCount < 4 // Max 5 total searches (1 initial + 4 load more)
                                         }
                                     })
                                     break

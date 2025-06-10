@@ -269,15 +269,15 @@ export const Search = () => {
     clearAndFocusSearchBar()
   }, [clearAndFocusSearchBar])
 
-  // Display information about match types - check for multiple words
-  const hasMultipleWords = searchValue.includes('+')
+  // Display information about match types - check for multiple phrases
+  const hasMultiplePhrases = searchValue.includes('+')
 
   return (
     <div className="flex flex-col w-full h-screen">
       <div className="flex flex-row pt-[25px] gap-5 px-[30px]">
         <main className="flex-1 h-full space-y-6">
-          {/* Search Mode Toggle - only show for multiple words and when we have search value */}
-          {hasMultipleWords && searchValue && (
+          {/* Search Mode Toggle - only show for multiple phrases and when we have search value */}
+          {hasMultiplePhrases && searchValue && (
             <Toggle
               checked={searchMode === 'and'}
               onChange={(checked) => setSearchMode(checked ? 'and' : 'or')}
@@ -299,7 +299,7 @@ export const Search = () => {
               onRemoveWord={handleRemoveWord}
               localActiveWords={localActiveWords}
               searchMode={searchMode}
-              hasMultiplePhrases={hasMultipleWords}
+              hasMultiplePhrases={hasMultiplePhrases}
               error={!!searchError}
               onLoadMore={onLoadMore}
               isLoadingMore={isLoadingMore}
