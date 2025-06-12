@@ -1,6 +1,6 @@
 # Brainstormer - Word Association Tool
 
-A creative tool that generates diverse word associations from a single input word. Built with React, Python, and OpenAI.
+A creative tool that generates diverse word associations from a single input word. Built with React, Python, and OpenAI!
 
 ## Project Structure
 
